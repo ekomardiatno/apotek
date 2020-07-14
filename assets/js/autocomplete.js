@@ -2,17 +2,20 @@
   'use strict'
   var timeout = null
   var xhr = new XMLHttpRequest()
-  $.fn.autocomplete = function (apiUrl, params) {
+  $.fn.autocomplete = function (apiUrl, options) {
     return this.each(function () {
       var $this = $(this)
       var wrapper = $this.parent()
+      $this.on('focus',function () {
+        options.onStart()
+      })
       $this.on('keydown', function (e) {
         if(e.which === 13 && wrapper.find('.option-wrapper').length) {
           e.preventDefault()
         }
       })
       $this.on('keyup', function (e) {
-        e.preventDefault
+        options.onTyping($(this).val())
         if(e.which !== 37 && e.which !== 38 && e.which !== 39 && e.which !== 40 && e.which !== 13) {
           var $this = $(this)
           wrapper.find('.option-wrapper').remove()
@@ -28,9 +31,9 @@
               var val = $this.val()
               var formData = new FormData()
               formData.append('queries', val)
-              if(params) {
-                Object.keys(params).map(function (key, i) {
-                  formData.append(key, Object.values(params)[i])
+              if(options.body) {
+                Object.keys(options.body).map(function (key, i) {
+                  formData.append(key, Object.values(options.body)[i])
                 })
               }
               xhr.open('POST', apiUrl, true)
@@ -63,7 +66,7 @@
               }
               xhr.send(formData)
             }
-          }.bind(this), 500)
+          }.bind(this), 300)
         } else if (e.which === 40) {
           if(wrapper.find('.option-wrapper').length) {
             var option = wrapper.find('.option-wrapper').find('button.option')
@@ -105,6 +108,7 @@
       wrapper.on('click', 'button.option', function () {
         $this.val($(this).attr('data-value'))
         wrapper.find('.option-wrapper').remove()
+        options.onSelect($(this).attr('data-value'))
       })
 
       wrapper.on('mouseover', 'button.option', function () {

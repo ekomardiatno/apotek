@@ -39,6 +39,21 @@
       </tr>
     </thead>
     <tbody>
+      <?php $no = 1; ?>
+      <?php foreach($data as $d) : ?>
+        <tr>
+          <td><?= $no; ?></td>
+          <td><?= $d['tanggal'] ?></td>
+          <td><?= $d['nama'] ?></td>
+          <td><?= $d['nik'] ?></td>
+          <td><?= $d['alamat'] ?></td>
+          <td><?= $d['norm'] ?></td>
+          <td><?= strtoupper($d['jenis_kelamin']) ?></td>
+          <td><?= $d['tanggal_kembali'] ?></td>
+          <td>&nbsp;</td>
+        </tr>
+        <?php $no++; ?>
+      <?php endforeach; ?>
     </tbody>
   </table>
 </div>

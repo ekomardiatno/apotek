@@ -14866,7 +14866,7 @@ a.btn-icon-only {
 
 .main-content {
   min-height: 100vh;
-  padding-top: 50px;
+  padding-top: 0;
   padding-bottom: 70px
 }
 
@@ -18407,6 +18407,22 @@ table.dataTable {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.loading.full {
+  position: fixed;
+  z-index: 1000;
+  background-color: rgba(0,0,0,.2);
+}
+
+.loading.full .box {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.loading.full span {
+  color: #2b7cf7;
 }
 
 .loading span {

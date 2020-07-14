@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Waktu pembuatan: 14 Jul 2020 pada 01.38
+-- Waktu pembuatan: 14 Jul 2020 pada 18.34
 -- Versi server: 10.4.11-MariaDB
 -- Versi PHP: 7.4.6
 
@@ -29,7 +29,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `konsul` (
   `id_konsul` int(11) NOT NULL,
-  `tanggal_konsul` date NOT NULL,
+  `tanggal` date NOT NULL,
   `tanggal_kembali` date NOT NULL,
   `nik` varchar(16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -42,10 +42,11 @@ CREATE TABLE `konsul` (
 
 CREATE TABLE `pasien` (
   `nik` varchar(16) NOT NULL,
-  `nama` varchar(100) NOT NULL,
+  `nama` varchar(50) NOT NULL,
   `jenis_kelamin` enum('l','p') NOT NULL,
   `alamat` text NOT NULL,
-  `norm` varchar(50) NOT NULL
+  `norm` varchar(50) NOT NULL,
+  `tanggal_dibuat` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -64,6 +65,16 @@ ALTER TABLE `konsul`
 --
 ALTER TABLE `pasien`
   ADD PRIMARY KEY (`nik`);
+
+--
+-- AUTO_INCREMENT untuk tabel yang dibuang
+--
+
+--
+-- AUTO_INCREMENT untuk tabel `konsul`
+--
+ALTER TABLE `konsul`
+  MODIFY `id_konsul` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
