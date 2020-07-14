@@ -9,9 +9,9 @@
 
   <title><?= $title != '' ? $title . ' | ' . getenv('APP_NAME') : getenv('APP_NAME') ?></title>
   <meta content="<?= $desc; ?>" name="description" />
-  <base href="<?= Web::url('admin') ?>">
+  <base href="<?= Web::url() ?>">
 
-  <!-- <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800" rel="stylesheet"> -->
+  <link href="<?= Web::assets('open-sans.css', 'css') ?>" rel="stylesheet">
   <link rel="stylesheet" href="<?= Web::assets('nucleo.css', 'css') ?>">
   <link rel="stylesheet" href="<?= Web::assets('bootstrap-datepicker.min.css', 'css') ?>">
   <link rel="stylesheet" href="<?= Web::assets('Chart.min.css', 'css') ?>">
@@ -34,6 +34,7 @@
   <script src="<?= Web::assets('flash-message.min.js', 'js') ?>"></script>
   <script src="<?= Web::assets('input-foto.js', 'js') ?>"></script>
   <script src="<?= Web::assets('argon.min.js', 'js') ?>"></script>
+  <script src="<?= Web::assets('autocomplete.js', 'js') ?>"></script>
 
 <body>
   <div class="main-content">

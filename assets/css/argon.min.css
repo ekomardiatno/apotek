@@ -2122,7 +2122,59 @@ textarea.form-control {
 }
 
 .form-group {
-  margin-bottom: 1.5rem
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.form-group .option-wrapper {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, .2);
+  border-radius: 3px;
+  max-height: 212px;
+  overflow-y: auto;
+  z-index: 99;
+}
+
+.form-group .option-wrapper .option {
+  padding: 6px 12px;
+  margin: 5px;
+  background-color: transparent;
+  outline: none;
+  border: 0;
+  flex-direction: row;
+  transition: .1s all ease-in;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-align: left;
+  min-height: min-content;
+}
+
+.form-group .option-wrapper .option.hover {
+  background-color: #2b7cf7;
+  color: #fff;
+  border-radius: 3px;
+  box-shadow: 0 2px 10px 5px rgba(0, 0, 0, .15);
+}
+
+.form-group .load-data {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: .625rem;
+  border-radius: 0 .375rem .375rem 0;
+  background-color: #fff;
+}
+
+.form-group .load-data img {
+  width: 25px;
+  height: 25px;
 }
 
 .form-text {
