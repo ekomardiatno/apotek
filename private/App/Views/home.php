@@ -43,14 +43,39 @@
       <?php foreach($data as $d) : ?>
         <tr>
           <td><?= $no; ?></td>
-          <td><?= $d['tanggal'] ?></td>
+          <td><?= Mod::timepiece($d['tanggal']) ?></td>
           <td><?= $d['nama'] ?></td>
           <td><?= $d['nik'] ?></td>
           <td><?= $d['alamat'] ?></td>
           <td><?= $d['norm'] ?></td>
           <td><?= strtoupper($d['jenis_kelamin']) ?></td>
-          <td><?= $d['tanggal_kembali'] ?></td>
-          <td>&nbsp;</td>
+          <td><?= Mod::timepiece($d['tanggal_kembali']) ?></td>
+          <td>
+            <form id="form-delete-id-<?= $d['id_konsul'] ?>" action="<?= Web::url('konsul.delete') ?>" method="post">
+              <?= Web::key_field() ?>
+              <input type="hidden" name="id_konsul" value="<?= $d['id_konsul'] ?>">
+              <button type="button" class="btn btn-danger btn-sm" onclick="
+                bootbox.confirm({
+                  message: 'Apakah Anda yakin akan menghapus data?',
+                  buttons: {
+                    confirm: {
+                      label: 'Hapus',
+                      className: 'btn-secondary btn-sm'
+                    },
+                    cancel: {
+                      label: 'Batal',
+                      className: 'btn-primary btn-sm'
+                    }
+                  },
+                  callback: function (result) {
+                    if(result) {
+                      $('form#form-delete-id-<?= $d['id_konsul'] ?>').submit()
+                    }
+                  }
+                })
+              ">Hapus</button>
+            </form>
+          </td>
         </tr>
         <?php $no++; ?>
       <?php endforeach; ?>

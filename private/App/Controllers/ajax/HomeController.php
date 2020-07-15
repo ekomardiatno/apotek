@@ -16,8 +16,14 @@ class HomeController extends Controller
 
     public function konsul() {
         $post = $this->request()->post;
-        $sql = "SELECT a.tanggal, b.nik, b.nama, b.alamat, b.jenis_kelamin, b.norm, a.tanggal_kembali FROM konsul a RIGHT JOIN pasien b ON b.nik=a.nik WHERE a.nik='" . $post['nik'] . "' ORDER BY a.tanggal DESC LIMIT 1";
-        $data = $this->db->query($sql, 'ARRAY_ONE');
+        $sql_konsul = "SELECT tanggal, tanggal_kembali FROM konsul WHERE nik='" . $post['nik'] . "' ORDER BY tanggal DESC LIMIT 1";
+        $sql_pasien = "SELECT nik, nama, alamat, jenis_kelamin, norm FROM pasien WHERE nik='" . $post['nik'] . "'";
+        $data_konsul = $this->db->query($sql_konsul, 'ARRAY_ONE');
+        $data_pasien = $this->db->query($sql_pasien, 'ARRAY_ONE');
+        $data = [
+            'konsul' => $data_konsul,
+            'pasien' => $data_pasien
+        ];
         echo json_encode($data);
     }
 }

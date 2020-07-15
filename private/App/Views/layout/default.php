@@ -20,12 +20,13 @@
   <link rel="stylesheet" href="<?= Web::assets('dataTables.bootstrap4.min.css', 'css') ?>">
   <link rel="stylesheet" href="<?= Web::assets('responsive.bootstrap4.min.css', 'css') ?>">
   <link rel="stylesheet" href="<?= Web::assets('argon.min.css', 'css') ?>">
-  <link rel="stylesheet" href="<?= Web::assets('all.min.css', 'css') ?>">
+  <link rel="stylesheet" href="<?= Web::assets('font-awesome.min.css', 'css') ?>">
 
   <script src="<?= Web::assets('jquery.min.js', 'js') ?>"></script>
   <script src="<?= Web::assets('bootstrap.bundle.min.js', 'js') ?>"></script>
   <script src="<?= Web::assets('nouislider.min.js', 'js') ?>"></script>
   <script src="<?= Web::assets('bootstrap-datepicker.min.js', 'js') ?>"></script>
+  <script src="<?= Web::assets('bootstrap-datepicker.id.min.js', 'locales') ?>"></script>
   <script src="<?= Web::assets('bootstrap-notify.min.js', 'js') ?>"></script>
   <script src="<?= Web::assets('jquery.dataTables.min.js', 'js') ?>"></script>
   <script src="<?= Web::assets('dataTables.bootstrap4.min.js', 'js') ?>"></script>
@@ -35,7 +36,56 @@
   <script src="<?= Web::assets('input-foto.js', 'js') ?>"></script>
   <script src="<?= Web::assets('argon.min.js', 'js') ?>"></script>
   <script src="<?= Web::assets('autocomplete.js', 'js') ?>"></script>
+  <script src="<?= Web::assets('bootbox.min.js', 'js') ?>"></script>
+  <script src="<?= Web::assets('bootbox.locales.min.js', 'js') ?>"></script>
+  <script>
+    function dateFormat(date) {
+      let y = parseInt(date.substr(0,4))
+      let m = parseInt(date.substr(5,2))
+      let d = parseInt(date.substr(8,2))
 
+      switch(m) {
+        case 1:
+          m = 'Jan'
+          break;
+        case 2:
+          m = 'Feb'
+          break;
+        case 3:
+          m = 'Mar'
+          break;
+        case 4:
+          m = 'Apr'
+          break;
+        case 5:
+          m = 'Mei'
+          break;
+        case 6:
+          m = 'Jun'
+          break;
+        case 7:
+          m = 'Jul'
+          break;
+        case 8:
+          m = 'Agu'
+          break;
+        case 9:
+          m = 'Sep'
+          break;
+        case 10:
+          m = 'Okt'
+          break;
+        case 11:
+          m = 'Nov'
+          break;
+        case 12:
+          m = 'Des'
+          break;
+      }
+
+      return `${d} ${m} ${y}`
+    }
+  </script>
 <body>
   <div class="main-content">
 
@@ -100,19 +150,21 @@
       </div>
     </div>
 
-    <footer class="footer">
-      <div class="row align-items-center justify-content-lg-between">
-        <div class="col-lg">
-          <div class="copyright text-center text-lg-left mb-1 mb-lg-0">
-            &copy; 2020 <a href="<?= Web::url() ?>" class="font-weight-bold ml-1" target="_blank"><?= getenv('APP_NAME') ?></a>
+    <footer class="footer px-0">
+      <div class="container px-lg-3 px-xl-6">
+        <div class="row align-items-center justify-content-lg-between">
+          <div class="col-sm">
+            <div class="copyright text-center text-sm-left mb-1 mb-sm-0">
+              &copy; 2020 <a href="<?= Web::url() ?>" class="font-weight-bold ml-1" target="_blank"><?= getenv('APP_NAME') ?></a>
+            </div>
+          </div>
+          <div class="col-sm">
+            <div class="copyright text-center text-sm-right">
+              Powered by <span class="font-weight-bold">KOMA-MVC</span>
+            </div>
           </div>
         </div>
-        <div class="col-lg">
-          <div class="copyright text-center text-lg-right">
-            Powered by <span class="font-weight-bold">KOMA-MVC</span>
-          </div>
-        </div>
-      </div>
+      </div>              
     </footer>
   </div>
 
@@ -182,6 +234,7 @@
       let datepicker = $(this).datepicker({
         disableTouchKeyboard: true,
         autoclose: false,
+        language: 'id',
         format: 'dd-mm-yyyy'
       })
       if ($(this).val() === '') {

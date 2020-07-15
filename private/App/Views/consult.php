@@ -49,7 +49,7 @@
 <script>
   $('#nik').autocomplete('<?= Web::url('ajax.home.pasien') ?>', {
     body: {
-      _key: 'aecf4790d1cd03c186f56025cd85275aeW9Md3ZWb2lMTnptMEgrWGd2NkVCT2xZeVR5bzBRL05JRDlmSVdqK3FXYnVHb0FuTkxVQ3RxZ1dGcjhVMTNaR0FFT2RmZDRaZ3lnM0w1Sjk2SXcvdVJZRmluRmdPVlQ5YzdnSXAxaHNmamNpWkhGY01kaXZtYmNuOWt4SW1JclQ='
+      _key: '<?= getenv('APP_KEY') ?>'
     },
     onStart: () => {
       if($('form .card-body').find('.alert')[0] || $('form button[type="submit"]').is(':disabled')) {
@@ -61,6 +61,15 @@
         $('form .card-body').find('.alert')[0].remove()
         $('form button[type="submit"]').prop('disabled', false)
       }
+
+      $('[name="nama"]').val() !== '' &&
+        $('[name="nama"]').val('')
+      $('[name="alamat"]').val() !== '' &&
+        $('[name="alamat"]').val('')
+      $('[name="norm"]').val() !== '' &&
+        $('[name="norm"]').val('')
+      $('[name="jenis_kelamin"]').val() !== '' &&
+        $('[name="jenis_kelamin"]').val('')
     },
     onSelect: (value) => {
       $('body').prepend(
@@ -71,7 +80,7 @@
         '</div>'
       )
       let data = new FormData()
-      data.append('_key', 'aecf4790d1cd03c186f56025cd85275aeW9Md3ZWb2lMTnptMEgrWGd2NkVCT2xZeVR5bzBRL05JRDlmSVdqK3FXYnVHb0FuTkxVQ3RxZ1dGcjhVMTNaR0FFT2RmZDRaZ3lnM0w1Sjk2SXcvdVJZRmluRmdPVlQ5YzdnSXAxaHNmamNpWkhGY01kaXZtYmNuOWt4SW1JclQ=')
+      data.append('_key', '<?= getenv('APP_KEY') ?>')
       data.append('nik', value)
       fetch(`<?= Web::url('ajax.home.konsul') ?>`, {
         method: 'POST',
@@ -79,12 +88,15 @@
       })
         .then(res => res.json())
         .then(res => {
-          if(res !== null) {
-            $('[name="nama"]').val(res.nama)
-            $('[name="alamat"]').val(res.alamat)
-            $('[name="jenis_kelamin"]').val(res.jenis_kelamin)
-            $('[name="norm"]').val(res.norm)
-            let date = new Date(res.tanggal_kembali)
+          console.log(res)
+          if(res.pasien !== null) {
+            $('[name="nama"]').val(res.pasien.nama)
+            $('[name="alamat"]').val(res.pasien.alamat)
+            $('[name="jenis_kelamin"]').val(res.pasien.jenis_kelamin)
+            $('[name="norm"]').val(res.pasien.norm)
+          }
+          if(res.konsul !== null) {
+            let date = new Date(res.konsul.tanggal_kembali)
             date.setHours(0)
             date.setMinutes(0)
             date.setSeconds(0)
@@ -97,7 +109,7 @@
             setTimeout(() => {
               $('body').find('.loading')[0].remove()
               if(diff < 0) {
-                $('form').find('.card .card-body').prepend('<div class="alert alert-danger">Sudah pernah melakukan konsultasi, konsultasi selanjutnya tanggal '+ res.tanggal_kembali +'</div>')
+                $('form').find('.card .card-body').prepend('<div class="alert alert-danger">Sudah pernah melakukan konsultasi, konsultasi selanjutnya tanggal '+ dateFormat(res.konsul.tanggal_kembali) +'</div>')
                 $('form').find('[type="submit"]').prop('disabled', true)
               }
             }, 1000)
@@ -119,10 +131,10 @@
     let y = value.substring(6,10)
     let m = value.substring(3,5)
     let d = value.substring(0,2)
-    let date = new Date(parseInt(y), parseInt(m), parseInt(d))
+    let date = new Date(parseInt(y), parseInt(m) - 1, parseInt(d))
     date = new Date(date.getTime() + (10*24*60*60*1000))
     y = date.getFullYear()
-    m = date.getMonth()
+    m = date.getMonth() + 1
     d = date.getDate()
     m = ('0' + m).slice(-2)
     d = ('0' + d).slice(-2)
