@@ -10,7 +10,7 @@ class AddController extends Controller
                 'add.consult', 'Pendaftaran'
             ]
         ]);
-        $this->_web->view('consult');
+        $this->_web->view('konsul');
     }
 
     public function post()

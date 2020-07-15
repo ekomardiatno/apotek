@@ -8,7 +8,7 @@
     <div class="card-body">
       <div class="form-group">
         <label class="small form-control-label" for="tanggal">Tanggal<span class="text-danger">*</span></label>
-        <input type="text" name="tanggal" required id="tanggal" value="<?= $now ?>" class="form-control form-control-alternative datepicker">
+        <input type="text" name="tanggal" required date-format="dd-mm-yyyy" id="tanggal" value="<?= $now ?>" class="form-control form-control-alternative datepicker">
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="nik">NIK<span class="text-danger">*</span></label>
@@ -36,12 +36,12 @@
       </div>
       <div class="form-group">
         <label for="tanggal_kembali" class="small form-control-label">Tanggal Kembali Konsul<span class="text-danger">*</span></label>
-        <input required type="text" name="tanggal_kembali" id="tanggal_kembali" value='<?= $date ?>' class="datepicker form-control form-control-alternative">
+        <input required date-format="dd-mm-yyyy" type="text" name="tanggal_kembali" id="tanggal_kembali" value='<?= $date ?>' class="datepicker form-control form-control-alternative">
       </div>
     </div>
     <div class="card-footer text-right">
       <button class="btn btn-secondary" type="reset">Reset</button>
-      <button class="btn btn-success" type="submit">Daftarkan</button>
+      <button class="btn btn-success" type="submit">Daftar</button>
     </div>
   </div>
 </form>

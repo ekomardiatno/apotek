@@ -12,7 +12,7 @@
                 <div class="input-group-prepend">
                   <span class="input-group-text" id="basic-addon1"><span class="fas fa-search"></span></span>
                 </div>
-                <input type="text" class="form-control" placeholder="Cari" id="search-datatables">
+                <input type="text" class="form-control form-control-alternative" placeholder="Cari" id="search-datatables">
               </div>
             </div>
           </div>

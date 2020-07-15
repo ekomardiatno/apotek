@@ -86,13 +86,42 @@
       return `${d} ${m} ${y}`
     }
   </script>
+
+  <style>
+    .navi-link ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: row;
+    }
+
+    .navi-link ul li a {
+      color: #fff;
+      padding: .25rem .5rem;
+      font-size: .8175rem;
+      letter-spacing: 1px;
+    }
+  </style>
 <body>
   <div class="main-content">
 
     <div class="header bg-gradient-primary pb-8 pt-5 pt-md-5">
       <div class="container px-lg-3 px-xl-6 mt--5">
-        <div class="py-2">
-          <img height="40" src="<?= Web::assets('brand/white.png', 'images'); ?>"/>
+        <div class="d-flex flex-row align-items-center justify-content-between mx--2">
+          <div class="py-2 mx-2">
+            <img height="40" src="<?= Web::assets('brand/white.png', 'images'); ?>"/>
+          </div>
+          <div class="navi-link ml-2 mr-0">
+            <ul>
+              <li>
+                <a href="<?= Web::url() ?>"><span class="fas fa-home"></span><span class="d-none d-md-inline-block ml-1">Depan</span></a>
+              </li>
+              <li>
+                <a href="<?= Web::url('pasien') ?>"><span class="fas fa-users"></span><span class="d-none d-md-inline-block ml-1">Daftar Pasien</span></a>
+              </li>
+            </ul>
+          </div>
         </div>
         <hr invert-color class="mt-0">
       </div>
@@ -231,11 +260,15 @@
 
   <script>
     $('.datepicker').each(function() {
+      let format = 'yyyy-mm-dd'
+      if($(this).attr('date-format')) {
+        format = $(this).attr('date-format')
+      }
       let datepicker = $(this).datepicker({
         disableTouchKeyboard: true,
         autoclose: false,
         language: 'id',
-        format: 'dd-mm-yyyy'
+        format: format
       })
       if ($(this).val() === '') {
         datepicker.datepicker("setDate", new Date())
