@@ -18,8 +18,8 @@ class KonsulController extends Controller
   {
 
       $post = $this->request()->post;
-      $pasien = $this->model('pasien');
-      $konsul = $this->model('konsul');
+      $pasien = $this->model('Pasien');
+      $konsul = $this->model('Konsul');
       $check_pasien = $pasien->read(
         null,
         [
@@ -112,8 +112,8 @@ class KonsulController extends Controller
   public function perbarui($id) {
 
     $post = $this->request()->post;
-    $pasien = $this->model('pasien');
-    $konsul = $this->model('konsul');
+    $pasien = $this->model('Pasien');
+    $konsul = $this->model('Konsul');
     $check_pasien = $pasien->read(
       null,
       [
