@@ -1,47 +1,61 @@
-<form action="<?= Web::url('konsul.pos') ?>" method="post">
+<form id="form-edit-id-<?= $data['id_konsul'] ?>" action="<?= Web::url('konsul.perbarui.' . $data['id_konsul']) ?>" method="post">
   <?= Web::key_field() ?>
-  <?php
-    $now = date('d-m-Y');
-    $date = date('d-m-Y', strtotime('+10 days', strtotime($now)));
-  ?>
   <div class="card shadow mb-4">
     <div class="card-body">
       <div class="form-group">
         <label class="small form-control-label" for="tanggal">Tanggal<span class="text-danger">*</span></label>
-        <input type="text" name="tanggal" required date-format="dd-mm-yyyy" id="tanggal" value="<?= $now ?>" class="form-control form-control-alternative datepicker">
+        <input type="text" name="tanggal" required date-format="dd-mm-yyyy" id="tanggal" value="<?= substr($data['tanggal'], 8, 2) . '-' . substr($data['tanggal'], 5, 2) . '-' . substr($data['tanggal'], 0, 4) ?>" class="form-control form-control-alternative datepicker">
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="nik">NIK<span class="text-danger">*</span></label>
-        <input type="text" autocomplete="off" maxlength="16" placeholder="Cth: 1402021601950001" required name="nik" id="nik" class="form-control form-control-alternative">
+        <input type="text" value="<?= $data['nik'] ?>" autocomplete="off" maxlength="16" placeholder="Cth: 1402021601950001" required name="nik" id="nik" class="form-control form-control-alternative">
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="nama">Nama<span class="text-danger">*</span></label>
-        <input type="text" autocomplete="off" maxlength="50" placeholder="Cth: Rani Fauziah" required name="nama" id="nama" class="form-control form-control-alternative">
+        <input type="text" autocomplete="off" value="<?= $data['nama'] ?>" maxlength="50" placeholder="Cth: Rani Fauziah" required name="nama" id="nama" class="form-control form-control-alternative">
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="alamat">Alamat</label>
-        <textarea name="alamat" placeholder="Alamat" id="alamat" class="form-control form-control-alternative"></textarea>
+        <textarea name="alamat" placeholder="Alamat" id="alamat" class="form-control form-control-alternative"><?= $data['alamat'] ?></textarea>
       </div>
       <div class="form-group">
-        <label class="small form-control-label" for="norm">No. Rekam Medis<span class="text-danger">*</span></label>
-        <input type="text" maxlength="50" autocomplete="off" required placeholder="Nomor rekam medis" required name="norm" id="norm" class="form-control form-control-alternative">
+        <label class="small form-control-label"for="norm">No. Rekam Medis<span class="text-danger">*</span></label>
+        <input type="text" maxlength="50" autocomplete="off"  required placeholder="Nomor rekam medis" value="<?= $data['norm'] ?>" required name="norm" id="norm" class="form-control form-control-alternative">
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="jenis_kelamin">Jenis Kelamin<span class="text-danger">*</span></label>
         <select name="jenis_kelamin" required id="jenis_kelamin" class="form-control form-control-alternative">
           <option value="">Pilih jenis kelamin</option>
-          <option value="l">Laki-laki</option>
-          <option value="p">Perempuan</option>
+          <option <?= $data['jenis_kelamin'] === 'l' ? 'selected' : '' ?> value="l">Laki-laki</option>
+          <option <?= $data['jenis_kelamin'] === 'p' ? 'selected' : '' ?> value="p">Perempuan</option>
         </select>
       </div>
       <div class="form-group">
         <label for="tanggal_kembali" class="small form-control-label">Tanggal Kembali Konsul<span class="text-danger">*</span></label>
-        <input required date-format="dd-mm-yyyy" type="text" name="tanggal_kembali" id="tanggal_kembali" value='<?= $date ?>' class="datepicker form-control form-control-alternative">
+        <input required date-format="dd-mm-yyyy" type="text" name="tanggal_kembali" id="tanggal_kembali" value='<?= substr($data['tanggal_kembali'], 8, 2) . '-' . substr($data['tanggal_kembali'], 5, 2) . '-' . substr($data['tanggal_kembali'], 0, 4) ?>' class="datepicker form-control form-control-alternative">
       </div>
     </div>
     <div class="card-footer text-right">
-      <button class="btn btn-secondary" type="reset">Reset</button>
-      <button class="btn btn-success" type="submit">Daftar</button>
+      <button type="button" class="btn btn-warning" onclick="
+        bootbox.confirm({
+          message: 'Apakah Anda yakin akan memperbarui data?',
+          buttons: {
+            confirm: {
+              label: 'Perbarui',
+              className: 'btn-warning btn-sm'
+            },
+            cancel: {
+              label: 'Batal',
+              className: 'btn-sencondary btn-sm'
+            }
+          },
+          callback: function (result) {
+            if(result) {
+              $('form#form-edit-id-<?= $data['id_konsul'] ?>').submit()
+            }
+          }
+        })
+      ">Perbarui</button>
     </div>
   </div>
 </form>
@@ -108,16 +122,7 @@
             setTimeout(() => {
               $('body').find('.loading')[0].remove()
               if(diff < 0) {
-                $('form').find('.card .card-body').prepend(
-                  '<div class="alert alert-danger d-flex">'+
-                    '<div class="flex-fill">'+
-                    'Telah melakukan konsultasi pada '+ dateFormat(res.konsul.tanggal) +', konsultasi selanjutnya tanggal:<h3 class="text-white mb-0">'+ dateFormat(res.konsul.tanggal_kembali) +'</h3>'+
-                    '</div>'+
-                    '<div class="ml-3">'+
-                      '<h1 class="fas fa-exclamation-circle text-white"></h1>'+
-                    '</div>'+
-                  '</div>'
-                )
+                $('form').find('.card .card-body').prepend('<div class="alert alert-danger">Telah melakukan konsultasi pada '+ dateFormat(res.konsul.tanggal) +', konsultasi selanjutnya tanggal:<h3 class="text-white mb-0">'+ dateFormat(res.konsul.tanggal_kembali) +'</h3></div>')
                 $('form').find('[type="submit"]').prop('disabled', true)
               }
             }, 1000)

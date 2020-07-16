@@ -31,7 +31,7 @@
         <th scope="col">No. RM</th>
         <th scope="col">L/P</th>
         <th scope="col">Terdaftar pada</th>
-        <th scope="col">&nbsp;</th>
+        <th scope="col">Atur Data</th>
       </tr>
     </thead>
     <tbody>
@@ -41,11 +41,37 @@
           <td><?= $no ?></td>
           <td><?= $d['nik'] ?></td>
           <td><?= $d['nama'] ?></td>
-          <td><?= $d['alamat'] ?></td>
+          <td><?= $d['alamat'] !== '' ? strlen($d['alamat']) > 15 ? substr($d['alamat'], 0, 14) . '...' : $d['alamat'] : '-' ?></td>
           <td><?= $d['norm'] ?></td>
-          <td><?= $d['jenis_kelamin'] ?></td>
+          <td><?= strtoupper($d['jenis_kelamin']) ?></td>
           <td><?= Mod::timepiece($d['tanggal_dibuat']) ?></td>
-          <td>&nbsp;</td>
+          <td>
+            <a href="<?= Web::url('pasien.edit.' . $d['nik']) ?>" class="btn btn-warning btn-sm"><span class="fas fa-edit"></span><span class="d-none d-md-inline-block ml-1">Edit</span></a>
+            <form class="d-inline-block" id="form-delete-id-<?= $d['nik'] ?>" action="<?= Web::url('pasien.hapus') ?>" method="post">
+              <?= Web::key_field() ?>
+              <input type="hidden" name="nik" value="<?= $d['nik'] ?>">
+              <button type="button" class="btn btn-danger btn-sm" onclick="
+                bootbox.confirm({
+                  message: 'Apakah Anda yakin akan menghapus data?',
+                  buttons: {
+                    confirm: {
+                      label: 'Hapus',
+                      className: 'btn-secondary btn-sm'
+                    },
+                    cancel: {
+                      label: 'Batal',
+                      className: 'btn-primary btn-sm'
+                    }
+                  },
+                  callback: function (result) {
+                    if(result) {
+                      $('form#form-delete-id-<?= $d['nik'] ?>').submit()
+                    }
+                  }
+                })
+              "><span class="fas fa-trash-alt"></span><span class="d-none d-md-inline-block ml-1">Hapus</span></button>
+            </form>
+          </td>
         </tr>
         <?php $no++; ?>
       <?php endforeach ?>

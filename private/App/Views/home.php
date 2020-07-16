@@ -17,7 +17,7 @@
             </div>
           </div>
           <div class="mx-1 d-flex">
-            <a href="<?= Web::url('add.consult'); ?>" class="btn btn-sm btn-primary d-flex align-items-center"><span class="fas fa-plus"></span><span class="d-none d-md-inline-block ml-1">Pendaftaran</span></a>
+            <a href="<?= Web::url('konsul.daftar'); ?>" class="btn btn-sm btn-primary d-flex align-items-center"><span class="fas fa-plus"></span><span class="d-none d-md-inline-block ml-1">Pendaftaran</span></a>
           </div>
         </div>
       </div>
@@ -34,8 +34,8 @@
         <th scope="col">Alamat</th>
         <th scope="col">No. RM</th>
         <th scope="col">L/P</th>
-        <th scope="col">Tanggal Kembali Konsul</th>
-        <th scope="col">&nbsp;</th>
+        <th scope="col">Tgl Kmbl.</th>
+        <th scope="col">Atur Data</th>
       </tr>
     </thead>
     <tbody>
@@ -44,14 +44,15 @@
         <tr>
           <td><?= $no; ?></td>
           <td><?= Mod::timepiece($d['tanggal']) ?></td>
-          <td><?= $d['nama'] ?></td>
-          <td><?= $d['nik'] ?></td>
-          <td><?= $d['alamat'] ?></td>
-          <td><?= $d['norm'] ?></td>
-          <td><?= strtoupper($d['jenis_kelamin']) ?></td>
+          <td><?= $d['nama'] !== NULL ? $d['nama'] : '-' ?></td>
+          <td><?= $d['nik'] !== NULL ? $d['nik'] : '-' ?></td>
+          <td><?= $d['alamat'] !== NULL || $d['alamat'] !== '' ? strlen($d['alamat']) > 15 ? substr($d['alamat'], 0, 14) . '...' : $d['alamat'] : '-' ?></td>
+          <td><?= $d['norm'] !== NULL ? $d['norm'] : '-' ?></td>
+          <td><?= $d['jenis_kelamin'] !== NULL ? strtoupper($d['jenis_kelamin']) : '-' ?></td>
           <td><?= Mod::timepiece($d['tanggal_kembali']) ?></td>
           <td>
-            <form id="form-delete-id-<?= $d['id_konsul'] ?>" action="<?= Web::url('konsul.delete') ?>" method="post">
+            <a href="<?= Web::url('konsul.edit.' . $d['id_konsul']) ?>" class="btn btn-warning btn-sm"><span class="fas fa-edit"></span><span class="d-none d-md-inline-block ml-1">Edit</span></a>
+            <form class="d-inline-block" id="form-delete-id-<?= $d['id_konsul'] ?>" action="<?= Web::url('konsul.hapus') ?>" method="post">
               <?= Web::key_field() ?>
               <input type="hidden" name="id_konsul" value="<?= $d['id_konsul'] ?>">
               <button type="button" class="btn btn-danger btn-sm" onclick="
@@ -73,7 +74,7 @@
                     }
                   }
                 })
-              ">Hapus</button>
+              "><span class="fas fa-trash-alt"></span><span class="d-none d-md-inline-block ml-1">Hapus</span></button>
             </form>
           </td>
         </tr>

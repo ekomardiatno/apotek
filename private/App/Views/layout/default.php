@@ -98,9 +98,14 @@
 
     .navi-link ul li a {
       color: #fff;
-      padding: .25rem .5rem;
-      font-size: .8175rem;
-      letter-spacing: 1px;
+      padding: .25rem 1rem;
+      font-size: .91025rem;
+      font-weight: 300;
+      letter-spacing: 1.5px;
+    }
+
+    .navi-link ul li a.active {
+      color: #fba840;
     }
   </style>
 <body>
@@ -108,17 +113,17 @@
 
     <div class="header bg-gradient-primary pb-8 pt-5 pt-md-5">
       <div class="container px-lg-3 px-xl-6 mt--5">
-        <div class="d-flex flex-row align-items-center justify-content-between mx--2">
-          <div class="py-2 mx-2">
+        <div class="d-flex flex-row align-items-center justify-content-between mx--3">
+          <div class="py-2 mx-3">
             <img height="40" src="<?= Web::assets('brand/white.png', 'images'); ?>"/>
           </div>
-          <div class="navi-link ml-2 mr-0">
+          <div class="navi-link ml-3 mr-0">
             <ul>
               <li>
-                <a href="<?= Web::url() ?>"><span class="fas fa-home"></span><span class="d-none d-md-inline-block ml-1">Depan</span></a>
+                <a href="<?= Web::url() ?>"><span class="fas fa-notes-medical"></span><span class="d-none d-md-inline-block ml-2">Konsultasi</span></a>
               </li>
               <li>
-                <a href="<?= Web::url('pasien') ?>"><span class="fas fa-users"></span><span class="d-none d-md-inline-block ml-1">Daftar Pasien</span></a>
+                <a href="<?= Web::url('pasien') ?>"><span class="fas fa-diagnoses"></span><span class="d-none d-md-inline-block ml-2">Pasien</span></a>
               </li>
             </ul>
           </div>
@@ -274,6 +279,18 @@
         datepicker.datepicker("setDate", new Date())
       }
     })
+  </script>
+
+  <script>
+  $('.navi-link li a').each(function () {
+    let href = this.href
+    let url = window.location.href
+    let baseUrl = $('base').attr('href')
+
+    if(url === href) {
+      $(this).addClass('active')
+    }
+  })
   </script>
 
 </body>
