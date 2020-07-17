@@ -47,32 +47,14 @@
 </form>
 
 <script>
-  $('#nik').autocomplete('<?= Web::url('ajax.home.pasien') ?>', {
-    body: {
-      _key: '<?= getenv('APP_KEY') ?>'
-    },
-    onStart: () => {
-      if($('form .card-body').find('.alert')[0] || $('form button[type="submit"]').is(':disabled')) {
-        $('form button[type="reset"]').click()
-      }
-    },
-    onTyping: (text) => {
-      if($('form .card-body').find('.alert')[0] || $('form button[type="submit"]').is(':disabled')) {
-        $('form .card-body').find('.alert')[0].remove()
-        $('form button[type="submit"]').prop('disabled', false)
-      }
+  var timeout
+  function checkingPasien(value) {
 
-      $('[name="nama"]').val() !== '' &&
-        $('[name="nama"]').val('')
-      $('[name="alamat"]').val() !== '' &&
-        $('[name="alamat"]').val('')
-      $('[name="norm"]').val() !== '' &&
-        $('[name="norm"]').val('')
-      $('[name="jenis_kelamin"]').val() !== '' &&
-        $('[name="jenis_kelamin"]').val('')
-    },
-    onSelect: (value) => {
-      $('body').prepend(
+    if($('form .card-body').find('.alert')[0] || $('form button[type="submit"]').is(':disabled')) {
+      $('form .card-body').find('.alert')[0].remove()
+      $('form button[type="submit"]').prop('disabled', false)
+    }
+    $('body').prepend(
         '<div class="loading full">'+
           '<div class="box">'+
             '<span class="fas fa-spinner"></span>'+
@@ -131,6 +113,36 @@
         .catch(err => {
           console.log('Error', err)
         })
+  }
+  $('#nik').autocomplete('<?= Web::url('ajax.home.pasien') ?>', {
+    body: {
+      _key: '<?= getenv('APP_KEY') ?>'
+    },
+    onStart: () => {
+      if($('form .card-body').find('.alert')[0] || $('form button[type="submit"]').is(':disabled')) {
+        $('form button[type="reset"]').click()
+      }
+    },
+    onTyping: (text) => {
+      if($('form .card-body').find('.alert')[0] || $('form button[type="submit"]').is(':disabled')) {
+        $('form .card-body').find('.alert')[0].remove()
+        $('form button[type="submit"]').prop('disabled', false)
+      }
+
+      $('[name="nama"]').val() !== '' &&
+        $('[name="nama"]').val('')
+      $('[name="alamat"]').val() !== '' &&
+        $('[name="alamat"]').val('')
+      $('[name="norm"]').val() !== '' &&
+        $('[name="norm"]').val('')
+      $('[name="jenis_kelamin"]').val() !== '' &&
+        $('[name="jenis_kelamin"]').val('')
+    },
+    onSelect: (value) => {
+      clearTimeout(timeout)
+      timeout = setTimeout(() => {
+        checkingPasien(value)
+      }, 0)
     }
 	})
   $('#tanggal').on('change', function () {
@@ -147,6 +159,12 @@
     m = ('0' + m).slice(-2)
     d = ('0' + d).slice(-2)
     $('#tanggal_kembali').val(`${d}-${m}-${y}`)
+    if($('#nik').val() !== '') {
+      clearTimeout(timeout)
+      timeout = setTimeout(() => {
+        checkingPasien($('#nik').val())
+      }, 0)
+    }
   })
   $('form button[type="reset"]').on('click',function () {
     $('form .card-body').find('.alert')[0].remove()
