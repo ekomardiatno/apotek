@@ -55,7 +55,7 @@
             }
           }
         })
-      ">Perbarui</button>
+      ">Simpan</button>
     </div>
   </div>
 </form>

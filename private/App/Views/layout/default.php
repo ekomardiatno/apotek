@@ -99,9 +99,8 @@
     .navi-link ul li a {
       color: #fff;
       padding: .25rem 1rem;
-      font-size: .91025rem;
-      font-weight: 300;
-      letter-spacing: 1.5px;
+      font-size: 1.05rem;
+      font-weight: 500;
     }
 
     .navi-link ul li a.active {
