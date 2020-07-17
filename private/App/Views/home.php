@@ -20,7 +20,7 @@
             <a href="<?= Web::url('konsul.daftar'); ?>" class="btn btn-sm btn-primary d-flex align-items-center"><span class="fas fa-plus"></span><span class="d-none d-md-inline-block ml-1">Pendaftaran</span></a>
           </div>
           <div class="mx-1 d-flex">
-            <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#report">
+            <button type="button" class="btn btn-warning btn-sm mr-0" data-toggle="modal" data-target="#report">
               <span class="fas fa-file-pdf"></span><span class="d-none d-md-inline-block ml-1">Buat Laporan</span>
             </button>
             <!-- Modal -->

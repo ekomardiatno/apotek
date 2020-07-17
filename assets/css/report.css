@@ -1,5 +1,8 @@
 body {
     font-size: 12pt;
+    font-family: Courier;
+    line-height: 1.5;
+    color: black
 }
 
 p,
@@ -8,11 +11,11 @@ h1 {
 }
 
 h1 {
-    margin-bottom: 10pt;
+    margin-bottom: 12pt;
 }
 
 p {
-    margin-bottom: 5pt;
+    margin-bottom: 6pt;
 }
 
 .text-center {
@@ -40,9 +43,9 @@ table tr th {
 }
 
 table thead {
-    background-color: #ddd;
+    background-color: #ccc;
 }
 
 table tbody tr:nth-of-type(even) {
-    background-color: #f5f5f5;
+    background-color: #eee;
 }
