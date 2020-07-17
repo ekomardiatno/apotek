@@ -271,7 +271,7 @@
       }
       let datepicker = $(this).datepicker({
         disableTouchKeyboard: true,
-        autoclose: false,
+        autoclose: true,
         language: 'id',
         format: format
       })
