@@ -17,7 +17,7 @@
             </div>
           </div>
           <div class="mx-1 d-flex">
-            <a href="<?= Web::url('konsul.daftar'); ?>" class="btn btn-sm btn-primary d-flex align-items-center"><span class="fas fa-plus"></span><span class="d-none d-md-inline-block ml-1">Pendaftaran</span></a>
+            <a href="<?= Web::url('konsul.daftar'); ?>" class="btn btn-sm btn-primary d-flex align-items-center"><span class="fas fa-plus-circle"></span><span class="d-none d-md-inline-block ml-1">Pendaftaran</span></a>
           </div>
           <div class="mx-1 d-flex">
             <button type="button" class="btn btn-warning btn-sm mr-0" data-toggle="modal" data-target="#report">
