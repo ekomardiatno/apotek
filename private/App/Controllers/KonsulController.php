@@ -53,6 +53,29 @@ class KonsulController extends Controller
             $this->redirect();
             die;
           }
+      } else {
+        $konsul_check = $konsul->read(['tanggal_kembali', 'tanggal'], [
+          'params' => [
+            [
+              'column' => 'nik',
+              'value' => $post['nik']
+            ]
+          ],
+          'order_by' => ['id_konsul', 'DESC'],
+          'limit' => [0,1]
+        ], 'ARRAY_ONE');
+        $tanggal1 = date_create($post['tanggal']);
+        $tanggal2 = date_create($konsul_check['tanggal_kembali']);
+        $diff = date_diff($tanggal2, $tanggal1);
+        $diff = intval($diff->format("%R%a"));
+        if($diff < 0) {
+          $konsul_check['tanggal'] = Mod::timepiece($konsul_check['tanggal']);
+          $konsul_check['tanggal_kembali'] = Mod::timepiece($konsul_check['tanggal_kembali']);
+          $msg = "Telah melakukan konsultasi pada $konsul_check[tanggal], konsultasi selanjutnya tanggal: $konsul_check[tanggal_kembali]";
+          Flasher::setFlash($msg, 'danger', 'ni ni-fat-remove');
+          $this->redirect('konsul.daftar');
+          die;
+        }
       }
 
       if (
