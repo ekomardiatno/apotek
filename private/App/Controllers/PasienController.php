@@ -2,6 +2,7 @@
 
 class PasienController extends Controller {
   public function index() {
+    $this->role(['konsul', 'farma']);
     $this->_web->title('Pasien');
     $this->_web->breadcrumb([
         [
@@ -19,6 +20,7 @@ class PasienController extends Controller {
   }
 
   public function hapus() {
+    $this->role(['konsul']);
     $post = $this->request()->post;
     $pasien = $this->model('Pasien');
     $delete = $pasien->delete(
@@ -42,6 +44,7 @@ class PasienController extends Controller {
   }
 
   public function edit($id) {
+    $this->role(['konsul']);
     $pasien = $this->model('Pasien');
     $data = $pasien->read(
       ['nik', 'nama', 'alamat', 'jenis_kelamin', 'norm'],
@@ -66,6 +69,7 @@ class PasienController extends Controller {
   }
 
   public function perbarui($id) {
+    $this->role(['konsul']);
     $post = $this->request()->post;
     $pasien = $this->model('Pasien');
     $konsul = $this->model('Konsul');

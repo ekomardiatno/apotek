@@ -1,4 +1,4 @@
-<form action="<?= Web::url('admin.profil.update.' . $data['id_users']) ?>" method="POST" id="change-profil">
+<form action="<?= Web::url('profil.update.' . $data['id_user']) ?>" method="POST" id="change-profil">
   <div class="card-group-flex-row card-group-flex-row-md">
     <div class="card bg-secondary shadow mb-3">
       <div class="card-body">
@@ -50,32 +50,35 @@
       </div>
     </div>
   </div>
-  <div class="row">
-    <div class="col-md-12">
-      <div class="card shadow mb-3 bg-secondary">
-        <div class="card-body p-3">
-          <button type="button" class="btn btn-primary btn-sm btn-save" data-toggle="modal" data-target="#modalSimpan">Simpan</button>
-          <!-- Modal -->
-          <div class="modal fade" id="modalSimpan" tabindex="-1" role="dialog" aria-labelledby="labelModalSimpan" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="labelModalSimpan">Peringatan</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body">
-                  <h3 class="m-0 font-weight-bold">Yakin ingin mengubah data?</h3>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                  <button type="submit" class="btn btn-primary">Ubah</button>
-                </div>
+  <div class="card shadow mb-3 bg-secondary">
+    <div class="card-body p-3">
+      <div class="row align-items-center flex-row-reverse">
+      <div class="col-12 col-lg-6">
+        <a href="<?= Web::url('logout') ?>" class="btn btn-danger btn-sm mb-1">Logout</a>
+        <p class="font-italic small text-muted mb-0">Klik untuk keluar</p>
+      </div>
+      <div class="col-12 col-lg-6">
+        <button type="button" class="btn btn-primary btn-sm btn-save mb-1" data-toggle="modal" data-target="#modalSimpan">Simpan</button>
+        <p class="font-italic small text-muted mb-0">Klik untuk menyimpan perubahan</p>
+        <!-- Modal -->
+        <div class="modal fade" id="modalSimpan" tabindex="-1" role="dialog" aria-labelledby="labelModalSimpan" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="labelModalSimpan">Peringatan</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <h3 class="m-0 font-weight-bold">Yakin ingin mengubah data?</h3>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                <button type="submit" class="btn btn-primary">Ubah</button>
               </div>
             </div>
           </div>
-          <button type="reset" class="btn btn-warning btn-sm">Reset</button>
         </div>
       </div>
     </div>

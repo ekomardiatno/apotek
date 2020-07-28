@@ -6,15 +6,15 @@ class ProfilController extends Controller
   public function __construct()
   {
     parent::__construct();
-    $this->role(['admin']);
-    $this->_model = $this->model('Admin');
+    $this->role(['konsul', 'farma']);
+    $this->_model = $this->model('User');
   }
-  public function edit()
+  public function index()
   {
 
     $username = Auth::user('username');
     $data = $this->_model->read(
-      ['id_admin', 'username', 'name', 'email'],
+      ['id_user', 'username', 'name', 'email'],
       [
         'cond' => [
           [
@@ -26,22 +26,22 @@ class ProfilController extends Controller
       'ARRAY_ONE'
     );
 
-    $this->_web->title('Ubah Profil');
+    $this->_web->title(Auth::user('name'));
     $this->_web->breadcrumb([
-      ['admin.profil.edit', 'Ubah profil']
+      ['profil', Auth::user('name')]
     ]);
-    $this->_web->layout('dashboard');
-    $this->_web->view('admin.profil.edit', $data);
+    $this->_web->view('profil', $data);
   }
 
   public function update($id)
   {
-    if ($_POST['attr']['password'] === '') {
-      unset($_POST['attr']['password']);
+    $post = $this->request()->post;
+    if ($post['attr']['password'] === '') {
+      unset($post['attr']['password']);
     } else {
-      $_POST['attr']['password'] = Mod::hash($_POST['attr']['password']);
+      $post['attr']['password'] = Mod::hash($post['attr']['password']);
     }
-    extract($_POST);
+    extract($post);
     $user = $this->_model->read(
       ['password'],
       [
@@ -69,6 +69,6 @@ class ProfilController extends Controller
       Flasher::setFlash('<b>Gagal!</b> Ada kesalahan', 'danger', 'ni ni-fat-remove', 'top', 'center');
     }
 
-    $this->redirect('admin.profil.edit');
+    $this->redirect('profil.edit');
   }
 }

@@ -98,8 +98,8 @@
 
     .navi-link ul li a {
       color: #fff;
-      padding: .25rem 1rem;
-      font-size: 1.05rem;
+      padding: .25rem .5rem;
+      font-size: .95rem;
       font-weight: 500;
     }
 
@@ -112,17 +112,20 @@
 
     <div class="header bg-gradient-primary pb-8 pt-5 pt-md-5">
       <div class="container px-lg-3 px-xl-6 mt--5">
-        <div class="d-flex flex-row align-items-center justify-content-between mx--3">
-          <div class="py-2 mx-3">
+        <div class="d-flex flex-row align-items-center justify-content-between mx--2">
+          <div class="py-2 mx-2">
             <img height="40" src="<?= Web::assets('brand/white.png', 'images'); ?>"/>
           </div>
-          <div class="navi-link ml-3 mr-0">
+          <div class="navi-link ml-2 mr-0">
             <ul>
               <li>
                 <a href="<?= Web::url() ?>"><span class="fas fa-notes-medical"></span><span class="d-none d-md-inline-block ml-2">Konsultasi</span></a>
               </li>
               <li>
-                <a href="<?= Web::url('pasien') ?>"><span class="fas fa-diagnoses"></span><span class="d-none d-md-inline-block ml-2">Pasien</span></a>
+                <a href="<?= Web::url('pasien') ?>"><span class="fas fa-user-injured"></span><span class="d-none d-md-inline-block ml-2">Pasien</span></a>
+              </li>
+              <li>
+                <a href="<?= Web::url('profil') ?>"><span class="fas fa-user-cog"></span><span class="d-none d-md-inline-block ml-2"><?= Auth::user('name') ?></span></a>
               </li>
             </ul>
           </div>

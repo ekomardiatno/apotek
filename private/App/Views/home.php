@@ -16,9 +16,11 @@
               </div>
             </div>
           </div>
+          <?php if(Auth::user('role') === 'konsul'): ?>
           <div class="mx-1 d-flex">
             <a href="<?= Web::url('konsul.daftar'); ?>" class="btn btn-sm btn-primary d-flex align-items-center"><span class="fas fa-plus-circle"></span><span class="d-none d-md-inline-block ml-1">Pendaftaran</span></a>
           </div>
+          <?php endif ?>
           <div class="mx-1 d-flex">
             <button type="button" class="btn btn-warning btn-sm mr-0" data-toggle="modal" data-target="#report">
               <span class="fas fa-file-pdf"></span><span class="d-none d-md-inline-block ml-1">Buat Laporan</span>
@@ -70,7 +72,9 @@
         <th scope="col">No. RM</th>
         <th scope="col">L/P</th>
         <th scope="col">Tgl Kmbl.</th>
-        <th scope="col">Atur Data</th>
+        <?php if(Auth::user('role') === 'konsul'): ?>
+          <th scope="col">Atur Data</th>
+        <?php endif ?>
       </tr>
     </thead>
     <tbody>
@@ -85,33 +89,35 @@
           <td><?= $d['norm'] !== NULL ? $d['norm'] : '-' ?></td>
           <td><?= $d['jenis_kelamin'] !== NULL ? strtoupper($d['jenis_kelamin']) : '-' ?></td>
           <td><?= Mod::timepiece($d['tanggal_kembali']) ?></td>
-          <td>
-            <a href="<?= Web::url('konsul.edit.' . $d['id_konsul']) ?>" class="btn btn-warning btn-sm"><span class="fas fa-edit"></span><span class="d-none d-md-inline-block ml-1">Edit</span></a>
-            <form class="d-inline-block" id="form-delete-id-<?= $d['id_konsul'] ?>" action="<?= Web::url('konsul.hapus') ?>" method="post">
-              <?= Web::key_field() ?>
-              <input type="hidden" name="id_konsul" value="<?= $d['id_konsul'] ?>">
-              <button type="button" class="btn btn-danger btn-sm" onclick="
-                bootbox.confirm({
-                  message: 'Apakah Anda yakin akan menghapus data?',
-                  buttons: {
-                    confirm: {
-                      label: 'Hapus',
-                      className: 'btn-secondary btn-sm'
+          <?php if(Auth::user('role') === 'konsul'): ?>
+            <td>
+              <a href="<?= Web::url('konsul.edit.' . $d['id_konsul']) ?>" class="btn btn-warning btn-sm"><span class="fas fa-edit"></span><span class="d-none d-md-inline-block ml-1">Edit</span></a>
+              <form class="d-inline-block" id="form-delete-id-<?= $d['id_konsul'] ?>" action="<?= Web::url('konsul.hapus') ?>" method="post">
+                <?= Web::key_field() ?>
+                <input type="hidden" name="id_konsul" value="<?= $d['id_konsul'] ?>">
+                <button type="button" class="btn btn-danger btn-sm" onclick="
+                  bootbox.confirm({
+                    message: 'Apakah Anda yakin akan menghapus data?',
+                    buttons: {
+                      confirm: {
+                        label: 'Hapus',
+                        className: 'btn-secondary btn-sm'
+                      },
+                      cancel: {
+                        label: 'Batal',
+                        className: 'btn-primary btn-sm'
+                      }
                     },
-                    cancel: {
-                      label: 'Batal',
-                      className: 'btn-primary btn-sm'
+                    callback: function (result) {
+                      if(result) {
+                        $('form#form-delete-id-<?= $d['id_konsul'] ?>').submit()
+                      }
                     }
-                  },
-                  callback: function (result) {
-                    if(result) {
-                      $('form#form-delete-id-<?= $d['id_konsul'] ?>').submit()
-                    }
-                  }
-                })
-              "><span class="fas fa-trash-alt"></span><span class="d-none d-md-inline-block ml-1">Hapus</span></button>
-            </form>
-          </td>
+                  })
+                "><span class="fas fa-trash-alt"></span><span class="d-none d-md-inline-block ml-1">Hapus</span></button>
+              </form>
+            </td>
+          <?php endif ?>
         </tr>
         <?php $no++; ?>
       <?php endforeach; ?>

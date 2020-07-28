@@ -3,6 +3,17 @@
 class KonsulController extends Controller
 {
 
+  public function __construct()
+  {
+    parent::__construct();
+    $this->role(['konsul']);
+  }
+
+  public function index()
+  {
+    $this->redirect('konsul.daftar');
+  }
+
   public function daftar()
   {
       $this->_web->title('Pendaftaran');

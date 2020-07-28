@@ -14,7 +14,7 @@ class LogoutController extends Controller
 
     }
 
-    $this->redirect('admin.login');
+    $this->redirect('login');
 
   }
 
