@@ -47,11 +47,11 @@ class Controller
 
         if ($this->has_login) {
             if (!in_array($_SESSION['auth']['role'], $role)) {
-                $this->redirect('admin');
+                $this->redirect();
             }
         } else {
             Auth::setUrl($url);
-            $this->redirect('admin.login');
+            $this->redirect('login');
         }
     }
 
