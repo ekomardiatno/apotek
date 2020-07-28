@@ -1,0 +1,51 @@
+body {
+    font-size: 12pt;
+    font-family: Courier;
+    line-height: 1.5;
+    color: black
+}
+
+p,
+h1 {
+    margin-top: 0;
+}
+
+h1 {
+    margin-bottom: 12pt;
+}
+
+p {
+    margin-bottom: 6pt;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.border-top-2pt td {
+    border-top-width: 2pt;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table tr td,
+table tr th {
+    border: 1pt solid black;
+    padding: 5pt;
+}
+
+table tr th {
+    border-bottom-width: 2pt;
+    text-transform: uppercase;
+}
+
+table thead {
+    background-color: #ccc;
+}
+
+table tbody tr:nth-of-type(even) {
+    background-color: #eee;
+}

@@ -8,11 +8,11 @@
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="nik">NIK<span class="text-danger">*</span></label>
-        <input type="text" value="<?= $data['nik'] ?>" autocomplete="off" maxlength="16" placeholder="Cth: 1402021601950001" required name="nik" id="nik" class="form-control form-control-alternative">
+        <input type="text" value="<?= $data['nik'] ?>" autocomplete="off" maxlength="16" placeholder="Mis. 1402021601950001" required name="nik" id="nik" class="form-control form-control-alternative">
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="nama">Nama<span class="text-danger">*</span></label>
-        <input type="text" autocomplete="off" value="<?= $data['nama'] ?>" maxlength="50" placeholder="Cth: Rani Fauziah" required name="nama" id="nama" class="form-control form-control-alternative">
+        <input type="text" autocomplete="off" value="<?= $data['nama'] ?>" maxlength="50" placeholder="Mis. Rani Fauziah" required name="nama" id="nama" class="form-control form-control-alternative">
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="alamat">Alamat</label>
@@ -55,38 +55,19 @@
             }
           }
         })
-      ">Perbarui</button>
+      ">Simpan</button>
     </div>
   </div>
 </form>
 
 <script>
-  $('#nik').autocomplete('<?= Web::url('ajax.home.pasien') ?>', {
-    body: {
-      _key: '<?= getenv('APP_KEY') ?>'
-    },
-    onStart: () => {
-      if($('form .card-body').find('.alert')[0] || $('form button[type="submit"]').is(':disabled')) {
-        $('form button[type="reset"]').click()
-      }
-    },
-    onTyping: (text) => {
-      if($('form .card-body').find('.alert')[0] || $('form button[type="submit"]').is(':disabled')) {
-        $('form .card-body').find('.alert')[0].remove()
-        $('form button[type="submit"]').prop('disabled', false)
-      }
-
-      $('[name="nama"]').val() !== '' &&
-        $('[name="nama"]').val('')
-      $('[name="alamat"]').val() !== '' &&
-        $('[name="alamat"]').val('')
-      $('[name="norm"]').val() !== '' &&
-        $('[name="norm"]').val('')
-      $('[name="jenis_kelamin"]').val() !== '' &&
-        $('[name="jenis_kelamin"]').val('')
-    },
-    onSelect: (value) => {
-      $('body').prepend(
+  var timeout
+  function checkingPasien(value) {
+    if($('form .card-body').find('.alert')[0] || $('form button[type="submit"]').is(':disabled')) {
+      $('form .card-body').find('.alert')[0].remove()
+      $('form button[type="submit"]').prop('disabled', false)
+    }
+    $('body').prepend(
         '<div class="loading full">'+
           '<div class="box">'+
             '<span class="fas fa-spinner"></span>'+
@@ -122,7 +103,16 @@
             setTimeout(() => {
               $('body').find('.loading')[0].remove()
               if(diff < 0) {
-                $('form').find('.card .card-body').prepend('<div class="alert alert-danger">Telah melakukan konsultasi pada '+ dateFormat(res.konsul.tanggal) +', konsultasi selanjutnya tanggal:<h3 class="text-white mb-0">'+ dateFormat(res.konsul.tanggal_kembali) +'</h3></div>')
+                $('form').find('.card .card-body').prepend(
+                  '<div class="alert alert-danger d-flex">'+
+                    '<div class="flex-fill">'+
+                    'Telah melakukan konsultasi pada '+ dateFormat(res.konsul.tanggal) +', konsultasi selanjutnya tanggal:<h3 class="text-white mb-0">'+ dateFormat(res.konsul.tanggal_kembali) +'</h3>'+
+                    '</div>'+
+                    '<div class="ml-3">'+
+                      '<h1 class="fas fa-exclamation-circle text-white"></h1>'+
+                    '</div>'+
+                  '</div>'
+                )
                 $('form').find('[type="submit"]').prop('disabled', true)
               }
             }, 1000)
@@ -136,6 +126,36 @@
         .catch(err => {
           console.log('Error', err)
         })
+  }
+  $('#nik').autocomplete('<?= Web::url('ajax.home.pasien') ?>', {
+    body: {
+      _key: '<?= getenv('APP_KEY') ?>'
+    },
+    onStart: () => {
+      if($('form .card-body').find('.alert')[0] || $('form button[type="submit"]').is(':disabled')) {
+        $('form button[type="reset"]').click()
+      }
+    },
+    onTyping: (text) => {
+      if($('form .card-body').find('.alert')[0] || $('form button[type="submit"]').is(':disabled')) {
+        $('form .card-body').find('.alert')[0].remove()
+        $('form button[type="submit"]').prop('disabled', false)
+      }
+
+      $('[name="nama"]').val() !== '' &&
+        $('[name="nama"]').val('')
+      $('[name="alamat"]').val() !== '' &&
+        $('[name="alamat"]').val('')
+      $('[name="norm"]').val() !== '' &&
+        $('[name="norm"]').val('')
+      $('[name="jenis_kelamin"]').val() !== '' &&
+        $('[name="jenis_kelamin"]').val('')
+    },
+    onSelect: (value) => {
+      clearTimeout(timeout)
+      timeout = setTimeout(() => {
+        checkingPasien(value)
+      }, 0)
     }
 	})
   $('#tanggal').on('change', function () {
@@ -152,6 +172,12 @@
     m = ('0' + m).slice(-2)
     d = ('0' + d).slice(-2)
     $('#tanggal_kembali').val(`${d}-${m}-${y}`)
+    if($('#nik').val() !== '') {
+      clearTimeout(timeout)
+      timeout = setTimeout(() => {
+        checkingPasien($('#nik').val())
+      }, 0)
+    }
   })
   $('form button[type="reset"]').on('click',function () {
     $('form .card-body').find('.alert')[0].remove()
