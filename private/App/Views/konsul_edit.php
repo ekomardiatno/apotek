@@ -104,7 +104,7 @@
               $('body').find('.loading')[0].remove()
               if(diff < 0) {
                 $('form').find('.card .card-body').prepend(
-                  '<div class="alert alert-danger d-flex">'+
+                  '<div class="alert alert-warning d-flex">'+
                     '<div class="flex-fill">'+
                     'Telah melakukan konsultasi pada '+ dateFormat(res.konsul.tanggal) +', konsultasi selanjutnya tanggal:<h3 class="text-white mb-0">'+ dateFormat(res.konsul.tanggal_kembali) +'</h3>'+
                     '</div>'+
