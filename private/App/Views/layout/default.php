@@ -115,7 +115,7 @@
 
     <div class="header bg-gradient-primary pb-8 pt-5 pt-md-5">
       <div class="container px-lg-3 px-xl-6 mt--5">
-        <div class="d-flex flex-row align-items-center justify-content-between mx--2">
+        <div class="d-flex flex-row align-items-center justify-content-between mx--2 mb-4 mt-3">
           <div class="py-2 mx-2">
             <img height="40" src="<?= Web::assets('brand/white.png', 'images'); ?>" />
           </div>
@@ -133,7 +133,6 @@
             </ul>
           </div>
         </div>
-        <hr invert-color class="mt-0">
       </div>
     </div>
 
@@ -189,7 +188,7 @@
       </div>
     </div>
 
-    <footer class="footer px-0">
+    <footer class="footer px-0 mt-1">
       <div class="container px-lg-3 px-xl-6">
         <div class="row align-items-center justify-content-lg-between">
           <div class="col-sm">
