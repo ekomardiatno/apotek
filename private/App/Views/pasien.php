@@ -6,7 +6,7 @@
       </div>
       <div class="mx-3">
         <div class="mx--1 d-flex">
-          <select id="length-pasien" style="width:60px" class="form-control form-control-sm form-control-alternative mb-0 mx-1">
+          <select id="length-pasien" style="width:55px" class="form-control form-control-sm form-control-alternative mb-0 mx-1">
             <option value="10">10</option>
             <option value="20">20</option>
             <option value="30">30</option>
