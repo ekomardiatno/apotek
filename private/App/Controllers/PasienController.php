@@ -90,8 +90,8 @@ class PasienController extends Controller
         "norm" => $row['norm'],
         "jenis_kelamin" => $row['jenis_kelamin'] !== NULL ? strtoupper($row['jenis_kelamin']) : '-',
         "tanggal_dibuat" => Mod::timepiece($row['tanggal_dibuat']),
-        "pengaturan" => "<a href='" . Web::url('pasien.edit.' . $row['nik']) . "' class='btn btn-warning btn-sm'><span class='fas fa-edit'></span> Edit</a>"
-          . "<button type='button' class='btn btn-danger btn-sm hapus-data' data-action='" . Web::url('pasien.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . $row['nik'] . "'><span class='fas fa-trash'></span> Hapus</button>"
+        "pengaturan" => "<a href='" . Web::url('pasien.edit.' . $row['nik']) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span> Edit</a>"
+          . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-action='" . Web::url('pasien.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . $row['nik'] . "'><span class='fas fa-trash'></span> Hapus</button>"
       );
       $i++;
     }

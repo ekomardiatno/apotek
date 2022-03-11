@@ -29,7 +29,7 @@
             </div>
           <?php endif ?>
           <div class="mx-1 d-flex">
-            <button type="button" class="btn btn-success btn-sm mr-0" data-toggle="modal" data-target="#report">
+            <button type="button" class="btn btn-gray btn-sm mr-0" data-toggle="modal" data-target="#report">
               <span class="fas fa-file-pdf"></span><span class="d-none d-md-inline-block ml-1">Buat Laporan</span>
             </button>
             <!-- Modal -->
@@ -117,6 +117,7 @@
       order: [
         [1, 'desc']
       ],
+      fixedHeader: true,
       lengthChange: false,
       language: {
         emptyTable: "Data konsultasi tidak tersedia",

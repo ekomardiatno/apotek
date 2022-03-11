@@ -81,6 +81,7 @@
       order: [
         [1, 'asc']
       ],
+      fixedHeader: true,
       lengthChange: false,
       language: {
         emptyTable: "Data pasien tidak tersedia",

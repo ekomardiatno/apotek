@@ -84,8 +84,8 @@ class HomeController extends Controller
                 "norm" => $row['norm'],
                 "jenis_kelamin" => $row['jenis_kelamin'] !== NULL ? strtoupper($row['jenis_kelamin']) : '-',
                 "tanggal_kembali" => Mod::timepiece($row['tanggal_kembali']),
-                "pengaturan" => "<a href='" . Web::url('konsul.edit.' . $row['id_konsul']) . "' class='btn btn-warning btn-sm'><span class='fas fa-edit'></span> Edit</a>"
-                    . "<button type='button' class='btn btn-danger btn-sm hapus-data' data-action='" . Web::url('konsul.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . $row['id_konsul'] . "'><span class='fas fa-trash'></span> Hapus</button>"
+                "pengaturan" => "<a href='" . Web::url('konsul.edit.' . $row['id_konsul']) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span> Edit</a>"
+                    . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-action='" . Web::url('konsul.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . $row['id_konsul'] . "'><span class='fas fa-trash'></span> Hapus</button>"
             );
             $i++;
         }
