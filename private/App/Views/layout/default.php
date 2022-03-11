@@ -40,50 +40,13 @@
   <script src="<?= Web::assets('bootbox.locales.min.js', 'js') ?>"></script>
   <script>
     function dateFormat(date) {
-      let y = parseInt(date.substr(0,4))
-      let m = parseInt(date.substr(5,2))
-      let d = parseInt(date.substr(8,2))
+      let y = parseInt(date.substr(0, 4))
+      let m = parseInt(date.substr(5, 2))
+      let d = parseInt(date.substr(8, 2))
 
-      switch(m) {
-        case 1:
-          m = 'Jan'
-          break;
-        case 2:
-          m = 'Feb'
-          break;
-        case 3:
-          m = 'Mar'
-          break;
-        case 4:
-          m = 'Apr'
-          break;
-        case 5:
-          m = 'Mei'
-          break;
-        case 6:
-          m = 'Jun'
-          break;
-        case 7:
-          m = 'Jul'
-          break;
-        case 8:
-          m = 'Agu'
-          break;
-        case 9:
-          m = 'Sep'
-          break;
-        case 10:
-          m = 'Okt'
-          break;
-        case 11:
-          m = 'Nov'
-          break;
-        case 12:
-          m = 'Des'
-          break;
-      }
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
-      return `${d} ${m} ${y}`
+      return `${d} ${months[m - 1]} ${y}`
     }
   </script>
 
@@ -107,7 +70,50 @@
     .navi-link ul li a.active {
       color: #fba840;
     }
+
+    ul.timeline {
+      list-style-type: none;
+      position: relative;
+      padding-left: 1.25rem;
+    }
+
+    ul.timeline:before {
+      content: ' ';
+      background: #d4d9df;
+      display: inline-block;
+      position: absolute;
+      left: 9px;
+      width: 2px;
+      top: 2px;
+      bottom: 6px;
+      z-index: 400;
+    }
+
+    ul.timeline>li {
+      margin-bottom: 1rem;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    ul.timeline>li:last-child {
+      margin-bottom: 0;
+    }
+
+    ul.timeline>li:before {
+      content: ' ';
+      background: white;
+      display: inline-block;
+      position: absolute;
+      border-radius: 50%;
+      border: 4px solid #2b7cf7;
+      left: -20px;
+      top: 2px;
+      width: 20px;
+      height: 20px;
+      z-index: 400;
+    }
   </style>
+
 <body>
   <div class="main-content">
 
@@ -115,7 +121,7 @@
       <div class="container px-lg-3 px-xl-6 mt--5">
         <div class="d-flex flex-row align-items-center justify-content-between mx--2">
           <div class="py-2 mx-2">
-            <img height="40" src="<?= Web::assets('brand/white.png', 'images'); ?>"/>
+            <img height="40" src="<?= Web::assets('brand/white.png', 'images'); ?>" />
           </div>
           <div class="navi-link ml-2 mr-0">
             <ul>
@@ -141,41 +147,41 @@
           <?php
           if ($breadcrumb !== null || $title !== '') :
           ?>
-          <div class="row align-items-center">
-            <div class="col mb-3">
-              <?php
-              if ($title !== '') :
-              ?>
-                <h6 class="h2 text-white d-inline-block mb-2 mb-lg-0 breadcrumb-title mr-md-3"><?= $title ?></h6>
-              <?php
-              endif
-              ?>
+            <div class="row align-items-center">
+              <div class="col mb-3">
+                <?php
+                if ($title !== '') :
+                ?>
+                  <h6 class="h2 text-white d-inline-block mb-2 mb-lg-0 breadcrumb-title mr-md-3"><?= $title ?></h6>
+                <?php
+                endif
+                ?>
 
-              <?php
-              if ($breadcrumb !== null) :
-              ?>
-              <nav aria-label="breadcrumb" class="d-block d-lg-inline-block">
-                <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
-                  <li class="breadcrumb-item"><a href="<?= Web::url() ?>"><i class="fas fa-home"></i></a></li>
-                  <?php
-                  $breadcrumbLength = count($breadcrumb);
-                  $number = 1;
-                  foreach ($breadcrumb as $b) :
-                  ?>
-                    <li class="breadcrumb-item <?= $breadcrumbLength === $number ? 'active' : '' ?>" <?= $breadcrumbLength === $number ? 'aria-current="page"' : '' ?>>
-                      <?= $breadcrumbLength !== $number ? '<a href="' . Web::url($b[0]) . '">' . $b[1] . '</a>' : $b[1] ?>
-                    </li>
-                  <?php
-                    $number++;
-                  endforeach
-                  ?>
-                </ol>
-              </nav>
-              <?php
-              endif
-              ?>
+                <?php
+                if ($breadcrumb !== null) :
+                ?>
+                  <nav aria-label="breadcrumb" class="d-block d-lg-inline-block">
+                    <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                      <li class="breadcrumb-item"><a href="<?= Web::url() ?>"><i class="fas fa-home"></i></a></li>
+                      <?php
+                      $breadcrumbLength = count($breadcrumb);
+                      $number = 1;
+                      foreach ($breadcrumb as $b) :
+                      ?>
+                        <li class="breadcrumb-item <?= $breadcrumbLength === $number ? 'active' : '' ?>" <?= $breadcrumbLength === $number ? 'aria-current="page"' : '' ?>>
+                          <?= $breadcrumbLength !== $number ? '<a href="' . Web::url($b[0]) . '">' . $b[1] . '</a>' : $b[1] ?>
+                        </li>
+                      <?php
+                        $number++;
+                      endforeach
+                      ?>
+                    </ol>
+                  </nav>
+                <?php
+                endif
+                ?>
+              </div>
             </div>
-          </div>
           <?php
           endif
           ?>
@@ -201,7 +207,7 @@
             </div>
           </div>
         </div>
-      </div>              
+      </div>
     </footer>
   </div>
 
@@ -269,7 +275,7 @@
   <script>
     $('.datepicker').each(function() {
       let format = 'yyyy-mm-dd'
-      if($(this).attr('date-format')) {
+      if ($(this).attr('date-format')) {
         format = $(this).attr('date-format')
       }
       let datepicker = $(this).datepicker({
@@ -285,15 +291,15 @@
   </script>
 
   <script>
-  $('.navi-link li a').each(function () {
-    let href = this.href
-    let url = window.location.href
-    let baseUrl = $('base').attr('href')
+    $('.navi-link li a').each(function() {
+      let href = this.href
+      let url = window.location.href
+      let baseUrl = $('base').attr('href')
 
-    if(url === href) {
-      $(this).addClass('active')
-    }
-  })
+      if (url === href) {
+        $(this).addClass('active')
+      }
+    })
   </script>
 
 </body>

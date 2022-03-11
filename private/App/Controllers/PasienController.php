@@ -1,13 +1,15 @@
 <?php
 
-class PasienController extends Controller {
-  public function index() {
+class PasienController extends Controller
+{
+  public function index()
+  {
     $this->role(['konsul', 'farma']);
     $this->_web->title('Pasien');
     $this->_web->breadcrumb([
-        [
-            'pasien', 'Pasien'
-        ]
+      [
+        'pasien', 'Pasien'
+      ]
     ]);
     $pasien = $this->model('Pasien');
     $data = $pasien->read(
@@ -19,7 +21,8 @@ class PasienController extends Controller {
     $this->_web->view('pasien', $data);
   }
 
-  public function hapus() {
+  public function hapus()
+  {
     $this->role(['konsul']);
     $post = $this->request()->post;
     $pasien = $this->model('Pasien');
@@ -34,7 +37,7 @@ class PasienController extends Controller {
       ]
     );
 
-    if($delete) {
+    if ($delete) {
       Flasher::setFlash('Data telah terhapus.', 'success', 'ni ni-check-bold');
     } else {
       Flasher::setFlash('Ada kesalahan yang tidak diketahui, silakan coba lagi.', 'danger', 'ni ni-fat-remove');
@@ -43,7 +46,8 @@ class PasienController extends Controller {
     $this->redirect('pasien');
   }
 
-  public function edit($id) {
+  public function edit($id)
+  {
     $this->role(['konsul']);
     $pasien = $this->model('Pasien');
     $data = $pasien->read(
@@ -58,7 +62,7 @@ class PasienController extends Controller {
       ],
       'ARRAY_ONE'
     );
-    
+
     $this->_web->title('Edit Pasien');
     $this->_web->breadcrumb([
       [
@@ -68,13 +72,14 @@ class PasienController extends Controller {
     $this->_web->view('pasien_edit', $data);
   }
 
-  public function perbarui($id) {
+  public function perbarui($id)
+  {
     $this->role(['konsul']);
     $post = $this->request()->post;
     $pasien = $this->model('Pasien');
     $konsul = $this->model('Konsul');
-    if($id !== $post['nik']) {
-      if(
+    if ($id !== $post['nik']) {
+      if (
         !$konsul->update(
           [
             'nik' => $post['nik']
@@ -95,7 +100,7 @@ class PasienController extends Controller {
       }
     }
 
-    if(
+    if (
       $pasien->update(
         [
           'nik' => $post['nik'],
@@ -115,7 +120,7 @@ class PasienController extends Controller {
       )
     ) {
       Flasher::setFlash('Data telah diperbarui.', 'success', 'ni ni-check-bold');
-      if($id !== $post['nik']) {
+      if ($id !== $post['nik']) {
         $this->redirect('pasien.edit.' . $post['nik']);
         die;
       }
@@ -123,5 +128,59 @@ class PasienController extends Controller {
       Flasher::setFlash('Ada kesalahan yang tidak diketahui, silakan coba lagi.', 'danger', 'ni ni-fat-remove');
     }
     $this->redirect('pasien.edit.' . $id);
+  }
+
+  public function detail($nik = '')
+  {
+    if (!$nik) Flasher::setFlash('NIK tidak ditemukan', 'danger', 'ni ni-fat-remove');
+    if (!$nik) return $this->redirect('pasien');
+    $pasien_m = $this->model('Pasien');
+    $konsul_m = $this->model('Konsul');
+    $pasien = $pasien_m->read(
+      ['nik', 'nama', 'alamat', 'jenis_kelamin', 'norm'],
+      [
+        'params' => [
+          [
+            'column' => 'nik',
+            'value' => $nik
+          ]
+        ]
+      ],
+      'ARRAY_ONE'
+    );
+    switch ($pasien['jenis_kelamin']) {
+      case 'l':
+        $pasien['jenis_kelamin'] = 'Laki-laki';
+        break;
+      case 'p':
+        $pasien['jenis_kelamin'] = 'Perempuan';
+        break;
+      default:
+        $pasien['jenis_kelamin'] = '-';
+    }
+
+    $konsul = $konsul_m->read(
+      ['tanggal', 'tanggal_kembali'],
+      [
+        'params' => [
+          [
+            'column' => 'nik',
+            'value' => $nik
+          ]
+        ],
+        'order_by' => ['tanggal', 'DESC']
+      ]
+    );
+
+    $this->_web->title('Detail Pasien');
+    $this->_web->breadcrumb([
+      [
+        'pasien.detail', 'Detail Pasien'
+      ]
+    ]);
+    $this->_web->view('pasien_detail', [
+      'pasien' => $pasien,
+      'konsul' => $konsul
+    ]);
   }
 }

@@ -24,6 +24,17 @@ class Database
         }
     }
 
+    public static function getPDOInstance()
+    {
+        $dsn = "mysql:host=" . getenv('DB_HOST') . ";dbname=" . getenv('DB_DATABASE') . ";charset=UTF8";
+        try {
+            $conn = new PDO($dsn, getenv('DB_USERNAME'), getenv('DB_PASSWORD'), [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+            return $conn;
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+    }
+
     public static function getInstance()
     {
 

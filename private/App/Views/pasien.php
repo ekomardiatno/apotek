@@ -40,7 +40,7 @@
         <tr>
           <td><?= $no ?></td>
           <td><?= $d['nik'] ?></td>
-          <td><?= $d['nama'] ?></td>
+          <td><a href="<?= Web::url('pasien.detail.' . $d['nik']) ?>"><?= $d['nama'] !== NULL ? $d['nama'] : '-' ?></a></td>
           <td><?= $d['alamat'] !== '' ? strlen($d['alamat']) > 15 ? substr($d['alamat'], 0, 14) . '...' : $d['alamat'] : '-' ?></td>
           <td><?= $d['norm'] ?></td>
           <td><?= strtoupper($d['jenis_kelamin']) ?></td>

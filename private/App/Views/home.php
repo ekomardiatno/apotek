@@ -28,7 +28,7 @@
             <!-- Modal -->
             <div class="modal fade" id="report" tabindex="-1" role="dialog" aria-labelledby="reportLabel" aria-hidden="true">
               <div class="modal-dialog modal-sm" role="document">
-                <form action="<?= Web::url('print') ?>" method="post">
+                <form action="<?= Web::url('print') ?>" target="_blank" method="post">
                   <div class="modal-content">
                     <div class="modal-header">
                       <h5 class="modal-title" id="reportLabel">Buat Laporan</h5>
@@ -83,7 +83,7 @@
         <tr>
           <td><?= $no; ?></td>
           <td><?= Mod::timepiece($d['tanggal']) ?></td>
-          <td><?= $d['nama'] !== NULL ? $d['nama'] : '-' ?></td>
+          <td><a href="<?= Web::url('pasien.detail.' . $d['nik']) ?>"><?= $d['nama'] !== NULL ? $d['nama'] : '-' ?></a></td>
           <td><?= $d['nik'] !== NULL ? $d['nik'] : '-' ?></td>
           <td><?= $d['alamat'] !== NULL || $d['alamat'] !== '' ? strlen($d['alamat']) > 15 ? substr($d['alamat'], 0, 14) . '...' : $d['alamat'] : '-' ?></td>
           <td><?= $d['norm'] !== NULL ? $d['norm'] : '-' ?></td>
