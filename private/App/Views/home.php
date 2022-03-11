@@ -119,12 +119,12 @@
       ],
       lengthChange: false,
       language: {
-        emptyTable: "Data tidak tersedia",
-        info: "_START_ - _END_ dari _TOTAL_ data",
+        emptyTable: "Data konsultasi tidak tersedia",
+        info: "Total _TOTAL_ konsultasi",
         infoEmpty: "",
         search: "Cari ",
         infoFiltered: "",
-        zeroRecords: "Kata kunci tidak ditemukan",
+        zeroRecords: "Konsultasi tidak ditemukan",
         paginate: {
           first: '<span class="fas fa-angle-double-left"></span>',
           last: '<span class="fas fa-angle-double-right"></span>',
