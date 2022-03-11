@@ -6,20 +6,27 @@
       </div>
       <div class="mx-3">
         <div class="mx--1 d-flex">
-          <div class="mx-1 flex-fill">
-            <div class="form-group mb-0">
+          <select id="length-konsultasi" style="width:60px" class="form-control form-control-sm form-control-alternative mb-0 mx-1">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+            <option value="40">40</option>
+            <option value="50">50</option>
+          </select>
+          <div class="flex-fill">
+            <div class="form-group mb-0 mx-1 flex-fill">
               <div class="input-group input-group-sm input-group-alternative">
                 <div class="input-group-prepend">
                   <span class="input-group-text" id="basic-addon1"><span class="fas fa-search"></span></span>
                 </div>
-                <input type="text" class="form-control form-control-alternative" placeholder="Cari" id="search-datatables">
+                <input type="text" class="form-control form-control-alternative" placeholder="Cari" id="search-konsultasi">
               </div>
             </div>
           </div>
-          <?php if(Auth::user('role') === 'konsul'): ?>
-          <div class="mx-1 d-flex">
-            <a href="<?= Web::url('konsul.daftar'); ?>" class="btn btn-sm btn-primary d-flex align-items-center"><span class="fas fa-plus-circle"></span><span class="d-none d-md-inline-block ml-1">Pendaftaran</span></a>
-          </div>
+          <?php if (Auth::user('role') === 'konsul') : ?>
+            <div class="mx-1 d-flex">
+              <a href="<?= Web::url('konsul.daftar'); ?>" class="btn btn-sm btn-primary d-flex align-items-center"><span class="fas fa-plus-circle"></span><span class="d-none d-md-inline-block ml-1">Pendaftaran</span></a>
+            </div>
           <?php endif ?>
           <div class="mx-1 d-flex">
             <button type="button" class="btn btn-warning btn-sm mr-0" data-toggle="modal" data-target="#report">
@@ -60,67 +67,123 @@
       </div>
     </div>
   </div>
-  <!-- Projects table -->
-  <table class="table datatables align-items-center table-flush">
+
+  <table id='konsultasi-data' class="table align-items-center table-flush" style="width:100%">
     <thead class="thead-light">
       <tr>
-        <th scope="col">No</th>
-        <th scope="col">Tanggal</th>
-        <th scope="col">Nama</th>
-        <th scope="col">NIK</th>
-        <th scope="col">Alamat</th>
-        <th scope="col">No. RM</th>
-        <th scope="col">L/P</th>
-        <th scope="col">Tgl Kmbl.</th>
-        <?php if(Auth::user('role') === 'konsul'): ?>
-          <th scope="col">Atur Data</th>
-        <?php endif ?>
+        <th>#</th>
+        <th>Tanggal</th>
+        <th>Nama</th>
+        <th>L/P</th>
+        <th>Tgl Kmbl</th>
+        <th>Aksi</th>
       </tr>
     </thead>
-    <tbody>
-      <?php $no = 1; ?>
-      <?php foreach($data as $d) : ?>
-        <tr>
-          <td><?= $no; ?></td>
-          <td><?= Mod::timepiece($d['tanggal']) ?></td>
-          <td><a href="<?= Web::url('pasien.detail.' . $d['nik']) ?>"><?= $d['nama'] !== NULL ? $d['nama'] : '-' ?></a></td>
-          <td><?= $d['nik'] !== NULL ? $d['nik'] : '-' ?></td>
-          <td><?= $d['alamat'] !== NULL || $d['alamat'] !== '' ? strlen($d['alamat']) > 15 ? substr($d['alamat'], 0, 14) . '...' : $d['alamat'] : '-' ?></td>
-          <td><?= $d['norm'] !== NULL ? $d['norm'] : '-' ?></td>
-          <td><?= $d['jenis_kelamin'] !== NULL ? strtoupper($d['jenis_kelamin']) : '-' ?></td>
-          <td><?= Mod::timepiece($d['tanggal_kembali']) ?></td>
-          <?php if(Auth::user('role') === 'konsul'): ?>
-            <td>
-              <a href="<?= Web::url('konsul.edit.' . $d['id_konsul']) ?>" class="btn btn-warning btn-sm"><span class="fas fa-edit"></span><span class="d-none d-md-inline-block ml-1">Edit</span></a>
-              <form class="d-inline-block" id="form-delete-id-<?= $d['id_konsul'] ?>" action="<?= Web::url('konsul.hapus') ?>" method="post">
-                <?= Web::key_field() ?>
-                <input type="hidden" name="id_konsul" value="<?= $d['id_konsul'] ?>">
-                <button type="button" class="btn btn-danger btn-sm" onclick="
-                  bootbox.confirm({
-                    message: 'Apakah Anda yakin akan menghapus data?',
-                    buttons: {
-                      confirm: {
-                        label: 'Hapus',
-                        className: 'btn-secondary btn-sm'
-                      },
-                      cancel: {
-                        label: 'Batal',
-                        className: 'btn-primary btn-sm'
-                      }
-                    },
-                    callback: function (result) {
-                      if(result) {
-                        $('form#form-delete-id-<?= $d['id_konsul'] ?>').submit()
-                      }
-                    }
-                  })
-                "><span class="fas fa-trash-alt"></span><span class="d-none d-md-inline-block ml-1">Hapus</span></button>
-              </form>
-            </td>
-          <?php endif ?>
-        </tr>
-        <?php $no++; ?>
-      <?php endforeach; ?>
-    </tbody>
   </table>
+
+  <script>
+    const dataTable = $('#konsultasi-data').DataTable({
+      responsive: true,
+      processing: true,
+      serverSide: true,
+      serverMethod: 'post',
+      ajax: {
+        url: '<?= Web::url('home.fetch') ?>',
+        data: {
+          _key: '<?= getenv('APP_KEY') ?>'
+        }
+      },
+      columns: [{
+          data: 'no',
+          orderable: false
+        },
+        {
+          data: 'tanggal'
+        },
+        {
+          data: 'nama'
+        },
+        {
+          data: 'jenis_kelamin'
+        },
+        {
+          data: 'tanggal_kembali'
+        },
+        {
+          data: 'pengaturan',
+          orderable: false
+        }
+      ],
+      order: [
+        [1, 'desc']
+      ],
+      lengthChange: false,
+      language: {
+        emptyTable: "Data tidak tersedia",
+        info: "_START_ - _END_ dari _TOTAL_ data",
+        infoEmpty: "",
+        search: "Cari ",
+        infoFiltered: "",
+        zeroRecords: "Kata kunci tidak ditemukan",
+        paginate: {
+          first: '<span class="fas fa-angle-double-left"></span>',
+          last: '<span class="fas fa-angle-double-right"></span>',
+          previous: '<span class="fas fa-angle-left"></span>',
+          next: '<span class="fas fa-angle-right"></span>'
+        }
+      }
+    })
+
+    $('#length-konsultasi').on('change', function() {
+      dataTable.page.len(this.value).draw()
+    })
+
+    $('#search-konsultasi').on("keyup", function() {
+      dataTable.search(this.value).draw()
+    })
+
+    $('body').on('click', '.hapus-data', function(e) {
+      bootbox.confirm({
+        message: 'Apakah Anda yakin akan menghapus data?',
+        buttons: {
+          confirm: {
+            label: 'Hapus',
+            className: 'btn-secondary btn-sm'
+          },
+          cancel: {
+            label: 'Batal',
+            className: 'btn-primary btn-sm'
+          }
+        },
+        callback: (result) => {
+          if (result) {
+            const form = document.createElement('form')
+            form.method = 'post'
+            form.action = $(this).data('action')
+            const fields = [{
+                name: '_key',
+                value: $(this).data('key')
+              },
+              {
+                name: 'id_konsul',
+                value: $(this).data('id')
+              }
+            ]
+            for (let i = 0; i < fields.length; i++) {
+              const hiddenField = document.createElement('input')
+              hiddenField.type = 'hidden'
+              hiddenField.name = fields[i].name
+              hiddenField.value = fields[i].value
+
+              form.appendChild(hiddenField)
+            }
+
+            document.body.appendChild(form)
+            form.submit()
+          }
+        }
+      })
+    })
+  </script>
+
 </div>

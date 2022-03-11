@@ -17,8 +17,7 @@
   <link rel="stylesheet" href="<?= Web::assets('Chart.min.css', 'css') ?>">
   <link rel="stylesheet" href="<?= Web::assets('nouislider.min.css', 'css') ?>">
   <link rel="stylesheet" href="<?= Web::assets('animate.min.css', 'css') ?>">
-  <link rel="stylesheet" href="<?= Web::assets('dataTables.bootstrap4.min.css', 'css') ?>">
-  <link rel="stylesheet" href="<?= Web::assets('responsive.bootstrap4.min.css', 'css') ?>">
+  <link rel="stylesheet" href="<?= Web::assets('datatables.min.css', 'css') ?>">
   <link rel="stylesheet" href="<?= Web::assets('argon.min.css', 'css') ?>">
   <link rel="stylesheet" href="<?= Web::assets('font-awesome.min.css', 'css') ?>">
 
@@ -28,10 +27,7 @@
   <script src="<?= Web::assets('bootstrap-datepicker.min.js', 'js') ?>"></script>
   <script src="<?= Web::assets('bootstrap-datepicker.id.min.js', 'locales') ?>"></script>
   <script src="<?= Web::assets('bootstrap-notify.min.js', 'js') ?>"></script>
-  <script src="<?= Web::assets('jquery.dataTables.min.js', 'js') ?>"></script>
-  <script src="<?= Web::assets('dataTables.bootstrap4.min.js', 'js') ?>"></script>
-  <script src="<?= Web::assets('dataTables.responsive.min.js', 'js') ?>"></script>
-  <script src="<?= Web::assets('responsive.bootstrap4.min.js', 'js') ?>"></script>
+  <script src="<?= Web::assets('datatables.min.js', 'js') ?>"></script>
   <script src="<?= Web::assets('flash-message.min.js', 'js') ?>"></script>
   <script src="<?= Web::assets('input-foto.js', 'js') ?>"></script>
   <script src="<?= Web::assets('argon.min.js', 'js') ?>"></script>

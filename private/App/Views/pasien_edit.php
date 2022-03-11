@@ -4,7 +4,7 @@
     <div class="card-body">
       <div class="form-group">
         <label class="small form-control-label" for="nik">NIK<span class="text-danger">*</span></label>
-        <input type="text" value="<?= $data['nik'] ?>" autocomplete="off" maxlength="16" placeholder="Mis. 1402021601950001" required name="nik" id="nik" class="form-control form-control-alternative">
+        <input type="text" value="<?= $data['nik'] ?>" autocomplete="off" maxlength="16" placeholder="Mis. 1234567890987654" required name="nik" id="nik" class="form-control form-control-alternative">
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="nama">Nama<span class="text-danger">*</span></label>

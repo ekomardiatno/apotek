@@ -21,6 +21,92 @@ class PasienController extends Controller
     $this->_web->view('pasien', $data);
   }
 
+  public function fetch()
+  {
+
+    if (empty($_SERVER['HTTP_X_REQUESTED_WITH']) || (empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest')) {
+      echo 'This is only for AJAX request';
+      exit;
+    }
+
+    $pdo = Database::getPDOInstance();
+
+    $post = $this->request()->post;
+
+    $draw = $post['draw'];
+    $row = $post['start'];
+    $rowperpage = $post['length']; // Rows display per page
+    $columnIndex = $post['order'][0]['column']; // Column index
+    $columnName = $post['columns'][$columnIndex]['data']; // Column name
+    $columnSortOrder = $post['order'][0]['dir']; // asc or desc
+    $searchValue = $post['search']['value']; // Search value
+
+    $searchArray = array();
+
+    // Search
+    $searchQuery = " ";
+    if ($searchValue !== '') {
+      $searchQuery = " AND (nik LIKE :nik OR norm LIKE :norm OR nama LIKE :nama) ";
+      $searchArray = array(
+        'nik' => "%$searchValue%",
+        'norm' => "%$searchValue%",
+        'nama' => "%$searchValue%"
+      );
+    }
+
+    // Total number of records without filtering
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM pasien");
+    $stmt->execute();
+    $records = $stmt->fetch();
+    $totalRecords = $records['allcount'];
+
+    // Total number of records with filtering
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM pasien WHERE 1" . $searchQuery);
+    $stmt->execute($searchArray);
+    $records = $stmt->fetch();
+    $totalRecordwithFilter = $records['allcount'];
+
+    // Fetch records
+    $stmt = $pdo->prepare("SELECT nama, nik, norm, jenis_kelamin, tanggal_dibuat FROM pasien WHERE 1" . $searchQuery . " ORDER BY " . $columnName . " " . $columnSortOrder . " LIMIT :limit,:offset");
+
+    // Bind values
+    foreach ($searchArray as $key => $search) {
+      $stmt->bindValue(':' . $key, $search, PDO::PARAM_STR);
+    }
+
+    $stmt->bindValue(':limit', (int)$row, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', (int)$rowperpage, PDO::PARAM_INT);
+    $stmt->execute();
+    $empRecords = $stmt->fetchAll();
+
+    $data = array();
+
+    $i = $row + 1;
+    foreach ($empRecords as $row) {
+      $data[] = array(
+        "no" => $i,
+        "nama" => "<a href='" . Web::url('pasien.detail.' . $row['nik']) . "'>" . ($row['nama'] !== NULL ? $row['nama'] : '-') . "</a>",
+        "nik" => $row['nik'],
+        "norm" => $row['norm'],
+        "jenis_kelamin" => $row['jenis_kelamin'] !== NULL ? strtoupper($row['jenis_kelamin']) : '-',
+        "tanggal_dibuat" => Mod::timepiece($row['tanggal_dibuat']),
+        "pengaturan" => "<a href='" . Web::url('pasien.edit.' . $row['nik']) . "' class='btn btn-warning btn-sm'><span class='fas fa-edit'></span> Edit</a>"
+          . "<button type='button' class='btn btn-danger btn-sm hapus-data' data-action='" . Web::url('pasien.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . $row['nik'] . "'><span class='fas fa-trash'></span> Hapus</button>"
+      );
+      $i++;
+    }
+
+    // Response
+    $response = array(
+      "draw" => intval($draw),
+      "iTotalRecords" => $totalRecords,
+      "iTotalDisplayRecords" => $totalRecordwithFilter,
+      "aaData" => $data
+    );
+
+    echo json_encode($response);
+  }
+
   public function hapus()
   {
     $this->role(['konsul']);
@@ -137,7 +223,7 @@ class PasienController extends Controller
     $pasien_m = $this->model('Pasien');
     $konsul_m = $this->model('Konsul');
     $pasien = $pasien_m->read(
-      ['nik', 'nama', 'alamat', 'jenis_kelamin', 'norm'],
+      ['nik', 'nama', 'alamat', 'jenis_kelamin', 'norm', 'tanggal_dibuat'],
       [
         'params' => [
           [
@@ -148,6 +234,9 @@ class PasienController extends Controller
       ],
       'ARRAY_ONE'
     );
+
+    $pasien['tanggal_dibuat'] = Mod::timepiece($pasien['tanggal_dibuat']);
+
     switch ($pasien['jenis_kelamin']) {
       case 'l':
         $pasien['jenis_kelamin'] = 'Laki-laki';

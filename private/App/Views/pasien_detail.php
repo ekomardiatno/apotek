@@ -12,7 +12,8 @@
           'nama' => 'Nama Pasien',
           'alamat' => 'Alamat Pasien',
           'jenis_kelamin' => 'Jenis Kelamin',
-          'norm' => 'Nomor Rekam Medis'
+          'norm' => 'Nomor Rekam Medis',
+          'tanggal_dibuat' => 'Terdaftar Sejak'
         ];
         foreach ($pasien_keys as $k) :
         ?>
