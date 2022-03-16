@@ -12069,7 +12069,7 @@ a.btn-icon-only {
   border-radius: 0.4375rem;
 }
 .main-content {
-  min-height: 100vh;
+  min-height: calc(100vh - 120px);
   padding-top: 0;
   padding-bottom: 70px;
 }

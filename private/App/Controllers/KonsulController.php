@@ -5,11 +5,13 @@ class KonsulController extends Controller
 
 
   private $db;
+  private $monthShort;
   public function __construct()
   {
     parent::__construct();
     $this->role(['konsul']);
     $this->db = Database::getInstance();
+    $this->monthShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   }
 
   public function index()
@@ -68,20 +70,16 @@ class KonsulController extends Controller
       'NUM_ROWS'
     );
 
-    $post['tanggal'] = substr($post['tanggal'], 6, 4) . '-' . substr($post['tanggal'], 3, 2) . '-' . substr($post['tanggal'], 0, 2);
-    $post['tanggal_kembali'] = substr($post['tanggal_kembali'], 6, 4) . '-' . substr($post['tanggal_kembali'], 3, 2) . '-' . substr($post['tanggal_kembali'], 0, 2);
-
-    if (strtotime($post['tanggal']) > strtotime($post['tanggal_kembali'])) {
-      Flasher::setData($post);
-      return $this->redirect('konsul.daftar');
-    }
+    $post['tanggal'] = substr($post['tanggal'], 7, 4) . '-' . sprintf("%02d", (array_search(substr($post['tanggal'], 3, 3), $this->monthShort) + 1)) . '-' . substr($post['tanggal'], 0, 2);
+    $post['tanggal_kembali'] = substr($post['tanggal_kembali'], 7, 4) . '-' . sprintf("%02d", (array_search(substr($post['tanggal_kembali'], 3, 3), $this->monthShort) + 1)) . '-' . substr($post['tanggal_kembali'], 0, 2);
 
     $start_date = new DateTime($post['tanggal']);
     $end_date = new DateTime($post['tanggal_kembali']);
     $interval = $start_date->diff($end_date);
 
-    if ($interval->days < 10) {
+    if (strtotime($post['tanggal']) > strtotime($post['tanggal_kembali']) || $interval->days < 10) {
       Flasher::setData($post);
+      Flasher::setFlash('Selisih tanggal kurang dari 10 hari.', 'danger', 'ni ni-fat-remove');
       return $this->redirect('konsul.daftar');
     }
 
@@ -201,16 +199,18 @@ class KonsulController extends Controller
       'NUM_ROWS'
     );
 
-    $post['tanggal'] = substr($post['tanggal'], 6, 4) . '-' . substr($post['tanggal'], 3, 2) . '-' . substr($post['tanggal'], 0, 2);
-    $post['tanggal_kembali'] = substr($post['tanggal_kembali'], 6, 4) . '-' . substr($post['tanggal_kembali'], 3, 2) . '-' . substr($post['tanggal_kembali'], 0, 2);
-
-    if (strtotime($post['tanggal']) > strtotime($post['tanggal_kembali'])) return $this->redirect('konsul.edit.' . $id);
+    $post['tanggal'] = substr($post['tanggal'], 7, 4) . '-' . sprintf("%02d", (array_search(substr($post['tanggal'], 3, 3), $this->monthShort) + 1)) . '-' . substr($post['tanggal'], 0, 2);
+    $post['tanggal_kembali'] = substr($post['tanggal_kembali'], 7, 4) . '-' . sprintf("%02d", (array_search(substr($post['tanggal_kembali'], 3, 3), $this->monthShort) + 1)) . '-' . substr($post['tanggal_kembali'], 0, 2);
 
     $start_date = new DateTime($post['tanggal']);
     $end_date = new DateTime($post['tanggal_kembali']);
     $interval = $start_date->diff($end_date);
 
-    if ($interval->days < 10) return $this->redirect('konsul.edit.' . $id);
+    if (strtotime($post['tanggal']) > strtotime($post['tanggal_kembali']) || $interval->days < 10) {
+      Flasher::setData($post);
+      Flasher::setFlash('Selisih tanggal kurang dari 10 hari.', 'danger', 'ni ni-fat-remove');
+      return $this->redirect('konsul.edit.' . $id);
+    }
 
     if (!$check_pasien) {
       if ($post['nama'] !== '' && $post['jenis_kelamin'] !== '' && $post['norm'] !== '') {
@@ -226,9 +226,9 @@ class KonsulController extends Controller
             ]
           )
         ) {
+          Flasher::setData($post);
           Flasher::setFlash('Ada kesalahan yang tidak diketahui, silakan coba lagi.', 'danger', 'ni ni-fat-remove');
-          $this->redirect('konsul.edit.' . $id);
-          die;
+          return $this->redirect('konsul.edit.' . $id);
         }
       }
     } else {
@@ -251,9 +251,9 @@ class KonsulController extends Controller
             ]
           )
         ) {
+          Flasher::setData($post);
           Flasher::setFlash('Ada kesalahan yang tidak diketahui, silakan coba lagi.', 'danger', 'ni ni-fat-remove');
-          $this->redirect('konsul.edit.' . $id);
-          die;
+          return $this->redirect('konsul.edit.' . $id);
         }
       }
     }

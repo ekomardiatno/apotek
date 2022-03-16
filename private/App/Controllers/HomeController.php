@@ -85,7 +85,7 @@ class HomeController extends Controller
             $data[] = array(
                 "no" => $i,
                 "tanggal" => Mod::timepiece($row['tanggal']),
-                "nama" => "<a href='" . Web::url('pasien.detail.' . $row['nik']) . "'>" . ($row['nama'] !== NULL ? $row['nama'] : '-') . "</a>",
+                "nama" => "<a href='" . Web::url('pasien.detail.' . md5($row['nik'])) . "'>" . ($row['nama'] !== NULL ? $row['nama'] : '-') . "</a>",
                 "nik" => $row['nik'],
                 "norm" => $row['norm'],
                 "jenis_kelamin" => $row['jenis_kelamin'] !== NULL ? strtoupper($row['jenis_kelamin']) : '-',

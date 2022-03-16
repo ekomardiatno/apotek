@@ -76,13 +76,15 @@
         <th>Nama</th>
         <th>L/P</th>
         <th>Tgl Kmbl</th>
-        <th>Aksi</th>
+        <?php if (Auth::user('role') === 'konsul') : ?>
+          <th>Aksi</th>
+        <?php endif; ?>
       </tr>
     </thead>
   </table>
 
   <script>
-    $('#print').on('submit', function () {
+    $('#print').on('submit', function() {
       $('#report').modal('hide')
     })
   </script>
@@ -115,10 +117,12 @@
         {
           data: 'tanggal_kembali'
         },
-        {
-          data: 'pengaturan',
-          orderable: false
-        }
+        <?php if (Auth::user('role') === 'konsul') :
+          echo "{
+            data: 'pengaturan',
+            orderable: false
+          }";
+        endif; ?>
       ],
       order: [
         [1, 'desc']

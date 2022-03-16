@@ -108,10 +108,13 @@
       height: 20px;
       z-index: 400;
     }
+    .main-content.default {
+      min-height: 100vh
+    }
   </style>
 
 <body>
-  <div class="main-content">
+  <div class="main-content default">
 
     <div class="header bg-gradient-primary pb-8 pt-5 pt-md-5">
       <div class="container px-lg-3 px-xl-6 mt--5">

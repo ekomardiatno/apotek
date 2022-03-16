@@ -7,9 +7,19 @@
   ?>
   <div class="card shadow mb-4">
     <div class="card-body">
-      <div class="form-group">
-        <label class="small form-control-label" for="tanggal">Tanggal<span class="text-danger">*</span></label>
-        <input type="text" name="tanggal" required id="tanggal" class="form-control form-control-alternative">
+      <div class="row mb-3">
+        <div class="col">
+          <div class="form-group mb-0">
+            <label class="small form-control-label" for="tanggal">Tanggal<span class="text-danger">*</span></label>
+            <input type="text" name="tanggal" required id="tanggal" class="form-control form-control-alternative">
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-group mb-0">
+            <label for="tanggal_kembali" class="small form-control-label">Tanggal Kembali<span class="text-danger">*</span></label>
+            <input required type="text" name="tanggal_kembali" id="tanggal_kembali" class="form-control form-control-alternative">
+          </div>
+        </div>
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="nik">NIK<span class="text-danger">*</span></label>
@@ -40,10 +50,6 @@
           <?php endforeach; ?>
         </select>
       </div>
-      <div class="form-group">
-        <label for="tanggal_kembali" class="small form-control-label">Tanggal Kembali Konsul<span class="text-danger">*</span></label>
-        <input required type="text" name="tanggal_kembali" id="tanggal_kembali" class="form-control form-control-alternative">
-      </div>
     </div>
     <div class="card-footer text-right">
       <button class="btn btn-secondary" type="reset">Reset</button>
@@ -56,7 +62,7 @@
   $('form').find('[type="submit"]').prop('disabled', true)
   var timeout
   const datepickerOptions = {
-    format: 'dd-mm-yyyy',
+    format: 'dd-M-yyyy',
     autoclose: true
   }
   const now = '<?= $now ?>'
@@ -66,20 +72,22 @@
   tanggal_comp.datepicker('setDate', now)
   tanggal_kembali_comp.datepicker('setDate', plus10day)
 
+  const monthShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
   $('#tanggal').on('change', function() {
     let $this = $(this)
     let value = $this.val()
-    let y = value.substring(6, 10)
-    let m = value.substring(3, 5)
+    let y = value.substring(7, 11)
+    let m = monthShort.indexOf(value.substring(3, 6))
     let d = value.substring(0, 2)
-    let date = new Date(parseInt(y), parseInt(m) - 1, parseInt(d))
+    let date = new Date(parseInt(y), parseInt(m), parseInt(d))
     date = new Date(date.getTime() + (10 * 24 * 60 * 60 * 1000))
     y = date.getFullYear()
     m = date.getMonth() + 1
     d = date.getDate()
     m = ('0' + m).slice(-2)
     d = ('0' + d).slice(-2)
-    if ($('#tanggal_kembali').val() !== `${d}-${m}-${y}`)
+    if ($('#tanggal_kembali').val() !== `${d}-${monthShort[parseInt(m) - 1]}-${y}`)
       tanggal_kembali_comp.datepicker('setDate', `${d}/${m}/${y}`)
     if ($('#nik').val() !== '') {
       clearTimeout(timeout)
@@ -92,17 +100,17 @@
   $('#tanggal_kembali').on('change', function() {
     let $this = $(this)
     let value = $this.val()
-    let y = value.substring(6, 10)
-    let m = value.substring(3, 5)
+    let y = value.substring(7, 11)
+    let m = monthShort.indexOf(value.substring(3, 6))
     let d = value.substring(0, 2)
-    let date = new Date(parseInt(y), parseInt(m) - 1, parseInt(d))
+    let date = new Date(parseInt(y), parseInt(m), parseInt(d))
     date = new Date(date.getTime() - (10 * 24 * 60 * 60 * 1000))
     y = date.getFullYear()
     m = date.getMonth() + 1
     d = date.getDate()
     m = ('0' + m).slice(-2)
     d = ('0' + d).slice(-2)
-    if ($('#tanggal').val() !== `${d}-${m}-${y}`)
+    if ($('#tanggal').val() !== `${d}-${monthShort[parseInt(m) - 1]}-${y}`)
       tanggal_comp.datepicker('setDate', `${d}/${m}/${y}`)
     if ($('#nik').val() !== '') {
       clearTimeout(timeout)
@@ -211,7 +219,7 @@
   if ($data) {
 
   ?>
-  checkingPasien()
+    checkingPasien()
   <?php
   }
   ?>

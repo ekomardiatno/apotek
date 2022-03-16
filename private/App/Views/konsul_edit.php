@@ -1,38 +1,50 @@
 <form id="form-edit-id-<?= $data['id_konsul'] ?>" action="<?= Web::url('konsul.perbarui.' . md5($data['id_konsul'])) ?>" method="post">
   <?= Web::key_field() ?>
+  <?php
+  $flash = Flasher::data();
+  $now = $flash ? substr($flash['tanggal'], 8, 2) . '/' . substr($flash['tanggal'], 5, 2) . '/' . substr($flash['tanggal'], 0, 4) : substr($data['tanggal'], 8, 2) . '/' . substr($data['tanggal'], 5, 2) . '/' . substr($data['tanggal'], 0, 4);
+  $plus10days = $flash ? substr($flash['tanggal_kembali'], 8, 2) . '/' . substr($flash['tanggal_kembali'], 5, 2) . '/' . substr($flash['tanggal_kembali'], 0, 4) : substr($data['tanggal_kembali'], 8, 2) . '/' . substr($data['tanggal_kembali'], 5, 2) . '/' . substr($data['tanggal_kembali'], 0, 4);
+  ?>
   <div class="card shadow mb-4">
     <div class="card-body">
-      <div class="form-group">
-        <label class="small form-control-label" for="tanggal">Tanggal<span class="text-danger">*</span></label>
-        <input type="text" name="tanggal" required date-format="dd-mm-yyyy" id="tanggal" value="<?= substr($data['tanggal'], 8, 2) . '-' . substr($data['tanggal'], 5, 2) . '-' . substr($data['tanggal'], 0, 4) ?>" class="form-control form-control-alternative datepicker">
+    <div class="row mb-3">
+        <div class="col">
+          <div class="form-group mb-0">
+            <label class="small form-control-label" for="tanggal">Tanggal<span class="text-danger">*</span></label>
+            <input type="text" name="tanggal" required id="tanggal" class="form-control form-control-alternative">
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-group mb-0">
+            <label for="tanggal_kembali" class="small form-control-label">Tanggal Kembali<span class="text-danger">*</span></label>
+            <input required type="text" name="tanggal_kembali" id="tanggal_kembali" class="form-control form-control-alternative">
+          </div>
+        </div>
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="nik">NIK<span class="text-danger">*</span></label>
-        <input type="text" value="<?= $data['nik'] ?>" autocomplete="off" maxlength="16" placeholder="Mis. 1234567890987654" required name="nik" id="nik" class="form-control form-control-alternative">
+        <input type="text" value="<?= $flash['nik'] ?? $data['nik'] ?>" autocomplete="off" maxlength="16" placeholder="Mis. 1234567890987654" required name="nik" id="nik" class="form-control form-control-alternative">
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="nama">Nama<span class="text-danger">*</span></label>
-        <input type="text" autocomplete="off" value="<?= $data['nama'] ?>" maxlength="50" placeholder="Mis. Rani Fauziah" required name="nama" id="nama" class="form-control form-control-alternative">
+        <input type="text" autocomplete="off" value="<?= $flash['nama'] ?? $data['nama'] ?>" maxlength="50" placeholder="Mis. Rani Fauziah" required name="nama" id="nama" class="form-control form-control-alternative">
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="alamat">Alamat</label>
-        <textarea name="alamat" placeholder="Alamat" id="alamat" class="form-control form-control-alternative"><?= $data['alamat'] ?></textarea>
+        <textarea name="alamat" placeholder="Alamat" id="alamat" class="form-control form-control-alternative"><?= $flash['alamat'] ?? $data['alamat'] ?></textarea>
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="norm">No. Rekam Medis<span class="text-danger">*</span></label>
-        <input type="text" maxlength="50" autocomplete="off" required placeholder="Nomor rekam medis" value="<?= $data['norm'] ?>" required name="norm" id="norm" class="form-control form-control-alternative">
+        <input type="text" maxlength="50" autocomplete="off" required placeholder="Nomor rekam medis" value="<?= $flash['norm'] ?? $data['norm'] ?>" required name="norm" id="norm" class="form-control form-control-alternative">
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="jenis_kelamin">Jenis Kelamin<span class="text-danger">*</span></label>
         <select name="jenis_kelamin" required id="jenis_kelamin" class="form-control form-control-alternative">
           <option value="">Pilih jenis kelamin</option>
-          <option <?= $data['jenis_kelamin'] === 'l' ? 'selected' : '' ?> value="l">Laki-laki</option>
-          <option <?= $data['jenis_kelamin'] === 'p' ? 'selected' : '' ?> value="p">Perempuan</option>
+          <?php $gender_selected = $flash['nik'] ?? $data['jenis_kelamin']; ?>
+          <option <?= $gender_selected === 'l' ? 'selected' : '' ?> value="l">Laki-laki</option>
+          <option <?= $gender_selected === 'p' ? 'selected' : '' ?> value="p">Perempuan</option>
         </select>
-      </div>
-      <div class="form-group">
-        <label for="tanggal_kembali" class="small form-control-label">Tanggal Kembali Konsul<span class="text-danger">*</span></label>
-        <input required date-format="dd-mm-yyyy" type="text" name="tanggal_kembali" id="tanggal_kembali" value='<?= substr($data['tanggal_kembali'], 8, 2) . '-' . substr($data['tanggal_kembali'], 5, 2) . '-' . substr($data['tanggal_kembali'], 0, 4) ?>' class="datepicker form-control form-control-alternative">
       </div>
     </div>
     <div class="card-footer text-right">
@@ -64,26 +76,32 @@
   $('form').find('button[type="button"]').prop('disabled', true)
   var timeout
   const datepickerOptions = {
-    format: 'dd-mm-yyyy',
+    format: 'dd-M-yyyy',
     autoclose: true
   }
+  const now = '<?= $now ?>'
+  const plus10day = '<?= $plus10days ?>'
   const tanggal_comp = $('#tanggal').datepicker(datepickerOptions)
   const tanggal_kembali_comp = $('#tanggal_kembali').datepicker(datepickerOptions)
+  tanggal_comp.datepicker('setDate', now)
+  tanggal_kembali_comp.datepicker('setDate', plus10day)
+
+  const monthShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
   $('#tanggal').on('change', function() {
     let $this = $(this)
     let value = $this.val()
-    let y = value.substring(6, 10)
-    let m = value.substring(3, 5)
+    let y = value.substring(7, 11)
+    let m = monthShort.indexOf(value.substring(3, 6))
     let d = value.substring(0, 2)
-    let date = new Date(parseInt(y), parseInt(m) - 1, parseInt(d))
+    let date = new Date(parseInt(y), parseInt(m), parseInt(d))
     date = new Date(date.getTime() + (10 * 24 * 60 * 60 * 1000))
     y = date.getFullYear()
     m = date.getMonth() + 1
     d = date.getDate()
     m = ('0' + m).slice(-2)
     d = ('0' + d).slice(-2)
-    if ($('#tanggal_kembali').val() !== `${d}-${m}-${y}`)
+    if ($('#tanggal_kembali').val() !== `${d}-${monthShort[parseInt(m) - 1]}-${y}`)
       tanggal_kembali_comp.datepicker('setDate', `${d}/${m}/${y}`)
     if ($('#nik').val() !== '') {
       clearTimeout(timeout)
@@ -96,17 +114,17 @@
   $('#tanggal_kembali').on('change', function() {
     let $this = $(this)
     let value = $this.val()
-    let y = value.substring(6, 10)
-    let m = value.substring(3, 5)
+    let y = value.substring(7, 11)
+    let m = monthShort.indexOf(value.substring(3, 6))
     let d = value.substring(0, 2)
-    let date = new Date(parseInt(y), parseInt(m) - 1, parseInt(d))
+    let date = new Date(parseInt(y), parseInt(m), parseInt(d))
     date = new Date(date.getTime() - (10 * 24 * 60 * 60 * 1000))
     y = date.getFullYear()
     m = date.getMonth() + 1
     d = date.getDate()
     m = ('0' + m).slice(-2)
     d = ('0' + d).slice(-2)
-    if ($('#tanggal').val() !== `${d}-${m}-${y}`)
+    if ($('#tanggal').val() !== `${d}-${monthShort[parseInt(m) - 1]}-${y}`)
       tanggal_comp.datepicker('setDate', `${d}/${m}/${y}`)
     if ($('#nik').val() !== '') {
       clearTimeout(timeout)

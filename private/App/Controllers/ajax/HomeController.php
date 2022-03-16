@@ -3,10 +3,12 @@
 class HomeController extends Controller
 {
     private $db;
+    private $monthShort;
     public function __construct()
     {
         parent::__construct();
         $this->db = Database::getInstance();
+        $this->monthShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     }
     public function pasien()
     {
@@ -19,8 +21,8 @@ class HomeController extends Controller
     public function konsul()
     {
         $post = $this->request()->post;
-        $post['tanggal'] = substr($post['tanggal'], 6, 4) . '-' . substr($post['tanggal'], 3, 2) . '-' . substr($post['tanggal'], 0, 2);
-        $post['tanggal_kembali'] = substr($post['tanggal_kembali'], 6, 4) . '-' . substr($post['tanggal_kembali'], 3, 2) . '-' . substr($post['tanggal_kembali'], 0, 2);
+        $post['tanggal'] = substr($post['tanggal'], 7, 4) . '-' . sprintf("%02d", (array_search(substr($post['tanggal'], 3, 3), $this->monthShort) + 1)) . '-' . substr($post['tanggal'], 0, 2);
+        $post['tanggal_kembali'] = substr($post['tanggal_kembali'], 7, 4) . '-' . sprintf("%02d", (array_search(substr($post['tanggal_kembali'], 3, 3), $this->monthShort) + 1)) . '-' . substr($post['tanggal_kembali'], 0, 2);
         $sql_count_data = 'SELECT COUNT(*) as count_data FROM konsul WHERE nik="' . $post['nik'] . '"';
         $sql_existed_data = "SELECT tanggal, tanggal_kembali FROM `konsul` WHERE nik = '" . $post['nik'] . "' AND ('" . $post['tanggal'] . "' BETWEEN tanggal AND tanggal_kembali OR '" . $post['tanggal_kembali'] . "' BETWEEN tanggal AND tanggal_kembali) ORDER BY tanggal ASC";
         $sql_konsul_last = "SELECT tanggal, tanggal_kembali FROM konsul WHERE nik='" . $post['nik'] . "' ORDER BY tanggal DESC LIMIT 1";

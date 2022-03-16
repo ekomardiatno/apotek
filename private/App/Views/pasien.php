@@ -36,7 +36,9 @@
         <th scope="col">NIK</th>
         <th scope="col">No. RM</th>
         <th scope="col">L/P</th>
-        <th scope="col">Aksi</th>
+        <?php if (Auth::user('role') === 'konsul') : ?>
+          <th scope="col">Aksi</th>
+        <?php endif; ?>
       </tr>
     </thead>
   </table>
@@ -69,10 +71,12 @@
         {
           data: 'jenis_kelamin'
         },
-        {
-          data: 'pengaturan',
-          orderable: false
-        }
+        <?php if (Auth::user('role') === 'konsul') :
+          echo "{
+            data: 'pengaturan',
+            orderable: false
+          }";
+        endif; ?>
       ],
       order: [
         [1, 'asc']

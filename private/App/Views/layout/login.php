@@ -30,7 +30,7 @@
 
   <div class="main-content">
     <!-- Navbar -->
-    <nav class="navbar navbar-top navbar-horizontal navbar-expand-md navbar-dark">
+    <nav class="navbar navbar-top navbar-horizontal navbar-expand-md navbar-dark mt-4">
       <div class="container px-4">
         <a class="navbar-brand" href="<?= Web::url('admin'); ?>">
           <img src="<?= Web::assets('brand/white.png', 'images'); ?>" />
@@ -69,7 +69,7 @@
       <div class="row align-items-center justify-content-xl-between">
         <div class="col-xl-12">
           <div class="copyright text-center text-xl-left text-muted">
-            &copy; 2019 <a href="https://instagram.com/codescripter" class="font-weight-bold ml-1" target="_blank">KOMA MVC</a>
+            &copy; 2019 <a href="https://ekomardiatno.github.io" class="font-weight-bold ml-1" target="_blank">KOMA MVC</a>
           </div>
         </div>
       </div>

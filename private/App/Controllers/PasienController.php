@@ -92,7 +92,7 @@ class PasienController extends Controller
         "tanggal_dibuat" => Mod::timepiece($row['tanggal_dibuat']),
         "pengaturan" => "<a href='" . Web::url('pasien.edit.' . md5($row['nik'])) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span> Edit</a>"
           . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-action='" . Web::url('pasien.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . md5($row['nik']) . "'><span class='fas fa-trash'></span> Hapus</button>"
-          . "<a href='" . Web::url('konsul.daftar.' . md5($row['nik'])) . "' class='btn btn-outline-success btn-sm'><span class='fas fa-plus'></span> Konsultasi</a>"
+          . "<a href='" . Web::url('konsul.daftar.' . md5($row['nik'])) . "' class='btn btn-outline-primary btn-sm'><span class='fas fa-plus'></span> Konsultasi</a>"
       );
       $i++;
     }
