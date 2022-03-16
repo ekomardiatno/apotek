@@ -35,7 +35,7 @@
             <!-- Modal -->
             <div class="modal fade" id="report" tabindex="-1" role="dialog" aria-labelledby="reportLabel" aria-hidden="true">
               <div class="modal-dialog modal-sm" role="document">
-                <form action="<?= Web::url('print') ?>" target="_blank" method="post">
+                <form action="<?= Web::url('print') ?>" id="print" target="_blank" method="post">
                   <div class="modal-content">
                     <div class="modal-header">
                       <h5 class="modal-title" id="reportLabel">Buat Laporan</h5>
@@ -47,7 +47,7 @@
                       <?= Web::key_field() ?>
                       <div class="form-group">
                         <label class="small form-control-label" for="start">Dari</label>
-                        <input type="text" name="start" required date-format="dd-mm-yyyy" id="start" class="form-control form-control-alternative datepicker">
+                        <input type="text" name="start" required date-format="dd-mm-yyyy" value="<?= date('01-m-Y') ?>" id="start" class="form-control form-control-alternative datepicker">
                       </div>
                       <div class="form-group">
                         <label class="small form-control-label" for="end">Sampai</label>
@@ -80,6 +80,12 @@
       </tr>
     </thead>
   </table>
+
+  <script>
+    $('#print').on('submit', function () {
+      $('#report').modal('hide')
+    })
+  </script>
 
   <script>
     const dataTable = $('#konsultasi-data').DataTable({

@@ -85,13 +85,14 @@ class PasienController extends Controller
     foreach ($empRecords as $row) {
       $data[] = array(
         "no" => $i,
-        "nama" => "<a href='" . Web::url('pasien.detail.' . $row['nik']) . "'>" . ($row['nama'] !== NULL ? $row['nama'] : '-') . "</a>",
+        "nama" => "<a href='" . Web::url('pasien.detail.' . md5($row['nik'])) . "'>" . ($row['nama'] !== NULL ? $row['nama'] : '-') . "</a>",
         "nik" => $row['nik'],
         "norm" => $row['norm'],
         "jenis_kelamin" => $row['jenis_kelamin'] !== NULL ? strtoupper($row['jenis_kelamin']) : '-',
         "tanggal_dibuat" => Mod::timepiece($row['tanggal_dibuat']),
-        "pengaturan" => "<a href='" . Web::url('pasien.edit.' . $row['nik']) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span> Edit</a>"
-          . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-action='" . Web::url('pasien.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . $row['nik'] . "'><span class='fas fa-trash'></span> Hapus</button>"
+        "pengaturan" => "<a href='" . Web::url('pasien.edit.' . md5($row['nik'])) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span> Edit</a>"
+          . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-action='" . Web::url('pasien.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . md5($row['nik']) . "'><span class='fas fa-trash'></span> Hapus</button>"
+          . "<a href='" . Web::url('konsul.daftar.' . md5($row['nik'])) . "' class='btn btn-outline-success btn-sm'><span class='fas fa-plus'></span> Konsultasi</a>"
       );
       $i++;
     }
@@ -116,7 +117,7 @@ class PasienController extends Controller
       [
         'params' => [
           [
-            'column' => 'nik',
+            'column' => 'md5(nik)',
             'value' => $post['nik']
           ]
         ]
@@ -141,7 +142,7 @@ class PasienController extends Controller
       [
         'params' => [
           [
-            'column' => 'nik',
+            'column' => 'md5(nik)',
             'value' => $id
           ]
         ]
@@ -149,8 +150,13 @@ class PasienController extends Controller
       'ARRAY_ONE'
     );
 
+    if(!$data) return printf('NIK tidak valid');
+
     $this->_web->title('Edit Pasien');
     $this->_web->breadcrumb([
+      [
+        'pasien', 'Pasien'
+      ],
       [
         'pasien.edit', 'Edit Pasien'
       ]
@@ -164,7 +170,7 @@ class PasienController extends Controller
     $post = $this->request()->post;
     $pasien = $this->model('Pasien');
     $konsul = $this->model('Konsul');
-    if ($id !== $post['nik']) {
+    if ($id !== md5($post['nik'])) {
       if (
         !$konsul->update(
           [
@@ -173,7 +179,7 @@ class PasienController extends Controller
           [
             'params' => [
               [
-                'column' => 'nik',
+                'column' => 'md5(nik)',
                 'value' => $id
               ]
             ]
@@ -198,7 +204,7 @@ class PasienController extends Controller
         [
           'params' => [
             [
-              'column' => 'nik',
+              'column' => 'md5(nik)',
               'value' => $id
             ]
           ]
@@ -206,8 +212,8 @@ class PasienController extends Controller
       )
     ) {
       Flasher::setFlash('Data telah diperbarui.', 'success', 'ni ni-check-bold');
-      if ($id !== $post['nik']) {
-        $this->redirect('pasien.edit.' . $post['nik']);
+      if ($id !== md5($post['nik'])) {
+        $this->redirect('pasien.edit.' . md5($post['nik']));
         die;
       }
     } else {
@@ -227,13 +233,14 @@ class PasienController extends Controller
       [
         'params' => [
           [
-            'column' => 'nik',
+            'column' => 'md5(nik)',
             'value' => $nik
           ]
         ]
       ],
       'ARRAY_ONE'
     );
+    if (!$pasien) return printf('NIK tidak valid');
 
     $pasien['tanggal_dibuat'] = Mod::timepiece($pasien['tanggal_dibuat']);
 
@@ -253,7 +260,7 @@ class PasienController extends Controller
       [
         'params' => [
           [
-            'column' => 'nik',
+            'column' => 'md5(nik)',
             'value' => $nik
           ]
         ],
@@ -263,6 +270,9 @@ class PasienController extends Controller
 
     $this->_web->title('Detail Pasien');
     $this->_web->breadcrumb([
+      [
+        'pasien', 'Pasien'
+      ],
       [
         'pasien.detail', 'Detail Pasien'
       ]

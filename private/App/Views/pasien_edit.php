@@ -1,4 +1,4 @@
-<form id="form-edit-id-<?= $data['nik'] ?>" action="<?= Web::url('pasien.perbarui.' . $data['nik']) ?>" method="post">
+<form id="form-edit-id-<?= $data['nik'] ?>" action="<?= Web::url('pasien.perbarui.' . md5($data['nik'])) ?>" method="post">
   <?= Web::key_field() ?>
   <div class="card shadow mb-4">
     <div class="card-body">

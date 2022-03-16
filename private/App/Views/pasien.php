@@ -36,7 +36,6 @@
         <th scope="col">NIK</th>
         <th scope="col">No. RM</th>
         <th scope="col">L/P</th>
-        <th scope="col">Terdaftar sejak</th>
         <th scope="col">Aksi</th>
       </tr>
     </thead>
@@ -69,9 +68,6 @@
         },
         {
           data: 'jenis_kelamin'
-        },
-        {
-          data: 'tanggal_dibuat'
         },
         {
           data: 'pengaturan',
