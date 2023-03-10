@@ -63,7 +63,7 @@ class HomeController extends Controller
         $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount, pasien.nik AS nik, pasien.norm AS norm, pasien.nama AS nama FROM konsul LEFT JOIN pasien ON konsul.nik=pasien.nik WHERE 1" . $searchQuery . ' GROUP BY pasien.nik');
         $stmt->execute($searchArray);
         $records = $stmt->fetch();
-        $totalRecordwithFilter = $records['allcount'];
+        $totalRecordwithFilter = $records['allcount'] ?? 0;
 
         // Fetch records
         $stmt = $pdo->prepare("SELECT konsul.id_konsul AS id_konsul, pasien.nama AS nama, pasien.nik AS nik, pasien.norm AS norm, pasien.jenis_kelamin AS jenis_kelamin, konsul.tanggal AS tanggal, konsul.tanggal_kembali AS tanggal_kembali FROM konsul LEFT JOIN pasien ON konsul.nik=pasien.nik WHERE 1" . $searchQuery . " ORDER BY " . $columnName . " " . $columnSortOrder . " LIMIT :limit,:offset");
