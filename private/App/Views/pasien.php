@@ -36,6 +36,7 @@
         <th scope="col">NIK</th>
         <th scope="col">No. RM</th>
         <th scope="col">L/P</th>
+        <th scope="col">Tanggal Lahir</th>
         <?php if (Auth::user('role') === 'konsul') : ?>
           <th scope="col">Aksi</th>
         <?php endif; ?>
@@ -70,6 +71,9 @@
         },
         {
           data: 'jenis_kelamin'
+        },
+        {
+          data: 'tanggal_lahir'
         },
         <?php if (Auth::user('role') === 'konsul') :
           echo "{

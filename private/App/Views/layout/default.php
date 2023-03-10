@@ -108,6 +108,7 @@
       height: 20px;
       z-index: 400;
     }
+
     .main-content.default {
       min-height: 100vh
     }
@@ -196,12 +197,12 @@
         <div class="row align-items-center justify-content-lg-between">
           <div class="col-sm">
             <div class="copyright text-center text-sm-left mb-1 mb-sm-0">
-              &copy; 2020 <a href="<?= Web::url() ?>" class="font-weight-bold ml-1" target="_blank"><?= getenv('APP_NAME') ?></a>
+              &copy; <?= date('Y') ?> <a href="<?= Web::url() ?>" class="font-weight-bold ml-1" target="_blank"><?= getenv('APP_NAME') ?></a>
             </div>
           </div>
           <div class="col-sm">
             <div class="copyright text-center text-sm-right">
-              Powered by <span class="font-weight-bold">KOMA-MVC</span>
+              Powered by <a href="https://ekomardiatno.github.io" class="text-default"><span class="font-weight-bold">KOMA-MVC</span></a>
             </div>
           </div>
         </div>
@@ -282,9 +283,9 @@
         language: 'id',
         format: format
       })
-      if ($(this).val() === '') {
-        datepicker.datepicker("setDate", new Date())
-      }
+      // if ($(this).val() === '') {
+      //   datepicker.datepicker("setDate", new Date())
+      // }
     })
   </script>
 

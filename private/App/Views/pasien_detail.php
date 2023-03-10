@@ -13,6 +13,7 @@
           'alamat' => 'Alamat Pasien',
           'jenis_kelamin' => 'Jenis Kelamin',
           'norm' => 'Nomor Rekam Medis',
+          'tanggal_lahir' => 'Tanggal Lahir',
           'tanggal_dibuat' => 'Terdaftar Sejak'
         ];
         foreach ($pasien_keys as $k) :
@@ -22,7 +23,7 @@
               <p class="small text-muted mb-0 mt-1 font-weight-bold"><?= $key_name[$k] ?></p>
             </div>
             <div style="flex: 2">
-              <p class="mb-0"><?= $data['pasien'][$k] ?></p>
+              <p class="mb-0"><?= $data['pasien'][$k] ?? '-' ?></p>
             </div>
           </div>
         <?php

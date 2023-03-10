@@ -7,7 +7,7 @@
   ?>
   <div class="card shadow mb-4">
     <div class="card-body">
-    <div class="row mb-3">
+      <div class="row mb-3">
         <div class="col">
           <div class="form-group mb-0">
             <label class="small form-control-label" for="tanggal">Tanggal<span class="text-danger">*</span></label>
@@ -32,6 +32,10 @@
       <div class="form-group">
         <label class="small form-control-label" for="alamat">Alamat</label>
         <textarea name="alamat" placeholder="Alamat" id="alamat" class="form-control form-control-alternative"><?= $flash['alamat'] ?? $data['alamat'] ?></textarea>
+      </div>
+      <div class="form-group">
+        <label for="tanggal_lahir" class="small form-control-label">Tanggal Lahir<span class="text-danger">*</span></label>
+        <input required type="text" placeholder="Tanggal Lahir" value="<?= $flash['tanggal_lahir'] ?? $data['tanggal_lahir'] ?>" name="tanggal_lahir" id="tanggal_lahir" class="datepicker form-control form-control-alternative">
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="norm">No. Rekam Medis<span class="text-danger">*</span></label>

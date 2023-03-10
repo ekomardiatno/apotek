@@ -34,6 +34,10 @@
         <textarea name="alamat" placeholder="Alamat" id="alamat" class="form-control form-control-alternative"><?= $flash['alamat'] ?? $data['alamat'] ?? '' ?></textarea>
       </div>
       <div class="form-group">
+        <label for="tanggal_lahir" class="small form-control-label">Tanggal Lahir<span class="text-danger">*</span></label>
+        <input required type="text" placeholder="Tanggal Lahir" value="<?= $flash['tanggal_lahir'] ?? $data['tanggal_lahir'] ?? '' ?>" name="tanggal_lahir" id="tanggal_lahir" class="datepicker form-control form-control-alternative">
+      </div>
+      <div class="form-group">
         <label class="small form-control-label" for="norm">No. Rekam Medis<span class="text-danger">*</span></label>
         <input type="text" maxlength="50" autocomplete="off" value="<?= $flash['norm'] ?? $data['norm'] ?? '' ?>" required placeholder="Nomor rekam medis" required name="norm" id="norm" class="form-control form-control-alternative">
       </div>

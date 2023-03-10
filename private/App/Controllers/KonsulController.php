@@ -35,7 +35,7 @@ class KonsulController extends Controller
     if ($id !== '') {
       $pasien_m = $this->model('Pasien');
       $data_pasien = $pasien_m->read(
-        ['nik', 'nama', 'jenis_kelamin', 'alamat', 'norm'],
+        ['nik', 'nama', 'jenis_kelamin', 'tanggal_lahir', 'alamat', 'norm'],
         [
           'params' => [
             [
@@ -91,6 +91,7 @@ class KonsulController extends Controller
             'nama' => $post['nama'],
             'jenis_kelamin' => $post['jenis_kelamin'],
             'alamat' => $post['alamat'],
+            'tanggal_lahir' => $post['tanggal_lahir'],
             'norm' => $post['norm'],
             'tanggal_dibuat' => date('Y-m-d')
           ]
@@ -164,7 +165,7 @@ class KonsulController extends Controller
   public function edit($id)
   {
     $db = Database::getInstance();
-    $sql = "SELECT id_konsul, a.tanggal, a.nik, b.nama, b.alamat, b.jenis_kelamin, b.norm, a.tanggal_kembali FROM konsul a LEFT JOIN pasien b ON b.nik=a.nik WHERE md5(id_konsul)='" . $id . "'";
+    $sql = "SELECT id_konsul, a.tanggal, a.nik, b.nama, b.alamat, b.tanggal_lahir, b.jenis_kelamin, b.norm, a.tanggal_kembali FROM konsul a LEFT JOIN pasien b ON b.nik=a.nik WHERE md5(id_konsul)='" . $id . "'";
     $data = $db->query($sql, 'ARRAY_ONE');
 
     if (!$data) return printf('ID Konsultasi tidak valid');
@@ -220,6 +221,7 @@ class KonsulController extends Controller
               'nik' => $post['nik'],
               'nama' => $post['nama'],
               'jenis_kelamin' => $post['jenis_kelamin'],
+              'tanggal_lahir' => $post['tanggal_lahir'],
               'alamat' => $post['alamat'],
               'norm' => $post['norm'],
               'tanggal_dibuat' => date('Y-m-d')
@@ -238,6 +240,7 @@ class KonsulController extends Controller
             [
               'nama' => $post['nama'],
               'jenis_kelamin' => $post['jenis_kelamin'],
+              'tanggal_lahir' => $post['tanggal_lahir'],
               'alamat' => $post['alamat'],
               'norm' => $post['norm'],
             ],

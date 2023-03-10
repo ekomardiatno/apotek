@@ -4,21 +4,7 @@ class PasienController extends Controller
 {
   public function index()
   {
-    $this->role(['konsul', 'farma']);
-    $this->_web->title('Pasien');
-    $this->_web->breadcrumb([
-      [
-        'pasien', 'Pasien'
-      ]
-    ]);
-    $pasien = $this->model('Pasien');
-    $data = $pasien->read(
-      ['nik', 'nama', 'jenis_kelamin', 'alamat', 'norm', 'tanggal_dibuat'],
-      [
-        'order_by' => ['tanggal_dibuat', 'DESC'],
-      ]
-    );
-    $this->_web->view('pasien', $data);
+    $this->_web->view('pasien');
   }
 
   public function fetch()
@@ -67,7 +53,7 @@ class PasienController extends Controller
     $totalRecordwithFilter = $records['allcount'];
 
     // Fetch records
-    $stmt = $pdo->prepare("SELECT nama, nik, norm, jenis_kelamin, tanggal_dibuat FROM pasien WHERE 1" . $searchQuery . " ORDER BY " . $columnName . " " . $columnSortOrder . " LIMIT :limit,:offset");
+    $stmt = $pdo->prepare("SELECT nama, nik, norm, tanggal_lahir, jenis_kelamin, tanggal_dibuat FROM pasien WHERE 1" . $searchQuery . " ORDER BY " . $columnName . " " . $columnSortOrder . " LIMIT :limit,:offset");
 
     // Bind values
     foreach ($searchArray as $key => $search) {
@@ -89,6 +75,7 @@ class PasienController extends Controller
         "nik" => $row['nik'],
         "norm" => $row['norm'],
         "jenis_kelamin" => $row['jenis_kelamin'] !== NULL ? strtoupper($row['jenis_kelamin']) : '-',
+        "tanggal_lahir" => $row['tanggal_lahir'] ? Mod::timepiece($row['tanggal_lahir']) : '-',
         "tanggal_dibuat" => Mod::timepiece($row['tanggal_dibuat']),
         "pengaturan" => "<a href='" . Web::url('pasien.edit.' . md5($row['nik'])) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span> Edit</a>"
           . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-action='" . Web::url('pasien.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . md5($row['nik']) . "'><span class='fas fa-trash'></span> Hapus</button>"
@@ -138,7 +125,7 @@ class PasienController extends Controller
     $this->role(['konsul']);
     $pasien = $this->model('Pasien');
     $data = $pasien->read(
-      ['nik', 'nama', 'alamat', 'jenis_kelamin', 'norm'],
+      ['nik', 'nama', 'alamat', 'tanggal_lahir', 'jenis_kelamin', 'norm'],
       [
         'params' => [
           [
@@ -150,7 +137,7 @@ class PasienController extends Controller
       'ARRAY_ONE'
     );
 
-    if(!$data) return printf('NIK tidak valid');
+    if (!$data) return printf('NIK tidak valid');
 
     $this->_web->title('Edit Pasien');
     $this->_web->breadcrumb([
@@ -199,6 +186,7 @@ class PasienController extends Controller
           'nama' => $post['nama'],
           'alamat' => $post['alamat'],
           'jenis_kelamin' => $post['jenis_kelamin'],
+          'tanggal_lahir' => $post['tanggal_lahir'],
           'norm' => $post['norm']
         ],
         [
@@ -229,7 +217,7 @@ class PasienController extends Controller
     $pasien_m = $this->model('Pasien');
     $konsul_m = $this->model('Konsul');
     $pasien = $pasien_m->read(
-      ['nik', 'nama', 'alamat', 'jenis_kelamin', 'norm', 'tanggal_dibuat'],
+      ['nik', 'nama', 'alamat', 'jenis_kelamin', 'tanggal_lahir', 'norm', 'tanggal_dibuat'],
       [
         'params' => [
           [

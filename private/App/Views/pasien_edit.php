@@ -15,8 +15,12 @@
         <textarea name="alamat" placeholder="Alamat" id="alamat" class="form-control form-control-alternative"><?= $data['alamat'] ?></textarea>
       </div>
       <div class="form-group">
-        <label class="small form-control-label"for="norm">No. Rekam Medis<span class="text-danger">*</span></label>
-        <input type="text" maxlength="50" autocomplete="off"  required placeholder="Nomor rekam medis" value="<?= $data['norm'] ?>" required name="norm" id="norm" class="form-control form-control-alternative">
+        <label for="tanggal_lahir" class="small form-control-label">Tanggal Lahir<span class="text-danger">*</span></label>
+        <input required type="text" placeholder="Tanggal Lahir" name="tanggal_lahir" id="tanggal_lahir" value="<?= $data['tanggal_lahir'] ?>" class="datepicker form-control form-control-alternative">
+      </div>
+      <div class="form-group">
+        <label class="small form-control-label" for="norm">No. Rekam Medis<span class="text-danger">*</span></label>
+        <input type="text" maxlength="50" autocomplete="off" required placeholder="Nomor rekam medis" value="<?= $data['norm'] ?>" required name="norm" id="norm" class="form-control form-control-alternative">
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="jenis_kelamin">Jenis Kelamin<span class="text-danger">*</span></label>
