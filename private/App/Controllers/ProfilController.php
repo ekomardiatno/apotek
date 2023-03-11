@@ -6,7 +6,7 @@ class ProfilController extends Controller
   public function __construct()
   {
     parent::__construct();
-    $this->role(['konsul', 'farma']);
+    $this->role(['konsul', 'farma', 'dokter']);
     $this->_model = $this->model('User');
   }
   public function index()
@@ -16,7 +16,7 @@ class ProfilController extends Controller
     $data = $this->_model->read(
       ['id_user', 'username', 'name', 'email'],
       [
-        'cond' => [
+        'params' => [
           [
             'column' => 'username',
             'value' => $username
@@ -24,7 +24,7 @@ class ProfilController extends Controller
         ]
       ],
       'ARRAY_ONE'
-    );
+    )['data'];
 
     $this->_web->title(Auth::user('name'));
     $this->_web->breadcrumb([
@@ -53,11 +53,11 @@ class ProfilController extends Controller
         ]
       ],
       'ARRAY_ONE'
-    );
+    )['data'];
 
     if (password_verify($password, $user['password'])) {
       $update = $this->_model->update($attr, ['data_id' => $id]);
-      if ($update) {
+      if ($update['success']) {
         $_SESSION['auth']['username'] = $attr['username'];
         $_SESSION['auth']['name'] = $attr['name'];
         $_SESSION['auth']['email'] = $attr['email'];

@@ -22,30 +22,40 @@
         </div>
       </div>
       <div class="form-group">
+        <label class="small form-control-label" for="id_dokter">Dokter Tujuan<span class="text-danger">*</span></label>
+        <select required name="id_dokter" class="form-control form-control-alternative">
+          <option value="">Pilih Dokter</option>
+          <?php $id_dokter = $flash['id_dokter'] ?? $data['pasien']['id_dokter'] ?? ''; ?>
+          <?php foreach ($data['dokter'] as $dokter) : ?>
+            <option <?= $id_dokter === $dokter['id_dokter'] ? 'selected' : '' ?> value="<?= $dokter['id_dokter'] ?>"><?= $dokter['name'] ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <div class="form-group">
         <label class="small form-control-label" for="nik">NIK<span class="text-danger">*</span></label>
-        <input type="text" autocomplete="off" maxlength="16" placeholder="Mis. 1234567890987654" required name="nik" id="nik" value="<?= $flash['nik'] ?? $data['nik'] ?? '' ?>" class="form-control form-control-alternative">
+        <input type="text" autocomplete="off" maxlength="16" placeholder="NIK" required name="nik" id="nik" value="<?= $flash['nik'] ?? $data['pasien']['nik'] ?? '' ?>" class="form-control form-control-alternative">
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="nama">Nama<span class="text-danger">*</span></label>
-        <input type="text" autocomplete="off" maxlength="50" placeholder="Mis. Rani Fauziah" required name="nama" value="<?= $flash['nama'] ?? $data['nama'] ?? '' ?>" id="nama" class="form-control form-control-alternative">
+        <input type="text" autocomplete="off" maxlength="50" placeholder="Nama" required name="nama" value="<?= $flash['nama'] ?? $data['pasien']['nama'] ?? '' ?>" id="nama" class="form-control form-control-alternative">
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="alamat">Alamat</label>
-        <textarea name="alamat" placeholder="Alamat" id="alamat" class="form-control form-control-alternative"><?= $flash['alamat'] ?? $data['alamat'] ?? '' ?></textarea>
+        <textarea name="alamat" placeholder="Alamat" id="alamat" class="form-control form-control-alternative"><?= $flash['alamat'] ?? $data['pasien']['alamat'] ?? '' ?></textarea>
       </div>
       <div class="form-group">
         <label for="tanggal_lahir" class="small form-control-label">Tanggal Lahir<span class="text-danger">*</span></label>
-        <input required type="text" placeholder="Tanggal Lahir" value="<?= $flash['tanggal_lahir'] ?? $data['tanggal_lahir'] ?? '' ?>" name="tanggal_lahir" id="tanggal_lahir" class="datepicker form-control form-control-alternative">
+        <input required type="text" autocomplete="off" placeholder="Tanggal Lahir" value="<?= $flash['tanggal_lahir'] ?? $data['pasien']['tanggal_lahir'] ?? '' ?>" name="tanggal_lahir" id="tanggal_lahir" class="datepicker form-control form-control-alternative">
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="norm">No. Rekam Medis<span class="text-danger">*</span></label>
-        <input type="text" maxlength="50" autocomplete="off" value="<?= $flash['norm'] ?? $data['norm'] ?? '' ?>" required placeholder="Nomor rekam medis" required name="norm" id="norm" class="form-control form-control-alternative">
+        <input type="text" maxlength="50" autocomplete="off" value="<?= $flash['norm'] ?? $data['pasien']['norm'] ?? '' ?>" required placeholder="Nomor rekam medis" required name="norm" id="norm" class="form-control form-control-alternative">
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="jenis_kelamin">Jenis Kelamin<span class="text-danger">*</span></label>
         <?php
         $gender_list = ['l', 'p'];
-        $value = $flash['jenis_kelamin'] ?? $data['jenis_kelamin'] ?? '';
+        $value = $flash['jenis_kelamin'] ?? $data['pasien']['jenis_kelamin'] ?? '';
         ?>
         <select name="jenis_kelamin" required id="jenis_kelamin" class="form-control form-control-alternative">
           <option value="">Pilih jenis kelamin</option>
@@ -57,7 +67,7 @@
     </div>
     <div class="card-footer text-right">
       <button class="btn btn-secondary" type="reset">Reset</button>
-      <button class="btn btn-success" type="submit">Daftar</button>
+      <button class="btn btn-primary" type="submit">Daftar</button>
     </div>
   </div>
 </form>
@@ -155,6 +165,7 @@
           $('[name="nama"]').val(res.pasien.nama)
           $('[name="alamat"]').val(res.pasien.alamat)
           $('[name="jenis_kelamin"]').val(res.pasien.jenis_kelamin)
+          $('[name="tanggal_lahir"]').val(res.pasien.tanggal_lahir)
           $('[name="norm"]').val(res.pasien.norm)
         }
         if (res.isAvailable) $('form').find('[type="submit"]').prop('disabled', false)
@@ -220,7 +231,7 @@
 
 
   <?php
-  if ($data) {
+  if ($data['pasien']) {
 
   ?>
     checkingPasien()

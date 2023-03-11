@@ -23,7 +23,7 @@
               <p class="small text-muted mb-0 mt-1 font-weight-bold"><?= $key_name[$k] ?></p>
             </div>
             <div style="flex: 2">
-              <p class="mb-0"><?= $data['pasien'][$k] ?? '-' ?></p>
+              <p class="mb-0"><?= isset($data['pasien'][$k]) && $data['pasien'][$k] !== '' ? $data['pasien'][$k] : '-' ?></p>
             </div>
           </div>
         <?php

@@ -173,11 +173,21 @@ class Database
             die;
         }
 
-        if ($this->mysqli->query($sql)) {
-            return true;
-        } else {
-            return false;
+        if (!$this->mysqli->query($sql)) {
+            $error = $this->mysqli->error;
+            $this->mysqli->close();
+            return [
+                'success' => false,
+                'error' => $error,
+                'sql' => $sql
+            ];
         }
+        $last_id = $this->mysqli->insert_id;
+        return [
+            'success' => true,
+            'last_inserted_id' => $last_id,
+            'sql' => $sql
+        ];
     }
 
     /* =======================================================
@@ -222,11 +232,20 @@ class Database
             die;
         }
 
-        if ($this->mysqli->query($sql)) {
-            return true;
-        } else {
-            return false;
+        if (!$this->mysqli->query($sql)) {
+            $error = $this->mysqli->error;
+            $this->mysqli->close();
+            return [
+                'success' => false,
+                'error' => $error,
+                'sql' => $sql
+            ];
         }
+        $this->mysqli->close();
+        return [
+            'success' => true,
+            'sql' => $sql
+        ];
     }
 
     public function delete($where = null, $fetch = null)
@@ -242,11 +261,20 @@ class Database
             die;
         }
 
-        if ($this->mysqli->query($sql)) {
-            return true;
-        } else {
-            return false;
+        if (!$this->mysqli->query($sql)) {
+            $error = $this->mysqli->error;
+            $this->mysqli->close();
+            return [
+                'success' => false,
+                'error' => $error,
+                'sql' => $sql
+            ];
         }
+        $this->mysqli->close();
+        return [
+            'success' => true,
+            'sql' => $sql
+        ];
     }
 
     public function query($sql, $fetch = 'ARRAY')
@@ -320,6 +348,15 @@ class Database
 
         $data = [];
         $query = $this->mysqli->query($sql);
+        if (!$query) {
+            $error = $this->mysqli->error;
+            $this->mysqli->close();
+            return [
+                'success' => false,
+                'error' => $error,
+                'sql' => $sql
+            ];
+        }
         switch ($fetch) {
             case 'ARRAY_ONE':
                 $row = $query->fetch_assoc();
@@ -340,7 +377,14 @@ class Database
                 $data = $query;
                 break;
         }
+        $last_id = $this->mysqli->insert_id;
+        $this->mysqli->close();
 
-        return $data;
+        return [
+            'success' => true,
+            'data' => $data,
+            'last_inserted_id' => $last_id,
+            'sql' => $sql
+        ];
     }
 }

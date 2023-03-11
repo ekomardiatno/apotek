@@ -6,7 +6,6 @@ class HomeController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->role(['konsul', 'farma']);
     }
 
     public function index()
@@ -27,6 +26,17 @@ class HomeController extends Controller
             echo 'This is only for AJAX request';
             exit;
         }
+
+        $isDokter = Auth::user('role') === 'dokter' ? true : false;
+
+        $dokter = $isDokter ? $this->model('Dokter')->read(['id_dokter'], [
+            'params' => [
+                [
+                    'column' => 'username',
+                    'value' => Auth::user('username')
+                ]
+            ]
+        ], 'ARRAY_ONE')['data'] : null;
 
         $pdo = Database::getPDOInstance();
 
@@ -54,19 +64,19 @@ class HomeController extends Controller
         }
 
         // Total number of records without filtering
-        $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM konsul");
+        $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM konsul" . ($isDokter ? " WHERE id_dokter='$dokter[id_dokter]' AND konsul.status_selesai='0'" : ''));
         $stmt->execute();
         $records = $stmt->fetch();
         $totalRecords = $records['allcount'];
 
         // Total number of records with filtering
-        $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount, pasien.nik AS nik, pasien.norm AS norm, pasien.nama AS nama FROM konsul LEFT JOIN pasien ON konsul.nik=pasien.nik WHERE 1" . $searchQuery . ' GROUP BY pasien.nik');
+        $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount, pasien.nik AS nik, pasien.norm AS norm, pasien.nama AS nama FROM konsul LEFT JOIN pasien ON konsul.nik=pasien.nik WHERE 1" . $searchQuery . ($isDokter ? " AND id_dokter='$dokter[id_dokter]' AND konsul.status_selesai='0'" : '') . ' GROUP BY pasien.nik');
         $stmt->execute($searchArray);
         $records = $stmt->fetch();
         $totalRecordwithFilter = $records['allcount'] ?? 0;
 
         // Fetch records
-        $stmt = $pdo->prepare("SELECT konsul.id_konsul AS id_konsul, pasien.nama AS nama, pasien.nik AS nik, pasien.norm AS norm, pasien.jenis_kelamin AS jenis_kelamin, konsul.tanggal AS tanggal, konsul.tanggal_kembali AS tanggal_kembali FROM konsul LEFT JOIN pasien ON konsul.nik=pasien.nik WHERE 1" . $searchQuery . " ORDER BY " . $columnName . " " . $columnSortOrder . " LIMIT :limit,:offset");
+        $stmt = $pdo->prepare("SELECT konsul.id_konsul AS id_konsul, pasien.nama AS nama, pasien.nik AS nik, pasien.norm AS norm, pasien.jenis_kelamin AS jenis_kelamin, konsul.tanggal AS tanggal, konsul.tanggal_kembali AS tanggal_kembali, konsul.tanggal_dibuat, pasien.tanggal_lahir FROM konsul LEFT JOIN pasien ON konsul.nik=pasien.nik WHERE 1" . $searchQuery . ($isDokter ? " AND id_dokter='$dokter[id_dokter]' AND konsul.status_selesai='0'" : '') . " ORDER BY " . $columnName . " " . $columnSortOrder . ", konsul.tanggal_dibuat " . $columnSortOrder . " LIMIT :limit,:offset");
 
         // Bind values
         foreach ($searchArray as $key => $search) {
@@ -80,8 +90,11 @@ class HomeController extends Controller
 
         $data = array();
 
+
         $i = $row + 1;
+        $dateNow = new DateTime();
         foreach ($empRecords as $row) {
+            $bornDate = new DateTime($row['tanggal_lahir']);
             $data[] = array(
                 "no" => $i,
                 "tanggal" => Mod::timepiece($row['tanggal']),
@@ -90,8 +103,10 @@ class HomeController extends Controller
                 "norm" => $row['norm'],
                 "jenis_kelamin" => $row['jenis_kelamin'] !== NULL ? strtoupper($row['jenis_kelamin']) : '-',
                 "tanggal_kembali" => Mod::timepiece($row['tanggal_kembali']),
-                "pengaturan" => "<a href='" . Web::url('konsul.edit.' . md5($row['id_konsul'])) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span> Edit</a>"
-                    . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-action='" . Web::url('konsul.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . md5($row['id_konsul']) . "'><span class='fas fa-trash'></span> Hapus</button>"
+                "tanggal_dibuat" => Mod::timepiece($row['tanggal_dibuat']),
+                'umur' => $dateNow->diff($bornDate)->y . ' Tahun',
+                "pengaturan" => $isDokter ? "<a href='" . Web::url('resep.tambah.' . md5($row['id_konsul'])) . "' class='btn btn-primary btn-sm'><span class='fas fa-edit'></span> Buat Resep</a>" : ("<a href='" . Web::url('konsul.edit.' . md5($row['id_konsul'])) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span> Edit</a>"
+                    . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-action='" . Web::url('konsul.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . md5($row['id_konsul']) . "'><span class='fas fa-trash'></span> Hapus</button>")
             );
             $i++;
         }

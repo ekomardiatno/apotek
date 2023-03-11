@@ -28,41 +28,43 @@
               <a href="<?= Web::url('konsul.daftar'); ?>" class="btn btn-sm btn-primary d-flex align-items-center"><span class="fas fa-plus-circle"></span><span class="d-none d-md-inline-block ml-1">Pendaftaran</span></a>
             </div>
           <?php endif ?>
-          <div class="mx-1 d-flex">
-            <button type="button" class="btn btn-gray btn-sm mr-0" data-toggle="modal" data-target="#report">
-              <span class="fas fa-file-pdf"></span><span class="d-none d-md-inline-block ml-1">Buat Laporan</span>
-            </button>
-            <!-- Modal -->
-            <div class="modal fade" id="report" tabindex="-1" role="dialog" aria-labelledby="reportLabel" aria-hidden="true">
-              <div class="modal-dialog modal-sm" role="document">
-                <form action="<?= Web::url('print') ?>" id="print" target="_blank" method="post">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="reportLabel">Buat Laporan</h5>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <div class="modal-body">
-                      <?= Web::key_field() ?>
-                      <div class="form-group">
-                        <label class="small form-control-label" for="start">Dari</label>
-                        <input type="text" name="start" required date-format="dd-mm-yyyy" value="<?= date('01-m-Y') ?>" id="start" class="form-control form-control-alternative datepicker">
+          <?php if (Auth::user('role') !== 'dokter') : ?>
+            <div class="mx-1 d-flex">
+              <button type="button" class="btn btn-gray btn-sm mr-0" data-toggle="modal" data-target="#report">
+                <span class="fas fa-file-pdf"></span><span class="d-none d-md-inline-block ml-1">Buat Laporan</span>
+              </button>
+              <!-- Modal -->
+              <div class="modal fade" id="report" tabindex="-1" role="dialog" aria-labelledby="reportLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm" role="document">
+                  <form action="<?= Web::url('print') ?>" id="print" target="_blank" method="post">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="reportLabel">Buat Laporan</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
                       </div>
-                      <div class="form-group">
-                        <label class="small form-control-label" for="end">Sampai</label>
-                        <input type="text" name="end" required date-format="dd-mm-yyyy" id="end" class="form-control form-control-alternative datepicker">
+                      <div class="modal-body">
+                        <?= Web::key_field() ?>
+                        <div class="form-group">
+                          <label class="small form-control-label" for="start">Dari</label>
+                          <input type="text" name="start" required date-format="dd-mm-yyyy" value="<?= date('01-m-Y') ?>" id="start" class="form-control form-control-alternative datepicker">
+                        </div>
+                        <div class="form-group">
+                          <label class="small form-control-label" for="end">Sampai</label>
+                          <input type="text" name="end" required date-format="dd-mm-yyyy" id="end" class="form-control form-control-alternative datepicker">
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-warning">Buat</button>
                       </div>
                     </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                      <button type="submit" class="btn btn-warning">Buat</button>
-                    </div>
-                  </div>
-                </form>
+                  </form>
+                </div>
               </div>
             </div>
-          </div>
+          <?php endif ?>
         </div>
       </div>
     </div>
@@ -75,8 +77,9 @@
         <th>Tanggal</th>
         <th>Nama</th>
         <th>L/P</th>
+        <th>Umur</th>
         <th>Tgl Kmbl</th>
-        <?php if (Auth::user('role') === 'konsul') : ?>
+        <?php if (Auth::user('role') === 'konsul' || Auth::user('role') === 'dokter') : ?>
           <th>Aksi</th>
         <?php endif; ?>
       </tr>
@@ -115,9 +118,12 @@
           data: 'jenis_kelamin'
         },
         {
+          data: 'umur'
+        },
+        {
           data: 'tanggal_kembali'
         },
-        <?php if (Auth::user('role') === 'konsul') :
+        <?php if (Auth::user('role') === 'konsul' || Auth::user('role') === 'dokter') :
           echo "{
             data: 'pengaturan',
             orderable: false
@@ -125,7 +131,7 @@
         endif; ?>
       ],
       order: [
-        [1, 'desc']
+        [1, '<?= Auth::user('role') === 'dokter' ? 'asc' : 'desc' ?>']
       ],
       fixedHeader: true,
       lengthChange: false,

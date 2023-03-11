@@ -112,6 +112,10 @@
     .main-content.default {
       min-height: 100vh
     }
+
+    .cursor-pointer {
+      cursor: pointer !important;
+    }
   </style>
 
 <body>
@@ -128,12 +132,29 @@
               <li>
                 <a href="<?= Web::url() ?>"><span class="fas fa-notes-medical"></span><span class="d-none d-md-inline-block ml-2">Konsultasi</span></a>
               </li>
-              <li>
-                <a href="<?= Web::url('pasien') ?>"><span class="fas fa-user-injured"></span><span class="d-none d-md-inline-block ml-2">Pasien</span></a>
-              </li>
+              <?php if (Auth::user('role') !== 'dokter') : ?>
+                <li>
+                  <a href="<?= Web::url('pasien') ?>"><span class="fas fa-user-injured"></span><span class="d-none d-md-inline-block ml-2">Pasien</span></a>
+                </li>
+              <?php endif; ?>
+              <?php if (Auth::user('role') === 'farma') : ?>
+                <li>
+                  <a href="<?= Web::url('obat') ?>"><span class="fas fa-capsules"></span><span class="d-none d-md-inline-block ml-2">Obat</span></a>
+                </li>
+              <?php endif; ?>
+              <?php if (Auth::user('role') === 'farma') : ?>
+                <li>
+                  <a href="<?= Web::url('dokter') ?>"><span class="fas fa-user-md"></span><span class="d-none d-md-inline-block ml-2">Dokter</span></a>
+                </li>
+              <?php endif; ?>
               <li>
                 <a href="<?= Web::url('profil') ?>"><span class="fas fa-user-cog"></span><span class="d-none d-md-inline-block ml-2"><?= Auth::user('name') ?></span></a>
               </li>
+              <?php if (Auth::user('role') === 'farma') : ?>
+                <li>
+                  <a href="<?= Web::url('pengaturan') ?>"><span class="fas fa-cog"></span><span class="d-none d-md-inline-block ml-2">Pengaturan</span></a>
+                </li>
+              <?php endif ?>
             </ul>
           </div>
         </div>
@@ -298,6 +319,48 @@
       if (url === href) {
         $(this).addClass('active')
       }
+    })
+  </script>
+
+  <script>
+    $('body').on('click', 'button[type=submit]', function(e) {
+      let form = $(e.target).parents('form')
+      if (form.length < 1) return
+      form = form[0]
+      const inputs = [...form].filter(a => (a.name && a.name !== '_key'))
+      let inputValid = true
+      for (let input of inputs) {
+        if (!input.checkValidity()) {
+          inputValid = false
+          break
+        }
+      }
+      if (!inputValid) return
+      e.preventDefault()
+      bootbox.confirm({
+        message: 'Apakah Anda yakin ingin menyimpan data?',
+        buttons: {
+          confirm: {
+            label: 'Simpan',
+            className: 'btn-secondary btn-sm'
+          },
+          cancel: {
+            label: 'Batal',
+            className: 'btn-primary btn-sm'
+          }
+        },
+        callback: (result) => {
+          if (result) {
+            form.submit()
+          }
+        }
+      })
+    })
+  </script>
+
+  <script>
+    $('.username-form').on('keyup', e => {
+      e.target.value = e.target.value.replace(/[^a-zA-Z0-9_]/g, '')
     })
   </script>
 

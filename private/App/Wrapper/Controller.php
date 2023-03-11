@@ -10,7 +10,7 @@
 class Controller
 {
 
-    private $model_dir = __DIR__.'/../Models/';
+    private $model_dir = __DIR__ . '/../Models/';
     private $has_login = false;
     protected $_web;
 
@@ -47,7 +47,7 @@ class Controller
 
         if ($this->has_login) {
             if (!in_array($_SESSION['auth']['role'], $role)) {
-                $this->redirect();
+                $this->redirect('');
             }
         } else {
             Auth::setUrl($url);

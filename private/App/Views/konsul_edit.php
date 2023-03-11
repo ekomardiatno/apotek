@@ -1,9 +1,9 @@
-<form id="form-edit-id-<?= $data['id_konsul'] ?>" action="<?= Web::url('konsul.perbarui.' . md5($data['id_konsul'])) ?>" method="post">
+<form id="form-edit-id-<?= $data['konsultasi']['id_konsul'] ?>" action="<?= Web::url('konsul.perbarui.' . md5($data['konsultasi']['id_konsul'])) ?>" method="post">
   <?= Web::key_field() ?>
   <?php
   $flash = Flasher::data();
-  $now = $flash ? substr($flash['tanggal'], 8, 2) . '/' . substr($flash['tanggal'], 5, 2) . '/' . substr($flash['tanggal'], 0, 4) : substr($data['tanggal'], 8, 2) . '/' . substr($data['tanggal'], 5, 2) . '/' . substr($data['tanggal'], 0, 4);
-  $plus10days = $flash ? substr($flash['tanggal_kembali'], 8, 2) . '/' . substr($flash['tanggal_kembali'], 5, 2) . '/' . substr($flash['tanggal_kembali'], 0, 4) : substr($data['tanggal_kembali'], 8, 2) . '/' . substr($data['tanggal_kembali'], 5, 2) . '/' . substr($data['tanggal_kembali'], 0, 4);
+  $now = $flash ? substr($flash['tanggal'], 8, 2) . '/' . substr($flash['tanggal'], 5, 2) . '/' . substr($flash['tanggal'], 0, 4) : substr($data['konsultasi']['tanggal'], 8, 2) . '/' . substr($data['konsultasi']['tanggal'], 5, 2) . '/' . substr($data['konsultasi']['tanggal'], 0, 4);
+  $plus10days = $flash ? substr($flash['tanggal_kembali'], 8, 2) . '/' . substr($flash['tanggal_kembali'], 5, 2) . '/' . substr($flash['tanggal_kembali'], 0, 4) : substr($data['konsultasi']['tanggal_kembali'], 8, 2) . '/' . substr($data['konsultasi']['tanggal_kembali'], 5, 2) . '/' . substr($data['konsultasi']['tanggal_kembali'], 0, 4);
   ?>
   <div class="card shadow mb-4">
     <div class="card-body">
@@ -22,43 +22,53 @@
         </div>
       </div>
       <div class="form-group">
+        <label class="small form-control-label" for="id_dokter">Dokter Tujuan<span class="text-danger">*</span></label>
+        <select required name="id_dokter" class="form-control form-control-alternative">
+          <option value="">Pilih Dokter</option>
+          <?php $id_dokter = $flash['id_dokter'] ?? $data['konsultasi']['id_dokter'] ?? ''; ?>
+          <?php foreach ($data['dokter'] as $dokter) : ?>
+            <option <?= $id_dokter === $dokter['id_dokter'] ? 'selected' : '' ?> value="<?= $dokter['id_dokter'] ?>"><?= $dokter['name'] ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <div class="form-group">
         <label class="small form-control-label" for="nik">NIK<span class="text-danger">*</span></label>
-        <input type="text" value="<?= $flash['nik'] ?? $data['nik'] ?>" autocomplete="off" maxlength="16" placeholder="Mis. 1234567890987654" required name="nik" id="nik" class="form-control form-control-alternative">
+        <input type="text" value="<?= $flash['nik'] ?? $data['konsultasi']['nik'] ?>" autocomplete="off" maxlength="16" placeholder="NIK" required name="nik" id="nik" class="form-control form-control-alternative">
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="nama">Nama<span class="text-danger">*</span></label>
-        <input type="text" autocomplete="off" value="<?= $flash['nama'] ?? $data['nama'] ?>" maxlength="50" placeholder="Mis. Rani Fauziah" required name="nama" id="nama" class="form-control form-control-alternative">
+        <input type="text" autocomplete="off" value="<?= $flash['nama'] ?? $data['konsultasi']['nama'] ?>" maxlength="50" placeholder="Nama" required name="nama" id="nama" class="form-control form-control-alternative">
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="alamat">Alamat</label>
-        <textarea name="alamat" placeholder="Alamat" id="alamat" class="form-control form-control-alternative"><?= $flash['alamat'] ?? $data['alamat'] ?></textarea>
+        <textarea name="alamat" placeholder="Alamat" id="alamat" class="form-control form-control-alternative"><?= $flash['alamat'] ?? $data['konsultasi']['alamat'] ?></textarea>
       </div>
       <div class="form-group">
         <label for="tanggal_lahir" class="small form-control-label">Tanggal Lahir<span class="text-danger">*</span></label>
-        <input required type="text" placeholder="Tanggal Lahir" value="<?= $flash['tanggal_lahir'] ?? $data['tanggal_lahir'] ?>" name="tanggal_lahir" id="tanggal_lahir" class="datepicker form-control form-control-alternative">
+        <input required type="text" placeholder="Tanggal Lahir" value="<?= $flash['tanggal_lahir'] ?? $data['konsultasi']['tanggal_lahir'] ?>" name="tanggal_lahir" autocomplete="off" id="tanggal_lahir" class="datepicker form-control form-control-alternative">
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="norm">No. Rekam Medis<span class="text-danger">*</span></label>
-        <input type="text" maxlength="50" autocomplete="off" required placeholder="Nomor rekam medis" value="<?= $flash['norm'] ?? $data['norm'] ?>" required name="norm" id="norm" class="form-control form-control-alternative">
+        <input type="text" maxlength="50" autocomplete="off" required placeholder="Nomor rekam medis" value="<?= $flash['norm'] ?? $data['konsultasi']['norm'] ?>" required name="norm" id="norm" class="form-control form-control-alternative">
       </div>
       <div class="form-group">
         <label class="small form-control-label" for="jenis_kelamin">Jenis Kelamin<span class="text-danger">*</span></label>
         <select name="jenis_kelamin" required id="jenis_kelamin" class="form-control form-control-alternative">
           <option value="">Pilih jenis kelamin</option>
-          <?php $gender_selected = $flash['nik'] ?? $data['jenis_kelamin']; ?>
+          <?php $gender_selected = $flash['nik'] ?? $data['konsultasi']['jenis_kelamin']; ?>
           <option <?= $gender_selected === 'l' ? 'selected' : '' ?> value="l">Laki-laki</option>
           <option <?= $gender_selected === 'p' ? 'selected' : '' ?> value="p">Perempuan</option>
         </select>
       </div>
     </div>
     <div class="card-footer text-right">
-      <button type="button" class="btn btn-warning" onclick="
+      <button type="button" class="btn btn-primary" onclick="
         bootbox.confirm({
           message: 'Apakah Anda yakin akan memperbarui data?',
           buttons: {
             confirm: {
               label: 'Perbarui',
-              className: 'btn-warning btn-sm'
+              className: 'btn-primary btn-sm'
             },
             cancel: {
               label: 'Batal',
@@ -67,7 +77,7 @@
           },
           callback: function (result) {
             if(result) {
-              $('form#form-edit-id-<?= $data['id_konsul'] ?>').submit()
+              $('form#form-edit-id-<?= $data['konsultasi']['id_konsul'] ?>').submit()
             }
           }
         })
@@ -156,7 +166,7 @@
     data.append('nik', value)
     data.append('tanggal', $('#tanggal').val())
     data.append('tanggal_kembali', $('#tanggal_kembali').val())
-    data.append('id', '<?= md5($data['id_konsul']) ?>')
+    data.append('id', '<?= md5($data['konsultasi']['id_konsul']) ?>')
     fetch(`<?= Web::url('ajax.home.konsul') ?>`, {
         method: 'POST',
         body: data

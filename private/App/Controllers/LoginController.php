@@ -15,16 +15,13 @@ class LoginController extends Controller
 
     parent::__construct();
 
-    if(isset($_SESSION['auth'])) {
+    if (isset($_SESSION['auth'])) {
 
-      if($_SESSION['auth']['hasLogin']) {
+      if ($_SESSION['auth']['hasLogin']) {
 
         $this->redirect();
-
       }
-
     }
-
   }
 
   public function index()
@@ -32,14 +29,13 @@ class LoginController extends Controller
 
     $this->_web->layout('login');
     $this->_web->view('login');
-
   }
 
   public function action()
   {
 
     $data = $this->request()->post;
-    if ( isset($data['username']) ) {
+    if (isset($data['username'])) {
 
       $attr = [
         'password',
@@ -55,16 +51,16 @@ class LoginController extends Controller
             'value' => $data['username']
           ]
         ],
-        'limit' => [0,1]
+        'limit' => [0, 1]
       ];
 
-      if($this->model('User')->read($attr, $where, 'NUM_ROWS') > 0) {
+      if ($this->model('User')->read($attr, $where, 'NUM_ROWS')['data'] > 0) {
 
-        $user = $this->model('User')->read($attr, $where, 'ARRAY_ONE');
+        $user = $this->model('User')->read($attr, $where, 'ARRAY_ONE')['data'];
 
         extract($user);
 
-        if(password_verify($data['password'], $password)) {
+        if (password_verify($data['password'], $password)) {
 
           $_SESSION['auth']['hasLogin'] = true;
           $_SESSION['auth']['username'] = $data['username'];
@@ -89,34 +85,26 @@ class LoginController extends Controller
           Flasher::setFlash('<b>Login berhasil</b>. Selamat datang di Halaman Admin.', 'success', 'ni ni-check-bold');
 
           $url = Auth::getUrl();
-          if($url != null) {
+          if ($url != null) {
             $this->redirect($url);
           } else {
             $this->redirect();
           }
-
         } else {
 
           Flasher::setFlash('Kombinasi username dan password tidak tepat.', 'danger', 'ni ni-fat-remove');
 
           $this->redirect('login');
-
         }
-
       } else {
 
         Flasher::setFlash('Kombinasi username dan password tidak tepat.', 'danger', 'ni ni-fat-remove');
 
         $this->redirect('login');
-
       }
-
     } else {
 
       $this->_web->view('error.404');
-
     }
-
   }
-
 }

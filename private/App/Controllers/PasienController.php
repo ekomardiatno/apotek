@@ -4,6 +4,13 @@ class PasienController extends Controller
 {
   public function index()
   {
+    $this->role(['konsul', 'farma']);
+    $this->_web->title('Pasien');
+    $this->_web->breadcrumb([
+      [
+        'pasien', 'Data Pasien'
+      ]
+    ]);
     $this->_web->view('pasien');
   }
 
@@ -17,15 +24,15 @@ class PasienController extends Controller
 
     $pdo = Database::getPDOInstance();
 
-    $post = $this->request()->post;
+    $get = $this->request()->get;
 
-    $draw = $post['draw'];
-    $row = $post['start'];
-    $rowperpage = $post['length']; // Rows display per page
-    $columnIndex = $post['order'][0]['column']; // Column index
-    $columnName = $post['columns'][$columnIndex]['data']; // Column name
-    $columnSortOrder = $post['order'][0]['dir']; // asc or desc
-    $searchValue = $post['search']['value']; // Search value
+    $draw = $get['draw'];
+    $row = $get['start'];
+    $rowperpage = $get['length']; // Rows display per page
+    $columnIndex = $get['order'][0]['column']; // Column index
+    $columnName = $get['columns'][$columnIndex]['data']; // Column name
+    $columnSortOrder = $get['order'][0]['dir']; // asc or desc
+    $searchValue = $get['search']['value']; // Search value
 
     $searchArray = array();
 
@@ -111,7 +118,7 @@ class PasienController extends Controller
       ]
     );
 
-    if ($delete) {
+    if ($delete['success']) {
       Flasher::setFlash('Data telah terhapus.', 'success', 'ni ni-check-bold');
     } else {
       Flasher::setFlash('Ada kesalahan yang tidak diketahui, silakan coba lagi.', 'danger', 'ni ni-fat-remove');
@@ -135,7 +142,7 @@ class PasienController extends Controller
         ]
       ],
       'ARRAY_ONE'
-    );
+    )['data'];
 
     if (!$data) return printf('NIK tidak valid');
 
@@ -171,7 +178,7 @@ class PasienController extends Controller
               ]
             ]
           ]
-        )
+        )['success']
       ) {
         Flasher::setFlash('Ada kesalahan yang tidak diketahui, silakan coba lagi.', 'danger', 'ni ni-fat-remove');
         $this->redirect('pasien.edit.' . $id);
@@ -197,7 +204,7 @@ class PasienController extends Controller
             ]
           ]
         ]
-      )
+      )['success']
     ) {
       Flasher::setFlash('Data telah diperbarui.', 'success', 'ni ni-check-bold');
       if ($id !== md5($post['nik'])) {
@@ -227,7 +234,7 @@ class PasienController extends Controller
         ]
       ],
       'ARRAY_ONE'
-    );
+    )['data'];
     if (!$pasien) return printf('NIK tidak valid');
 
     $pasien['tanggal_dibuat'] = Mod::timepiece($pasien['tanggal_dibuat']);
@@ -254,7 +261,7 @@ class PasienController extends Controller
         ],
         'order_by' => ['tanggal', 'DESC']
       ]
-    );
+    )['data'];
 
     $this->_web->title('Detail Pasien');
     $this->_web->breadcrumb([

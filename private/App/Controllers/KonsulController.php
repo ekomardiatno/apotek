@@ -14,6 +14,23 @@ class KonsulController extends Controller
     $this->monthShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   }
 
+  private function __dokter()
+  {
+    $dokter = $this->model('Dokter');
+    $data_dokter = $dokter->join(
+      'LEFT JOIN',
+      [
+        'dokter' => ['id_dokter'],
+        'user' => ['name']
+      ],
+      [
+        'user' => ['index_table' => 'dokter', 'index_id' => 'username']
+      ]
+    );
+
+    return $data_dokter['data'];
+  }
+
   public function index()
   {
     $this->redirect('konsul.daftar');
@@ -45,10 +62,12 @@ class KonsulController extends Controller
           ]
         ],
         'ARRAY_ONE'
-      );
+      )['data'];
     }
 
-    $this->_web->view('konsul', $data_pasien);
+    $data_dokter = $this->__dokter();
+
+    $this->_web->view('konsul', ['pasien' => $data_pasien, 'dokter' => $data_dokter]);
   }
 
   public function pos()
@@ -68,7 +87,7 @@ class KonsulController extends Controller
         ]
       ],
       'NUM_ROWS'
-    );
+    )['data'];
 
     $post['tanggal'] = substr($post['tanggal'], 7, 4) . '-' . sprintf("%02d", (array_search(substr($post['tanggal'], 3, 3), $this->monthShort) + 1)) . '-' . substr($post['tanggal'], 0, 2);
     $post['tanggal_kembali'] = substr($post['tanggal_kembali'], 7, 4) . '-' . sprintf("%02d", (array_search(substr($post['tanggal_kembali'], 3, 3), $this->monthShort) + 1)) . '-' . substr($post['tanggal_kembali'], 0, 2);
@@ -92,10 +111,9 @@ class KonsulController extends Controller
             'jenis_kelamin' => $post['jenis_kelamin'],
             'alamat' => $post['alamat'],
             'tanggal_lahir' => $post['tanggal_lahir'],
-            'norm' => $post['norm'],
-            'tanggal_dibuat' => date('Y-m-d')
+            'norm' => $post['norm']
           ]
-        )
+        )['success']
       ) {
         Flasher::setData($post);
         Flasher::setFlash('Ada kesalahan yang tidak diketahui, silakan coba lagi.', 'danger', 'ni ni-fat-remove');
@@ -126,9 +144,10 @@ class KonsulController extends Controller
         [
           'tanggal' => $post['tanggal'],
           'nik' => $post['nik'],
-          'tanggal_kembali' => $post['tanggal_kembali']
+          'tanggal_kembali' => $post['tanggal_kembali'],
+          'id_dokter' => $post['id_dokter']
         ]
-      )
+      )['success']
     ) {
       Flasher::setFlash('Pendaftaran konsultasi berhasil.', 'success', 'ni ni-check-bold');
     } else {
@@ -153,7 +172,7 @@ class KonsulController extends Controller
       ]
     );
 
-    if ($delete) {
+    if ($delete['success']) {
       Flasher::setFlash('Data telah terhapus.', 'success', 'ni ni-check-bold');
     } else {
       Flasher::setFlash('Ada kesalahan yang tidak diketahui, silakan coba lagi.', 'danger', 'ni ni-fat-remove');
@@ -165,7 +184,7 @@ class KonsulController extends Controller
   public function edit($id)
   {
     $db = Database::getInstance();
-    $sql = "SELECT id_konsul, a.tanggal, a.nik, b.nama, b.alamat, b.tanggal_lahir, b.jenis_kelamin, b.norm, a.tanggal_kembali FROM konsul a LEFT JOIN pasien b ON b.nik=a.nik WHERE md5(id_konsul)='" . $id . "'";
+    $sql = "SELECT id_konsul, a.id_dokter, a.tanggal, a.nik, b.nama, b.alamat, b.tanggal_lahir, b.jenis_kelamin, b.norm, a.tanggal_kembali FROM konsul a LEFT JOIN pasien b ON b.nik=a.nik WHERE md5(id_konsul)='" . $id . "'";
     $data = $db->query($sql, 'ARRAY_ONE');
 
     if (!$data) return printf('ID Konsultasi tidak valid');
@@ -179,7 +198,10 @@ class KonsulController extends Controller
         'konsul.edit', 'Edit Konsul'
       ]
     ]);
-    $this->_web->view('konsul_edit', $data);
+
+    $data_dokter = $this->__dokter();
+
+    $this->_web->view('konsul_edit', ['konsultasi' => $data, 'dokter' => $data_dokter]);
   }
 
   public function perbarui($id)
@@ -198,7 +220,7 @@ class KonsulController extends Controller
         ]
       ],
       'NUM_ROWS'
-    );
+    )['data'];
 
     $post['tanggal'] = substr($post['tanggal'], 7, 4) . '-' . sprintf("%02d", (array_search(substr($post['tanggal'], 3, 3), $this->monthShort) + 1)) . '-' . substr($post['tanggal'], 0, 2);
     $post['tanggal_kembali'] = substr($post['tanggal_kembali'], 7, 4) . '-' . sprintf("%02d", (array_search(substr($post['tanggal_kembali'], 3, 3), $this->monthShort) + 1)) . '-' . substr($post['tanggal_kembali'], 0, 2);
@@ -223,10 +245,9 @@ class KonsulController extends Controller
               'jenis_kelamin' => $post['jenis_kelamin'],
               'tanggal_lahir' => $post['tanggal_lahir'],
               'alamat' => $post['alamat'],
-              'norm' => $post['norm'],
-              'tanggal_dibuat' => date('Y-m-d')
+              'norm' => $post['norm']
             ]
-          )
+          )['success']
         ) {
           Flasher::setData($post);
           Flasher::setFlash('Ada kesalahan yang tidak diketahui, silakan coba lagi.', 'danger', 'ni ni-fat-remove');
@@ -252,7 +273,7 @@ class KonsulController extends Controller
                 ]
               ]
             ]
-          )
+          )['success']
         ) {
           Flasher::setData($post);
           Flasher::setFlash('Ada kesalahan yang tidak diketahui, silakan coba lagi.', 'danger', 'ni ni-fat-remove');
@@ -266,7 +287,8 @@ class KonsulController extends Controller
         [
           'tanggal' => $post['tanggal'],
           'nik' => $post['nik'],
-          'tanggal_kembali' => $post['tanggal_kembali']
+          'tanggal_kembali' => $post['tanggal_kembali'],
+          'id_dokter' => $post['id_dokter']
         ],
         [
           'params' => [
@@ -276,7 +298,7 @@ class KonsulController extends Controller
             ]
           ]
         ]
-      )
+      )['success']
     ) {
       Flasher::setFlash('Perbarui data konsultasi berhasil.', 'success', 'ni ni-check-bold');
     } else {

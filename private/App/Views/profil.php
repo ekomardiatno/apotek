@@ -6,7 +6,7 @@
           <?= Web::key_field() ?>
           <div class="form-group">
             <label class="small form-control-label" for="username">Username<span class="text-danger">*</span></label>
-            <input value="<?= $data['username'] ?>" type="text" maxlength="50" placeholder="Masukkan username" required name="attr[username]" id="username" class="form-control form-control-sm form-control-alternative">
+            <input value="<?= $data['username'] ?>" type="text" maxlength="50" placeholder="Masukkan username" required name="attr[username]" id="username" class="form-control form-control-sm form-control-alternative username-form">
           </div>
           <div class="form-group">
             <label class="small form-control-label" for="name">Nama<span class="text-danger">*</span></label>
