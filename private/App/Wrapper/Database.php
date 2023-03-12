@@ -12,16 +12,17 @@ class Database
 
     private static $_instance = null;
 
-    private $mysqli,
-        $table;
+    private $table;
 
-    public function __construct()
+    public function mysqli()
     {
-        $this->mysqli = new mysqli(getenv('DB_HOST'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'), getenv('DB_DATABASE'));
+        $conn = new mysqli(getenv('DB_HOST'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'), getenv('DB_DATABASE'));
 
-        if (mysqli_connect_errno()) {
-            echo "Failed to connect to MySQL: " . mysqli_connect_error();
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
         }
+
+        return $conn;
     }
 
     public static function getPDOInstance()
@@ -39,7 +40,6 @@ class Database
     {
 
         if (!isset(self::$_instance)) {
-
             self::$_instance = new Database;
         }
 
@@ -173,16 +173,16 @@ class Database
             die;
         }
 
-        if (!$this->mysqli->query($sql)) {
-            $error = $this->mysqli->error;
-            $this->mysqli->close();
+        if (!$this->mysqli()->query($sql)) {
+            $error = $this->mysqli()->error;
+            $this->mysqli()->close();
             return [
                 'success' => false,
                 'error' => $error,
                 'sql' => $sql
             ];
         }
-        $last_id = $this->mysqli->insert_id;
+        $last_id = $this->mysqli()->insert_id;
         return [
             'success' => true,
             'last_inserted_id' => $last_id,
@@ -232,16 +232,16 @@ class Database
             die;
         }
 
-        if (!$this->mysqli->query($sql)) {
-            $error = $this->mysqli->error;
-            $this->mysqli->close();
+        if (!$this->mysqli()->query($sql)) {
+            $error = $this->mysqli()->error;
+            $this->mysqli()->close();
             return [
                 'success' => false,
                 'error' => $error,
                 'sql' => $sql
             ];
         }
-        $this->mysqli->close();
+        $this->mysqli()->close();
         return [
             'success' => true,
             'sql' => $sql
@@ -261,16 +261,16 @@ class Database
             die;
         }
 
-        if (!$this->mysqli->query($sql)) {
-            $error = $this->mysqli->error;
-            $this->mysqli->close();
+        if (!$this->mysqli()->query($sql)) {
+            $error = $this->mysqli()->error;
+            $this->mysqli()->close();
             return [
                 'success' => false,
                 'error' => $error,
                 'sql' => $sql
             ];
         }
-        $this->mysqli->close();
+        $this->mysqli()->close();
         return [
             'success' => true,
             'sql' => $sql
@@ -347,10 +347,10 @@ class Database
     {
 
         $data = [];
-        $query = $this->mysqli->query($sql);
+        $query = $this->mysqli()->query($sql);
         if (!$query) {
-            $error = $this->mysqli->error;
-            $this->mysqli->close();
+            $error = $this->mysqli()->error;
+            $this->mysqli()->close();
             return [
                 'success' => false,
                 'error' => $error,
@@ -377,8 +377,8 @@ class Database
                 $data = $query;
                 break;
         }
-        $last_id = $this->mysqli->insert_id;
-        $this->mysqli->close();
+        $last_id = $this->mysqli()->insert_id;
+        $this->mysqli()->close();
 
         return [
             'success' => true,
