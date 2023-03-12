@@ -142,6 +142,11 @@
                   <a href="<?= Web::url('obat') ?>"><span class="fas fa-capsules"></span><span class="d-none d-md-inline-block ml-2">Obat</span></a>
                 </li>
               <?php endif; ?>
+              <?php if (Auth::user('role') === 'dokter' || Auth::user('role') === 'konsul') : ?>
+                <li>
+                  <a href="<?= Web::url('resep') ?>"><span class="fas fa-capsules"></span><span class="d-none d-md-inline-block ml-2">Resep</span></a>
+                </li>
+              <?php endif; ?>
               <?php if (Auth::user('role') === 'farma') : ?>
                 <li>
                   <a href="<?= Web::url('dokter') ?>"><span class="fas fa-user-md"></span><span class="d-none d-md-inline-block ml-2">Dokter</span></a>

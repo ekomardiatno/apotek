@@ -61,18 +61,18 @@
           <div class="modal-body">
             <?= Web::key_field() ?>
             <div class="form-group form-group-stok-kategori">
-              <label class="small form-control-label" for="nama_kategori">Kategori</label>
+              <label class="small form-control-label" for="nama_kategori">Kategori<span class="text-danger">*</span></label>
               <input type="hidden" name="id_kategori" />
-              <input type="text" required id="nama_kategori" name="nama_kategori" placeholder="Pilih atau masukan kategori baru" class="form-control form-control-alternative">
+              <input type="text" autocomplete="off" required id="nama_kategori" maxlength="150" name="nama_kategori" placeholder="Pilih atau masukan kategori baru" class="form-control form-control-alternative">
             </div>
             <div class="form-group">
-              <label for="kuantitas" class="small form-control-label">Kuantitas</label>
-              <input type="number" name="kuantitas" id="kuantitas" class="form-control form-control-alternative" placeholder="Kuantitas">
+              <label for="kuantitas" class="small form-control-label">Kuantitas<span class="text-danger">*</span></label>
+              <input type="number" required name="kuantitas" id="kuantitas" min="0" class="form-control form-control-alternative" placeholder="Kuantitas">
             </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-            <button type="submit" class="btn btn-primary">Buat</button>
+            <button type="submit" class="btn btn-primary">Simpan</button>
           </div>
         </div>
       </form>
@@ -102,10 +102,12 @@
           data: 'satuan_obat'
         },
         {
-          data: 'stok_obat'
+          data: 'stok_obat',
+          orderable: false
         },
         {
-          data: 'deskripsi_obat'
+          data: 'deskripsi_obat',
+          orderable: false
         },
         <?php if (Auth::user('role') === 'farma') :
           echo "{
@@ -196,11 +198,17 @@
       }
       const data = e.dataset
       const form = $('#stokObat').find('form')
-      form.prepend(`<input type='hidden' name='id_konsul' value='${data.id}'>`)
-      form.prepend(`<input type='hidden' name='type' value='${data.type}'>`)
+      form.prepend(`<input type='hidden' name='id_obat' value='${data.id}'/>`)
+      form.prepend(`<input type='hidden' name='type' value='${data.type}'/>`)
+      form.prepend(`<input type='hidden' name='stok_obat' value='${data.qty}'/>`)
       const idKeyName = data.type === 'add' ? 'id_stok_masuk_kategori' : 'id_stok_keluar_kategori'
       const nameKeyName = data.type === 'add' ? 'nama_stok_masuk_kategori' : 'nama_stok_keluar_kategori'
       let inputKategori = $('#stokObat').find('input#nama_kategori')
+      let inputKuantitas = $('#stokObat').find('input#kuantitas')
+      if (inputKuantitas.length > 0) {
+        console.log(inputKuantitas, data.qty)
+        inputKuantitas[0].max = data.type !== 'add' ? data.qty : ''
+      }
       if ($('#stokObat').find('h5.modal-title').length > 0) {
         $('#stokObat').find('h5.modal-title')[0].textContent = `${data.name} - ${data.type === 'add' ? 'Stok Masuk' : 'Stok Keluar'}`
       }
@@ -244,7 +252,7 @@
                 a = a.parentNode
               }
 
-            const valueByInputKategori = res.filter(a => (a[nameKeyName].indexOf(inputKategori.value) > -1))
+            const valueByInputKategori = res.filter(a => a[nameKeyName] === inputKategori.value)
             if (valueByInputKategori.length < 1) {
               if (inputIdKategori) inputIdKategori.value = ''
             } else {

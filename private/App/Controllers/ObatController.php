@@ -72,16 +72,17 @@ class ObatController extends Controller
 
     $i = $row + 1;
     foreach ($empRecords as $row) {
+      $row['id_obat'] = md5($row['id_obat']);
       $data[] = array(
         "no" => $i,
         "nama_obat" => $row['nama_obat'],
         "satuan_obat" => $row['satuan_obat'],
-        "stok_obat" => "<button type='button' class='btn btn-primary btn-sm stock-btn mr-0' data-type='remove' data-id='" . $row['id_obat'] . "' data-name='" . $row['nama_obat'] . "'><span class='fas fa-minus'></span></button>"
+        "stok_obat" => "<button type='button' class='btn btn-secondary btn-sm stock-btn mr-0' data-type='remove' data-id='" . $row['id_obat'] . "' data-name='" . $row['nama_obat'] . "' data-qty='" . $row['stok_obat'] . "'><span class='fas fa-minus'></span></button>"
           . "<span class='mx-2 font-weight-bold h4 mt-1' style='vertical-align:middle'>" . $row['stok_obat'] . "</span>"
-          . "<button type='button' class='btn btn-primary btn-sm stock-btn' data-type='add' data-id='" . $row['id_obat'] . "' data-name='" . $row['nama_obat'] . "'><span class='fas fa-plus'></span></button>",
+          . "<button type='button' class='btn btn-secondary btn-sm stock-btn' data-type='add' data-id='" . $row['id_obat'] . "' data-name='" . $row['nama_obat'] . "' data-qty='" . $row['stok_obat'] . "'><span class='fas fa-plus'></span></button>",
         "deskripsi_obat" => $row['deskripsi_obat'] !== '' ? $row['deskripsi_obat'] : '-',
-        "pengaturan" => "<a href='" . Web::url('obat.edit.' . md5($row['id_obat'])) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span><span class='ml-1 d-none d-md-inline-block'>Edit</span></a>"
-          . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-action='" . Web::url('obat.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . md5($row['id_obat']) . "'><span class='fas fa-trash'></span><span class='ml-1 d-none d-md-inline-block'>Hapus</span></button>"
+        "pengaturan" => "<a href='" . Web::url('obat.edit.' . $row['id_obat']) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span><span class='ml-1 d-none d-md-inline-block'>Edit</span></a>"
+          . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-action='" . Web::url('obat.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . $row['id_obat'] . "'><span class='fas fa-trash'></span><span class='ml-1 d-none d-md-inline-block'>Hapus</span></button>"
       );
       $i++;
     }
@@ -212,6 +213,66 @@ class ObatController extends Controller
   public function stok()
   {
     $post = $this->request()->post;
-    echo json_encode($post);
+    $post['stok_obat'] = intval($post['stok_obat']);
+    $post['kuantitas'] = intval($post['kuantitas']);
+    $stok_baru = $post['type'] === 'add' ? $post['stok_obat'] + $post['kuantitas'] : $post['stok_obat'] - $post['kuantitas'];
+    $stokKategori = $post['type'] === 'add' ? $this->model('StokMasukKategori') : $this->model('StokKeluarKategori');
+    if ($post['id_kategori'] === "" || !isset($post['id_kategori'])) {
+      $nameKeyName = $post['type'] === 'add' ? 'nama_stok_masuk_kategori' : 'nama_stok_keluar_kategori';
+      $stokKategoriInsert = $stokKategori->insert([
+        $nameKeyName => $post['nama_kategori']
+      ]);
+      if (!$stokKategoriInsert['success']) {
+        Flasher::setFlash('Gagal menyimpan data.', 'danger', 'ni ni-fat-remove');
+        return $this->redirect('obat');
+      }
+      $post['id_kategori'] = $stokKategoriInsert['last_inserted_id'];
+    }
+
+    $stokHistori = $post['type'] === 'add' ? $this->model('StokMasuk') : $this->model('StokKeluar');
+    $idKeyName = $post['type'] === 'add' ? 'id_stok_masuk_kategori' : 'id_stok_keluar_kategori';
+    $qtyKeyName = $post['type'] === 'add' ? 'kuantitas_stok_masuk' : 'kuantitas_stok_keluar';
+    $stokHistoriInsert = $stokHistori->insert([
+      $idKeyName => $post['id_kategori'],
+      $qtyKeyName => $post['kuantitas']
+    ]);
+
+    if (!$stokHistoriInsert['success']) {
+      Flasher::setFlash('Gagal menyimpan data.', 'danger', 'ni ni-fat-remove');
+      return $this->redirect('obat');
+    }
+
+    $obat = $this->model('Obat');
+    $obatUpdate = $obat->update(
+      [
+        'stok_obat' => $stok_baru
+      ],
+      [
+        'params' => [
+          [
+            'column' => 'md5(id_obat)',
+            'value' => $post['id_obat']
+          ]
+        ]
+      ]
+    );
+
+    if (!$obatUpdate['success']) {
+      $stokHistori->delete(
+        [
+          'params' => [
+            [
+              'column' => $idKeyName,
+              'value' => $stokHistoriInsert['last_inserted_id']
+            ]
+          ]
+        ]
+      );
+      Flasher::setFlash('Gagal menyimpan data.', 'danger', 'ni ni-fat-remove');
+      return $this->redirect('obat');
+    }
+
+    Flasher::setFlash('Stok telah diperbarui', 'success', 'ni ni-check-bold');
+    return $this->redirect('obat');
   }
 }
