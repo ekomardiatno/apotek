@@ -110,48 +110,5 @@
     $('#search-pasien').on("keyup", function() {
       dataTable.search(this.value).draw()
     })
-
-    $('body').on('click', '.hapus-data', function(e) {
-      bootbox.confirm({
-        message: 'Apakah Anda yakin akan menghapus data?',
-        buttons: {
-          confirm: {
-            label: 'Hapus',
-            className: 'btn-secondary btn-sm'
-          },
-          cancel: {
-            label: 'Batal',
-            className: 'btn-primary btn-sm'
-          }
-        },
-        callback: (result) => {
-          if (result) {
-            const form = document.createElement('form')
-            form.method = 'post'
-            form.action = $(this).data('action')
-            const fields = [{
-                name: '_key',
-                value: $(this).data('key')
-              },
-              {
-                name: 'nik',
-                value: $(this).data('id')
-              }
-            ]
-            for (let i = 0; i < fields.length; i++) {
-              const hiddenField = document.createElement('input')
-              hiddenField.type = 'hidden'
-              hiddenField.name = fields[i].name
-              hiddenField.value = fields[i].value
-
-              form.appendChild(hiddenField)
-            }
-
-            document.body.appendChild(form)
-            form.submit()
-          }
-        }
-      })
-    })
   </script>
 </div>

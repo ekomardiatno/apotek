@@ -367,6 +367,51 @@
     $('.username-form').on('keyup', e => {
       e.target.value = e.target.value.replace(/[^a-zA-Z0-9_]/g, '')
     })
+
+
+
+    $('body').on('click', '.hapus-data', function(e) {
+      bootbox.confirm({
+        message: 'Apakah Anda yakin akan menghapus data?',
+        buttons: {
+          confirm: {
+            label: 'Hapus',
+            className: 'btn-secondary btn-sm'
+          },
+          cancel: {
+            label: 'Batal',
+            className: 'btn-primary btn-sm'
+          }
+        },
+        callback: (result) => {
+          if (result) {
+            const form = document.createElement('form')
+            form.method = 'post'
+            form.action = $(this).data('action')
+            const fields = [{
+                name: '_key',
+                value: $(this).data('key')
+              },
+              {
+                name: $(this).data('keyid'),
+                value: $(this).data('id')
+              }
+            ]
+            for (let i = 0; i < fields.length; i++) {
+              const hiddenField = document.createElement('input')
+              hiddenField.type = 'hidden'
+              hiddenField.name = fields[i].name
+              hiddenField.value = fields[i].value
+
+              form.append(hiddenField)
+            }
+
+            document.body.append(form)
+            form.submit()
+          }
+        }
+      })
+    })
   </script>
 
 </body>
