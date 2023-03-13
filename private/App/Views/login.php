@@ -1,5 +1,4 @@
-<div class="row justify-content-center">
-  <div class="col-lg-5 col-md-7">
+  <div class="mx-auto" style="max-width:500px">
     <div class="card bg-secondary shadow border-0 mt-5">
       <div class="card-body px-lg-5 py-lg-5">
         <div class="text-center text-muted mb-4">
@@ -31,4 +30,3 @@
       </div>
     </div>
   </div>
-</div>
