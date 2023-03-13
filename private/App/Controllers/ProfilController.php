@@ -14,7 +14,7 @@ class ProfilController extends Controller
 
     $username = Auth::user('username');
     $data = $this->_model->read(
-      ['id_user', 'username', 'name', 'email'],
+      ['md5(id_user) as id_user', 'username', 'name', 'email'],
       [
         'params' => [
           [
@@ -33,9 +33,10 @@ class ProfilController extends Controller
     $this->_web->view('profil', $data);
   }
 
-  public function update($id)
+  public function update()
   {
     $post = $this->request()->post;
+    $id = $post['id_user'];
     if ($post['attr']['password'] === '') {
       unset($post['attr']['password']);
     } else {
@@ -45,9 +46,9 @@ class ProfilController extends Controller
     $user = $this->_model->read(
       ['password'],
       [
-        'cond' => [
+        'params' => [
           [
-            'column' => 'id_users',
+            'column' => 'md5(id_user)',
             'value' => $id
           ]
         ]
@@ -56,7 +57,14 @@ class ProfilController extends Controller
     )['data'];
 
     if (password_verify($password, $user['password'])) {
-      $update = $this->_model->update($attr, ['data_id' => $id]);
+      $update = $this->_model->update($attr, [
+        'params' => [
+          [
+            'column' => 'md5(id_user)',
+            'value' => $id
+          ]
+        ]
+      ]);
       if ($update['success']) {
         $_SESSION['auth']['username'] = $attr['username'];
         $_SESSION['auth']['name'] = $attr['name'];

@@ -1,9 +1,10 @@
-<form action="<?= Web::url('profil.update.' . $data['id_user']) ?>" method="POST" id="change-profil">
+<form action="<?= Web::url('profil.update') ?>" method="POST" id="change-profil">
   <div class="mb-4">
     <div class="card-group-flex-row card-group-flex-row-md">
       <div class="card bg-secondary shadow mb-3">
         <div class="card-body">
           <?= Web::key_field() ?>
+          <input type="hidden" name="id_user" value="<?= $data['id_user'] ?>" />
           <div class="form-group">
             <label class="small form-control-label" for="username">Username<span class="text-danger">*</span></label>
             <input value="<?= $data['username'] ?>" type="text" maxlength="50" placeholder="Masukkan username" required name="attr[username]" id="username" class="form-control form-control-sm form-control-alternative username-form">
@@ -55,28 +56,8 @@
       <div class="card-body p-3">
         <div class="row align-items-center">
           <div class="col-12 col-lg-6 mb-3 mb-lg-0">
-            <button type="button" class="btn btn-primary btn-sm btn-save mb-1" data-toggle="modal" data-target="#modalSimpan">Simpan</button>
+            <button type="submit" class="btn btn-primary btn-save btn-sm mb-1">Simpan</button>
             <p class="font-italic small text-muted mb-0">Klik untuk menyimpan perubahan</p>
-            <!-- Modal -->
-            <div class="modal fade" id="modalSimpan" tabindex="-1" role="dialog" aria-labelledby="labelModalSimpan" aria-hidden="true">
-              <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="labelModalSimpan">Peringatan</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <h3 class="m-0 font-weight-bold">Yakin ingin mengubah data?</h3>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Ubah</button>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
           <div class="col-12 col-lg-6">
             <a href="<?= Web::url('logout') ?>" class="btn btn-danger btn-sm mb-1">Logout</a>
@@ -131,9 +112,10 @@
   })
 
   form.find('.btn-save').on('click', function() {
+    console.log('yeay')
     if (!isReady($(this))) {
       e.preventDefault()
-      flashMessage('ni ni-fat-remove', 'Gagal! Periksa kembali form', '<?= $msg['type']; ?>', '<?= $msg['y']; ?>', '<?= $msg['x']; ?>')
+      flashMessage('ni ni-fat-remove', 'Mohon periksa kembali isian anda', 'warning', 'top', 'center')
     }
   })
 </script>
