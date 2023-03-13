@@ -357,6 +357,10 @@ class Database
                 'sql' => $sql
             ];
         }
+        if (gettype($query) === 'boolean') return [
+            'success' => true,
+            'sql' => $sql
+        ];
         switch ($fetch) {
             case 'ARRAY_ONE':
                 $row = $query->fetch_assoc();

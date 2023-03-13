@@ -46,7 +46,7 @@ class Controller
         }
 
         if ($this->has_login) {
-            if (!in_array($_SESSION['auth']['role'], $role)) {
+            if (count($role) > 0 && !in_array($_SESSION['auth']['role'], $role)) {
                 $this->redirect('');
             }
         } else {
