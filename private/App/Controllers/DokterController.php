@@ -81,6 +81,7 @@ class DokterController extends Controller
         "sip_dokter" => $row['sip_dokter'],
         "pengaturan" => "<a href='" . Web::url('obat.edit.' . md5($row['id_dokter'])) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span> Edit</a>"
           . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-action='" . Web::url('obat.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-keyid='id_dokter' data-id='" . md5($row['id_dokter']) . "'><span class='fas fa-trash'></span> Hapus</button>"
+          . "<form action='" . Web::url('dokter.reset') . "' method='post' class='d-inline-block'>" . Web::key_field() . "<input type='hidden' name='username' value='" . $row['username'] . "' /><button type='submit' class='btn btn-outline-primary btn-sm'><span class='fas fa-key'></span> Reset</button></form>"
       );
       $i++;
     }
@@ -96,8 +97,27 @@ class DokterController extends Controller
     echo json_encode($response);
   }
 
+  public function reset()
+  {
+    $this->role(['farma']);
+    $post = $this->request()->post;
+    $user = $this->model('User');
+    $updateUser = $user->update(['password' => Mod::hash($post['username'])], [
+      'params' => [
+        ['column' => 'username', 'value' => $post['username']]
+      ]
+    ]);
+    if (!$updateUser['success']) {
+      Flasher::setFlash('Gagal mengatur ulang password', 'danger', 'ni ni-fat-remove');
+    } else {
+      Flasher::setFlash('Gagal mengatur ulang password', 'success', 'ni ni-check-bold');
+    }
+    $this->redirect('dokter');
+  }
+
   public function tambah()
   {
+    $this->role(['farma']);
     $this->_web->title('Dokter');
     $this->_web->breadcrumb([
       [
@@ -112,6 +132,7 @@ class DokterController extends Controller
 
   public function pos()
   {
+    $this->role(['farma']);
     $post = $this->request()->post;
     $post_user = [
       'name' => $post['name'],
