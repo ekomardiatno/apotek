@@ -10,8 +10,7 @@
 class Flasher
 {
 
-    private static $msg = null,
-    $data = null;
+    private static $data = null;
 
     public static function setFlash($msg, $type, $icon = null, $y = 'top', $x = 'center')
     {
@@ -24,25 +23,25 @@ class Flasher
             'y' => $y
         ];
 
+        return isset($_SESSION['flash']);
     }
 
     public static function flash()
     {
+        $msg = null;
 
         if (isset($_SESSION['flash'])) {
-            self::$msg = $_SESSION['flash'];
+            $msg = $_SESSION['flash'];
+            unset($_SESSION['flash']);
         }
 
-        unset($_SESSION['flash']);
-        return self::$msg;
-
+        return $msg;
     }
 
     public static function setData($data)
     {
 
         $_SESSION['data_flasher'] = $data;
-
     }
 
     public static function data()
@@ -54,7 +53,5 @@ class Flasher
 
         unset($_SESSION['data_flasher']);
         return self::$data;
-
     }
-
 }
