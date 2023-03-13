@@ -1,7 +1,7 @@
 <?php $flash = Flasher::data(); ?>
 <?php $data_resep = $flash['resep'] ?? $data['resep'] ?? [] ?>
 <?php $pasien = $data['pasien'] ?? null ?>
-<?php $props = ['nama' => 'Nama Pasien', 'jenis_kelamin' => 'Jenis Kelamin', 'tanggal_lahir' => 'Umur', 'alamat' => 'Alamat'] ?>
+<?php $props = ['nama' => 'Nama Pasien', 'jenis_kelamin' => 'Jenis Kelamin', 'umur' => 'Umur', 'alamat' => 'Alamat'] ?>
 <div class="row">
   <?php if ($pasien) : ?>
     <div class="col-md-4">
@@ -12,12 +12,6 @@
             switch ($key) {
               case 'jenis_kelamin':
                 $value = $value === 'l' ? 'Laki-laki' : 'Perempuan';
-                break;
-              case 'tanggal_lahir':
-                $tanggal_lahir = new DateTime($value);
-                $tanggal_now = new DateTime();
-                $diff = $tanggal_now->diff($tanggal_lahir);
-                $value = $diff->y . ' Tahun';
             }
             ?>
             <label class="mb-1 small"><?= $props[$key] ?></label>
@@ -28,9 +22,14 @@
     </div>
   <?php endif ?>
   <div class="<?= $pasien ? 'col-md-8' : 'col' ?>">
-    <form action="<?= Web::url('resep.pos') ?>" method="post">
+    <form action="<?= isset($data['id_resep']) ? Web::url('resep.update') : Web::url('resep.pos') ?>" method="post">
       <?= Web::key_field() ?>
-      <input type="hidden" name="id_konsul" value="<?= $data['id_konsul'] ?>" />
+      <?php if (isset($data['id_konsul'])) : ?>
+        <input type="hidden" name="id_konsul" value="<?= $data['id_konsul'] ?>" />
+      <?php endif ?>
+      <?php if (isset($data['id_resep'])) : ?>
+        <input type="hidden" name="id_resep" value="<?= $data['id_resep'] ?>" />
+      <?php endif ?>
       <div class="card shadow mb-4">
         <div class="card-body">
           <div class="d-flex align-items-center mb-3" style="gap:1rem">
@@ -72,7 +71,7 @@
                       <input class="form-control form-control-sm" type="text" value="<?= $resep['dosis'] ?>" required="" placeholder="Dosis" name="data[dosis][]">
                     </td>
                     <td class="p-2">
-                      <button type="button" class="btn btn-danger btn-sm"><span class="fas fa-times"></span></button>
+                      <button type="button" class="btn btn-danger btn-sm" onclick="hapusBarisObat(this)"><span class="fas fa-times"></span></button>
                     </td>
                   </tr>
                 <?php endforeach ?>
@@ -81,7 +80,7 @@
           </table>
         </div>
         <div class="card-footer d-flex">
-          <a href="<?= Web::url('konsul'); ?>" class="btn btn-secondary ml-auto">Batal</a>
+          <a href="<?= isset($data['id_resep']) ? Web::url('resep') : Web::url('konsul'); ?>" class="btn btn-secondary ml-auto">Batal</a>
           <button type="submit" class="btn btn-primary" id="tombol-simpan-resep">Simpan</button>
         </div>
       </div>
@@ -93,6 +92,23 @@
   <?php if (count($data_resep) < 1) : ?>
     $('#tombol-simpan-resep').attr('disabled', true)
   <?php endif ?>
+
+  function hapusBarisObat(e) {
+    const tr = $(e.target ?? e).parents('tr')
+    if (tr.length < 1) return
+    const tableBody = tr[0].parentNode
+    const parentChildLength = tableBody.children.length
+    tr[0].remove()
+    if (parentChildLength < 2) {
+      $('#tombol-simpan-resep').attr('disabled', true)
+      $(tableBody).append(`
+          <tr id="hapus-ini-nanti">
+            <td colspan="4" class="text-center">Silakan tambahkan obat</td>
+          </tr>
+        `)
+    }
+  }
+
   $('#tambah-resep-obat').on('click', e => {
     const select = $('#pilih-resep-obat').length > 0 ? $('#pilih-resep-obat')[0] : null
     if (!select) return flashMessage('ni ni-fat-remove', 'Tidak dapat menambahkan obat', 'danger', 'top', 'center')
@@ -150,21 +166,7 @@
     const removeButton = element('button')
     removeButton.type = 'button'
     removeButton.className = 'btn btn-danger btn-sm'
-    removeButton.addEventListener('click', e => {
-      const tr = $(e.target).parents('tr')
-      if (tr.length < 1) return
-      const tableBody = tr[0].parentNode
-      const parentChildLength = tableBody.children.length
-      tr[0].remove()
-      if (parentChildLength < 2) {
-        $('#tombol-simpan-resep').attr('disabled', true)
-        $(tableBody).append(`
-          <tr id="hapus-ini-nanti">
-            <td colspan="4" class="text-center">Silakan tambahkan obat</td>
-          </tr>
-        `)
-      }
-    })
+    removeButton.addEventListener('click', hapusBarisObat)
     const spanIconButton = element('span')
     spanIconButton.className = 'fas fa-times'
     removeButton.append(spanIconButton)

@@ -9,7 +9,7 @@ class KonsulController extends Controller
   public function __construct()
   {
     parent::__construct();
-    $this->role(['konsul']);
+    $this->role();
     $this->db = Database::getInstance();
     $this->monthShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   }
@@ -33,11 +33,12 @@ class KonsulController extends Controller
 
   public function index()
   {
-    $this->redirect('konsul.daftar');
+    $this->redirect('');
   }
 
   public function daftar($id = '')
   {
+    $this->role(['konsul']);
     $this->_web->title('Pendaftaran');
     $this->_web->breadcrumb([
       [
@@ -72,7 +73,7 @@ class KonsulController extends Controller
 
   public function pos()
   {
-
+    $this->role(['konsul']);
     $post = $this->request()->post;
     $pasien = $this->model('Pasien');
     $konsul = $this->model('Konsul');
@@ -121,7 +122,7 @@ class KonsulController extends Controller
       }
     } else {
       $sql_existed_date = "SELECT * FROM `konsul` WHERE nik = '" . $post['nik'] . "' AND ('" . $post['tanggal'] . "' BETWEEN tanggal AND tanggal_kembali OR '" . $post['tanggal_kembali'] . "' BETWEEN tanggal AND tanggal_kembali) ORDER BY tanggal ASC";
-      $data_existed_date = $this->db->query($sql_existed_date);
+      $data_existed_date = $this->db->query($sql_existed_date)['data'];
       $available_date = false;
       if (count($data_existed_date) >= 2) {
         if (strtotime($post['tanggal']) >= strtotime($data_existed_date[0]['tanggal_kembali']) && strtotime($post['tanggal_kembali']) <= strtotime($data_existed_date[1]['tanggal'])) $available_date = true;
@@ -159,7 +160,10 @@ class KonsulController extends Controller
 
   public function hapus()
   {
+    $this->role(['konsul']);
     $post = $this->request()->post;
+    echo json_encode($post);
+    die;
     $konsul = $this->model('Konsul');
     $delete = $konsul->delete(
       [
@@ -183,9 +187,10 @@ class KonsulController extends Controller
 
   public function edit($id)
   {
+    $this->role(['konsul']);
     $db = Database::getInstance();
     $sql = "SELECT id_konsul, a.id_dokter, a.tanggal, a.nik, b.nama, b.alamat, b.tanggal_lahir, b.jenis_kelamin, b.norm, a.tanggal_kembali FROM konsul a LEFT JOIN pasien b ON b.nik=a.nik WHERE md5(id_konsul)='" . $id . "'";
-    $data = $db->query($sql, 'ARRAY_ONE');
+    $data = $db->query($sql, 'ARRAY_ONE')['data'];
 
     if (!$data) return printf('ID Konsultasi tidak valid');
 
@@ -206,6 +211,7 @@ class KonsulController extends Controller
 
   public function perbarui($id)
   {
+    $this->role(['konsul']);
     $post = $this->request()->post;
     $pasien = $this->model('Pasien');
     $konsul = $this->model('Konsul');

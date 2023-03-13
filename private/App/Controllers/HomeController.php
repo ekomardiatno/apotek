@@ -6,6 +6,7 @@ class HomeController extends Controller
     public function __construct()
     {
         parent::__construct();
+        $this->role();
     }
 
     public function index()
@@ -13,7 +14,7 @@ class HomeController extends Controller
         $this->_web->title('Konsultasi');
         $this->_web->breadcrumb([
             [
-                'home', 'Konsultasi'
+                'home', 'Daftar Konsultasi'
             ]
         ]);
         $this->_web->view('home');
@@ -76,7 +77,7 @@ class HomeController extends Controller
         $totalRecordwithFilter = $records['allcount'] ?? 0;
 
         // Fetch records
-        $stmt = $pdo->prepare("SELECT konsul.id_konsul AS id_konsul, pasien.nama AS nama, pasien.nik AS nik, pasien.norm AS norm, pasien.jenis_kelamin AS jenis_kelamin, konsul.tanggal AS tanggal, konsul.tanggal_kembali AS tanggal_kembali, konsul.tanggal_dibuat, pasien.tanggal_lahir FROM konsul LEFT JOIN pasien ON konsul.nik=pasien.nik WHERE 1" . $searchQuery . ($isDokter ? " AND id_dokter='$dokter[id_dokter]' AND konsul.status_selesai='0'" : '') . " ORDER BY " . $columnName . " " . $columnSortOrder . ", konsul.tanggal_dibuat " . $columnSortOrder . " LIMIT :limit,:offset");
+        $stmt = $pdo->prepare("SELECT konsul.id_konsul AS id_konsul, pasien.nama AS nama, pasien.nik AS nik, pasien.norm AS norm, pasien.jenis_kelamin AS jenis_kelamin, konsul.tanggal AS tanggal, konsul.tanggal_kembali AS tanggal_kembali, konsul.tanggal_dibuat, pasien.tanggal_lahir, user.name AS nama_dokter FROM konsul LEFT JOIN pasien ON konsul.nik=pasien.nik LEFT JOIN dokter ON konsul.id_dokter=dokter.id_dokter LEFT JOIN user ON user.username=dokter.username WHERE 1" . $searchQuery . ($isDokter ? " AND konsul.id_dokter='$dokter[id_dokter]' AND konsul.status_selesai='0'" : '') . " ORDER BY " . $columnName . " " . $columnSortOrder . ", konsul.tanggal_dibuat " . $columnSortOrder . " LIMIT :limit,:offset");
 
         // Bind values
         foreach ($searchArray as $key => $search) {
@@ -105,8 +106,9 @@ class HomeController extends Controller
                 "tanggal_kembali" => Mod::timepiece($row['tanggal_kembali']),
                 "tanggal_dibuat" => Mod::timepiece($row['tanggal_dibuat']),
                 'umur' => $dateNow->diff($bornDate)->y . ' Tahun',
+                'nama_dokter' => $row['nama_dokter'],
                 "pengaturan" => $isDokter ? "<a href='" . Web::url('resep.tambah.' . md5($row['id_konsul'])) . "' class='btn btn-primary btn-sm'><span class='fas fa-edit'></span> Buat Resep</a>" : ("<a href='" . Web::url('konsul.edit.' . md5($row['id_konsul'])) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span> Edit</a>"
-                    . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-action='" . Web::url('konsul.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . md5($row['id_konsul']) . "'><span class='fas fa-trash'></span> Hapus</button>")
+                    . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-keyid='id_konsul' data-action='" . Web::url('konsul.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . md5($row['id_konsul']) . "'><span class='fas fa-trash'></span> Hapus</button>")
             );
             $i++;
         }

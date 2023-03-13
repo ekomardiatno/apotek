@@ -80,7 +80,7 @@ class DokterController extends Controller
         "kategori_dokter" => $row['kategori_dokter'],
         "sip_dokter" => $row['sip_dokter'],
         "pengaturan" => "<a href='" . Web::url('obat.edit.' . md5($row['id_dokter'])) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span> Edit</a>"
-          . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-action='" . Web::url('obat.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . md5($row['id_dokter']) . "'><span class='fas fa-trash'></span> Hapus</button>"
+          . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-action='" . Web::url('obat.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-keyid='id_dokter' data-id='" . md5($row['id_dokter']) . "'><span class='fas fa-trash'></span> Hapus</button>"
       );
       $i++;
     }
@@ -118,7 +118,7 @@ class DokterController extends Controller
       'username' => $post['username'],
       'email' => $post['email'],
       'role' => 'dokter',
-      'password' => password_hash($post['username'], PASSWORD_DEFAULT)
+      'password' => Mod::hash($post['username'])
     ];
     $post_dokter = [
       'sip_dokter' => $post['sip_dokter'],

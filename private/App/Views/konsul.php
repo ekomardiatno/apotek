@@ -232,7 +232,6 @@
 
   <?php
   if ($data['pasien']) {
-
   ?>
     checkingPasien()
   <?php

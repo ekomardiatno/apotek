@@ -3,6 +3,15 @@
 class ResepController extends Controller
 {
 
+  private $_db;
+
+  public function __construct()
+  {
+    parent::__construct();
+    $this->_db = new Database;
+    $this->role(['konsul', 'dokter']);
+  }
+
   public function index($type = null)
   {
     $this->_web->title('Resep');
@@ -91,15 +100,19 @@ class ResepController extends Controller
       $tanggal_lahir = new DateTime($row['tanggal_lahir']);
       $tanggal_now = new DateTime();
       $diff_tanggal = $tanggal_now->diff($tanggal_lahir);
+      $data_resep = '';
+      foreach (unserialize($row['data_resep']) as $id => $resep) {
+        $data_resep .= '(' . $resep['kuantitas'] . ') ' . $resep['nama_obat'] . ' - ' . $resep['dosis'] . ($id < count(unserialize($row['data_resep'])) - 1 ? ', ' : '');
+      }
       $data[] = [
         'no' => $i,
         'tanggal_diubah' => $row['tanggal_diubah'],
         'tanggal' => Mod::timepiece($row['tanggal_diubah']),
         'nama' => $row['nama'],
         'jenis_kelamin' => $row['jenis_kelamin'] === 'l' ? 'Laki-laki' : 'Perempuan',
-        'umur' => $diff_tanggal->y,
-        'data_resep' => '-',
-        'pengaturan' => Auth::user('role') === 'dokter' ? "<button type='button' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span><span class='d-none d-md-inline-block ml-1'>Edit</span></button><button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-action='" . Web::url('resep.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . md5($row['id_resep']) . "'><span class='fas fa-trash'></span><span class='d-none d-md-inline-block ml-1'>Hapus</span></button>" : "<button type='button' class='btn btn-outline-primary btn-sm'><span class='fas fa-print'></span><span class='d-none d-md-inline-block ml-1'>Cetak</span></button>",
+        'umur' => $diff_tanggal->y . ' Tahun',
+        'data_resep' => $data_resep,
+        'pengaturan' => Auth::user('role') === 'dokter' ? "<a href='" . Web::url('resep.edit.' . md5($row['id_resep'])) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span><span class='d-none d-md-inline-block ml-1'>Edit</span></a><button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-keyid='id_resep' data-action='" . Web::url('resep.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . md5($row['id_resep']) . "'><span class='fas fa-trash'></span><span class='d-none d-md-inline-block ml-1'>Hapus</span></button>" : "<button type='button' class='btn btn-outline-primary btn-sm'><span class='fas fa-print'></span><span class='d-none d-md-inline-block ml-1'>Cetak</span></button>",
         'nama_dokter' => $row['name']
       ];
       $i++;
@@ -116,10 +129,10 @@ class ResepController extends Controller
     echo json_encode($response);
   }
 
-  private function __dataObat($plainId = false, $where = null, $fetch = 'ARRAY')
+  private function __dataObat()
   {
     $obat = $this->model('Obat');
-    $data_obat = $obat->read(['nama_obat', 'satuan_obat', ($plainId ? 'id_obat' : 'md5(id_obat) as id_obat')], $where, $fetch);
+    $data_obat = $obat->read(['nama_obat', 'satuan_obat', 'md5(id_obat) as id_obat']);
     return $data_obat['data'];
   }
 
@@ -140,6 +153,7 @@ class ResepController extends Controller
 
   public function tambah($id = '')
   {
+    $this->role(['dokter']);
     $this->_web->title('Resep');
     $this->_web->breadcrumb([
       [
@@ -151,8 +165,9 @@ class ResepController extends Controller
     ]);
     if ($id === '') return $this->redirect('konsul');
     $db = Database::getInstance();
-    $pasien = $db->query("SELECT pasien.nama, pasien.jenis_kelamin, pasien.tanggal_lahir, pasien.alamat FROM `konsul` LEFT JOIN pasien ON pasien.nik=konsul.nik WHERE md5(id_konsul)='" . $id . "'", 'ARRAY_ONE');
+    $pasien = $db->query("SELECT pasien.nama, pasien.jenis_kelamin, timestampdiff(year, pasien.tanggal_lahir, curdate()) as umur, pasien.alamat FROM `konsul` LEFT JOIN pasien ON pasien.nik=konsul.nik WHERE md5(konsul.id_konsul)='" . $id . "' AND konsul.status_selesai='0'", 'ARRAY_ONE');
     $pasien = $pasien['success'] ? $pasien['data'] : null;
+    if (!$pasien) return $this->redirect('konsul');
     $this->_web->view('resep_form', [
       'id_konsul' => $id,
       'obat' => $this->__dataObat(),
@@ -161,6 +176,7 @@ class ResepController extends Controller
   }
   public function pos()
   {
+    $this->role(['dokter']);
     $post = $this->request()->post;
     if (!isset($post['data'])) return $this->redirect('konsul');
     $data = [];
@@ -207,7 +223,7 @@ class ResepController extends Controller
     }
 
     if (count($unableToSaved) > 0) {
-      Flasher::setFlash('Beberapa obat memiliki stok yg tidak cukup.', 'error', 'danger', 'ni ni-fat-remove');
+      Flasher::setFlash('Stok ' . $unableToSaved[0]['nama_obat'] . ' tidak cukup.', 'danger', 'ni ni-fat-remove');
       foreach ($data as $key => $val) {
         if (in_array($val, $unableToSaved)) array_splice($data, $key, 1);
       }
@@ -224,7 +240,7 @@ class ResepController extends Controller
     ]);
 
     if (!$resepInsert['success']) {
-      Flasher::setFlash('Tidak dapat menyimpan data.', 'error', 'danger', 'ni ni-fat-remove');
+      Flasher::setFlash('Tidak dapat menyimpan data.', 'danger', 'ni ni-fat-remove');
       Flasher::setData([
         'resep' => $data
       ]);
@@ -266,7 +282,7 @@ class ResepController extends Controller
           ]
         ]
       ]);
-      Flasher::setFlash('Tidak dapat menyimpan data.', 'error', 'danger', 'ni ni-fat-remove');
+      Flasher::setFlash('Tidak dapat menyimpan data.', 'danger', 'ni ni-fat-remove');
       Flasher::setData([
         'resep' => $data
       ]);
@@ -284,6 +300,157 @@ class ResepController extends Controller
     ]);
 
     Flasher::setFlash('Resep telah dibuat.', 'success', 'ni ni-check-bold');
-    return $this->redirect('konsul');
+    $this->redirect('konsul');
+  }
+
+  public function edit($id = null)
+  {
+    $this->role(['dokter']);
+    $this->_web->title('Resep');
+    $this->_web->breadcrumb([
+      [
+        'resep', 'Data Resep'
+      ],
+      [
+        'resep.edit', 'Edit Resep'
+      ]
+    ]);
+    if (!$id) return $this->redirect('resep');
+    $pasien = $this->_db->query('SELECT resep.data_resep, pasien.nama, pasien.jenis_kelamin, timestampdiff(year, pasien.tanggal_lahir, curdate()) as umur, pasien.alamat FROM resep LEFT JOIN konsul ON konsul.id_konsul=resep.id_konsul LEFT JOIN pasien ON pasien.nik=konsul.nik WHERE md5(resep.id_resep)="' . $id . '"', 'ARRAY_ONE')['data'];
+    $data_resep = $pasien['data_resep'];
+    unset($pasien['data_resep']);
+    $this->_web->view('resep_form', [
+      'id_resep' => $id,
+      'pasien' => $pasien,
+      'obat' => $this->__dataObat(),
+      'resep' => unserialize($data_resep)
+    ]);
+  }
+
+  private function searchForId($val, $array, $prop)
+  {
+    foreach ($array as $key => $obj) {
+      if ($obj[$prop] === $val) {
+        return $key;
+      }
+    }
+    return -1;
+  }
+
+  public function update()
+  {
+    $this->role(['dokter']);
+    $post = $this->request()->post;
+    $curResep = $this->model('Resep')->read(['data_resep'], [
+      'params' => [
+        ['column' => 'md5(id_resep)', 'value' => $post['id_resep']]
+      ]
+    ], 'ARRAY_ONE');
+    $curResep = $curResep ? $curResep['data']['data_resep'] : null;
+    $nextResep = [];
+    foreach ($post['data']['id_obat'] as $index => $id_obat) {
+      $kuantitas = intval($post['data']['kuantitas'][$index]);
+      $dosis = $post['data']['dosis'][$index];
+      $nama_obat = $post['data']['nama_obat'][$index];
+      $nextResep[] = [
+        'id_obat' => $id_obat,
+        'nama_obat' => $nama_obat,
+        'kuantitas' => $kuantitas,
+        'dosis' => $dosis,
+      ];
+    }
+    if (!$curResep['success']) {
+      Flasher::setFlash('Tidak dapat menyimpan data.', 'danger', 'ni ni-fat-remove');
+      Flasher::setData([
+        'resep' => $nextResep
+      ]);
+      return $this->redirect('resep.edit.' . $post['id_resep']);
+    }
+    $curResep = unserialize($curResep);
+
+    foreach ($nextResep as $obj) {
+      $indexedCurResep = $this->searchForId($obj['id_obat'], $curResep, 'id_obat');
+      $checkAny = $this->_db->query('SELECT stok_obat FROM obat WHERE stok_obat>=' . ($indexedCurResep < 0 ? $obj['kuantitas'] : $obj['kuantitas'] - $curResep[$indexedCurResep]['kuantitas']) . ' AND md5(id_obat)="' . $obj['id_obat'] . '"', 'ARRAY_ONE')['data'];
+      if (!$checkAny) {
+        Flasher::setFlash('Stok ' . $obj['nama_obat'] . ' tidak cukup.', 'danger', 'ni ni-fat-remove');
+        Flasher::setData([
+          'resep' => $nextResep
+        ]);
+        return $this->redirect('resep.edit.' . $post['id_resep']);
+      }
+    }
+
+    $updateResep = $this->_db->query("UPDATE resep SET data_resep='" . serialize($nextResep) . "' WHERE md5(id_resep)='" . $post['id_resep'] . "'");
+
+    if (!$updateResep['success']) {
+      Flasher::setFlash('Tidak dapat menyimpan data.', 'danger', 'ni ni-fat-remove');
+      Flasher::setData([
+        'resep' => $nextResep
+      ]);
+      return $this->redirect('resep.edit.' . $post['id_resep']);
+    }
+
+    foreach ($nextResep as $obj) {
+      $indexedCurResep = $this->searchForId($obj['id_obat'], $curResep, 'id_obat');
+      if ($indexedCurResep < 0) {
+        $this->_db->query('UPDATE obat SET stok_obat=stok_obat-' . $obj['kuantitas'] . ' WHERE md5(id_obat)="' . $obj['id_obat'] . '"');
+      } else {
+        $stok_baru = $obj['kuantitas'] - $curResep[$indexedCurResep]['kuantitas'];
+        $this->_db->query('UPDATE obat SET stok_obat=stok_obat-' . $stok_baru . ' WHERE md5(id_obat)="' . $obj['id_obat'] . '"');
+        array_splice($curResep, $indexedCurResep, 1);
+      }
+    }
+
+    if (count($curResep) > 0) {
+      foreach ($curResep as $obj) {
+        $this->_db->query('UPDATE obat SET stok_obat=stok_obat+' . $obj['kuantitas'] . ' WHERE md5(id_obat)="' . $obj['id_obat'] . '"');
+      }
+    }
+
+    Flasher::setFlash('Resep telah diubah.', 'success', 'ni ni-check-bold');
+    $this->redirect('resep.edit.' . $post['id_resep']);
+  }
+
+  public function hapus()
+  {
+    $this->role(['dokter']);
+    $post = $this->request()->post;
+    $curResep = $this->model('Resep')->read(['id_konsul', 'data_resep'], [
+      'params' => [
+        ['column' => 'md5(id_resep)', 'value' => $post['id_resep']]
+      ]
+    ], 'ARRAY_ONE');
+    if (!$curResep['success'] || !$curResep['data']) {
+      Flasher::setFlash('Tidak dapat menghapus data.', 'danger', 'ni ni-fat-remove');
+      return $this->redirect('resep');
+    }
+
+    $updateKonsul = $this->_db->query('UPDATE konsul SET status_selesai="0" WHERE id_konsul="' . $curResep['data']['id_konsul'] . '"');
+    if (!$updateKonsul['success']) {
+      Flasher::setFlash('Tidak dapat menghapus data.', 'danger', 'ni ni-fat-remove');
+      return $this->redirect('resep');
+    }
+
+    $error = [];
+    foreach (unserialize($curResep['data']['data_resep']) as $obj) {
+      $updateStok = $this->_db->query('UPDATE obat SET stok_obat=stok_obat+' . $obj['kuantitas'] . ' WHERE md5(id_obat)="' . $obj['id_obat'] . '"');
+      if (!$updateStok['success']) {
+        $error[] = $obj;
+      }
+    }
+
+    $deleteResep = $this->_db->query('DELETE FROM resep WHERE md5(id_resep)="' . $post['id_resep'] . '"');
+    if (!$deleteResep['success']) {
+      foreach (unserialize($curResep['data']['data_resep']) as $obj) {
+        if ($this->searchForId($obj['id_obat'], $error, 'id_obat') < 0) {
+          $this->_db->query('UPDATE obat SET stok_obat=stok_obat+' . $obj['kuantitas'] . ' WHERE md5(id_obat)="' . $obj['id_obat'] . '"');
+        }
+      }
+      Flasher::setFlash('Tidak dapat menghapus data.', 'danger', 'ni ni-fat-remove');
+      return $this->redirect('resep');
+    }
+
+    Flasher::setFlash('Data telah terhapus.', 'success', 'ni ni-check-bold');
+    $this->redirect('resep');
   }
 }

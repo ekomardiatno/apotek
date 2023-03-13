@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="<?= Web::assets('nucleo.css', 'css'); ?>">
 
   <link rel="stylesheet" href="<?= Web::assets('animate.min.css', 'css'); ?>">
-  <link rel="stylesheet" href="<?= Web::assets('argon.min.css', 'css'); ?>">
+  <link rel="stylesheet" href="<?= Web::assets('argon.css', 'css'); ?>">
 
   <script src="<?= Web::assets('jquery.min.js', 'js') ?>"></script>
   <script src="<?= Web::assets('bootstrap.bundle.min.js', 'js') ?>"></script>
@@ -23,6 +23,13 @@
   <script src="<?= Web::assets('flash-message.min.js', 'js') ?>"></script>
 
   <script src="<?= Web::assets('argon.min.js', 'js'); ?>"></script>
+
+  <style>
+    .cursor-pointer,
+    .btn {
+      cursor: pointer;
+    }
+  </style>
 
 </head>
 

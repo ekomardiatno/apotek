@@ -2,9 +2,14 @@
 
 class PasienController extends Controller
 {
+  public function __construct()
+  {
+    parent::__construct();
+    $this->role(['konsul', 'farma']);
+  }
+  
   public function index()
   {
-    $this->role(['konsul', 'farma']);
     $this->_web->title('Pasien');
     $this->_web->breadcrumb([
       [
@@ -85,7 +90,7 @@ class PasienController extends Controller
         "tanggal_lahir" => $row['tanggal_lahir'] ? Mod::timepiece($row['tanggal_lahir']) : '-',
         "tanggal_dibuat" => Mod::timepiece($row['tanggal_dibuat']),
         "pengaturan" => "<a href='" . Web::url('pasien.edit.' . md5($row['nik'])) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span> Edit</a>"
-          . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-action='" . Web::url('pasien.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . md5($row['nik']) . "'><span class='fas fa-trash'></span> Hapus</button>"
+          . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-keyid='nik' data-action='" . Web::url('pasien.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . md5($row['nik']) . "'><span class='fas fa-trash'></span> Hapus</button>"
           . "<a href='" . Web::url('konsul.daftar.' . md5($row['nik'])) . "' class='btn btn-outline-primary btn-sm'><span class='fas fa-plus'></span> Konsultasi</a>"
       );
       $i++;
@@ -106,6 +111,7 @@ class PasienController extends Controller
   {
     $this->role(['konsul']);
     $post = $this->request()->post;
+    echo json_encode($post); die;
     $pasien = $this->model('Pasien');
     $delete = $pasien->delete(
       [

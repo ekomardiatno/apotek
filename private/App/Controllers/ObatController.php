@@ -2,6 +2,11 @@
 
 class ObatController extends Controller
 {
+  public function __construct()
+  {
+    parent::__construct();
+    $this->role(['farma']);
+  }
   public function index()
   {
     $this->_web->title('Obat');
@@ -82,7 +87,7 @@ class ObatController extends Controller
           . "<button type='button' class='btn btn-secondary btn-sm stock-btn' data-type='add' data-id='" . $row['id_obat'] . "' data-name='" . $row['nama_obat'] . "' data-qty='" . $row['stok_obat'] . "'><span class='fas fa-plus'></span></button>",
         "deskripsi_obat" => $row['deskripsi_obat'] !== '' ? $row['deskripsi_obat'] : '-',
         "pengaturan" => "<a href='" . Web::url('obat.edit.' . $row['id_obat']) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span><span class='ml-1 d-none d-md-inline-block'>Edit</span></a>"
-          . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-action='" . Web::url('obat.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . $row['id_obat'] . "'><span class='fas fa-trash'></span><span class='ml-1 d-none d-md-inline-block'>Hapus</span></button>"
+          . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-keyid='id_obat' data-action='" . Web::url('obat.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . $row['id_obat'] . "'><span class='fas fa-trash'></span><span class='ml-1 d-none d-md-inline-block'>Hapus</span></button>"
       );
       $i++;
     }
@@ -189,6 +194,8 @@ class ObatController extends Controller
   {
     $this->role(['farma']);
     $post = $this->request()->post;
+    echo json_encode($post);
+    die;
     $obat = $this->model('Obat');
     $delete = $obat->delete(
       [

@@ -15,7 +15,7 @@ class HomeController extends Controller
         $post = $this->request()->post;
         $sql = "SELECT nik AS value, CONCAT(nik, ' - ', nama) AS text FROM pasien WHERE nik LIKE '%" . $post['queries'] . "%' ORDER BY nama ASC LIMIT 10";
         $data = $this->db->query($sql);
-        echo json_encode($data);
+        echo json_encode($data['data']);
     }
 
     public function konsul()
@@ -29,12 +29,12 @@ class HomeController extends Controller
         $sql_konsul_first = "SELECT tanggal, tanggal_kembali FROM konsul WHERE nik='" . $post['nik'] . "' ORDER BY tanggal ASC LIMIT 1";
         $sql_pasien = "SELECT nik, nama, alamat, jenis_kelamin, tanggal_lahir, norm FROM pasien WHERE nik='" . $post['nik'] . "'";
         $sql_old_data = 'SELECT tanggal, tanggal_kembali FROM konsul WHERE md5(id_konsul)="' . ($post['id'] ?? '') . '"';
-        $old_data = isset($post['id']) !== '' ? $this->db->query($sql_old_data, 'ARRAY_ONE') : null;
-        $count_data = isset($post['id']) !== '' ? $this->db->query($sql_count_data, 'ARRAY_ONE') : null;
-        $existed_data = $this->db->query($sql_existed_data);
-        $first_konsul = $this->db->query($sql_konsul_first, 'ARRAY_ONE');
-        $last_konsul = $this->db->query($sql_konsul_last, 'ARRAY_ONE');
-        $data_pasien = $this->db->query($sql_pasien, 'ARRAY_ONE');
+        $old_data = isset($post['id']) !== '' ? $this->db->query($sql_old_data, 'ARRAY_ONE')['data'] : null;
+        $count_data = isset($post['id']) !== '' ? $this->db->query($sql_count_data, 'ARRAY_ONE')['data'] : null;
+        $existed_data = $this->db->query($sql_existed_data)['data'];
+        $first_konsul = $this->db->query($sql_konsul_first, 'ARRAY_ONE')['data'];
+        $last_konsul = $this->db->query($sql_konsul_last, 'ARRAY_ONE')['data'];
+        $data_pasien = $this->db->query($sql_pasien, 'ARRAY_ONE')['data'];
         $available_date = false;
         if (count($existed_data) >= 2) {
             if (strtotime($post['tanggal']) >= strtotime($existed_data[0]['tanggal_kembali']) && strtotime($post['tanggal_kembali']) <= strtotime($existed_data[1]['tanggal'])) $available_date = true;

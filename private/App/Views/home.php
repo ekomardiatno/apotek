@@ -23,6 +23,11 @@
               </div>
             </div>
           </div>
+          <?php if (Auth::user('role') === 'dokter') : ?>
+            <div class="mx-1 d-flex">
+              <a href="<?= Web::url('konsul'); ?>" class="btn btn-sm btn-primary d-flex align-items-center"><span class="fas fa-sync"></span></a>
+            </div>
+          <?php endif ?>
           <?php if (Auth::user('role') === 'konsul') : ?>
             <div class="mx-1 d-flex">
               <a href="<?= Web::url('konsul.daftar'); ?>" class="btn btn-sm btn-primary d-flex align-items-center"><span class="fas fa-plus-circle"></span><span class="d-none d-md-inline-block ml-1">Pendaftaran</span></a>
@@ -79,6 +84,9 @@
         <th>L/P</th>
         <th>Umur</th>
         <th>Tgl Kmbl</th>
+        <?php if (Auth::user('role') !== 'dokter') : ?>
+          <th>Nama Dokter</th>
+        <?php endif; ?>
         <?php if (Auth::user('role') === 'konsul' || Auth::user('role') === 'dokter') : ?>
           <th>Aksi</th>
         <?php endif; ?>
@@ -123,12 +131,15 @@
         {
           data: 'tanggal_kembali'
         },
-        <?php if (Auth::user('role') === 'konsul' || Auth::user('role') === 'dokter') :
-          echo "{
+        <?php if (Auth::user('role') !== 'dokter') : ?> {
+            data: 'nama_dokter',
+          },
+        <?php endif; ?>
+        <?php if (Auth::user('role') === 'konsul' || Auth::user('role') === 'dokter') : ?> {
             data: 'pengaturan',
             orderable: false
-          }";
-        endif; ?>
+          }
+        <?php endif; ?>
       ],
       order: [
         [1, '<?= Auth::user('role') === 'dokter' ? 'asc' : 'desc' ?>']

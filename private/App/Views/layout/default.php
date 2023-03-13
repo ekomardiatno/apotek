@@ -18,7 +18,7 @@
   <link rel="stylesheet" href="<?= Web::assets('nouislider.min.css', 'css') ?>">
   <link rel="stylesheet" href="<?= Web::assets('animate.min.css', 'css') ?>">
   <link rel="stylesheet" href="<?= Web::assets('datatables.min.css', 'css') ?>">
-  <link rel="stylesheet" href="<?= Web::assets('argon.min.css', 'css') ?>">
+  <link rel="stylesheet" href="<?= Web::assets('argon.css', 'css') ?>">
   <link rel="stylesheet" href="<?= Web::assets('font-awesome.min.css', 'css') ?>">
 
   <script src="<?= Web::assets('jquery.min.js', 'js') ?>"></script>
@@ -113,8 +113,9 @@
       min-height: 100vh
     }
 
-    .cursor-pointer {
-      cursor: pointer !important;
+    .cursor-pointer,
+    .btn {
+      cursor: pointer;
     }
   </style>
 

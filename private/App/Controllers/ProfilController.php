@@ -6,7 +6,7 @@ class ProfilController extends Controller
   public function __construct()
   {
     parent::__construct();
-    $this->role(['konsul', 'farma', 'dokter']);
+    $this->role();
     $this->_model = $this->model('User');
   }
   public function index()
@@ -61,12 +61,12 @@ class ProfilController extends Controller
         $_SESSION['auth']['username'] = $attr['username'];
         $_SESSION['auth']['name'] = $attr['name'];
         $_SESSION['auth']['email'] = $attr['email'];
-        Flasher::setFlash('<b>Berhasil!</b> profil diperbarui', 'success', 'ni ni-check-bold', 'top', 'center');
+        Flasher::setFlash('Profil berhasil diperbarui', 'success', 'ni ni-check-bold', 'top', 'center');
       } else {
-        Flasher::setFlash('<b>Gagal!</b> Ada kesalahan', 'danger', 'ni ni-fat-remove', 'top', 'center');
+        Flasher::setFlash('Username atau Email telah digunakan akun lain', 'danger', 'ni ni-fat-remove', 'top', 'center');
       }
     } else {
-      Flasher::setFlash('<b>Gagal!</b> Ada kesalahan', 'danger', 'ni ni-fat-remove', 'top', 'center');
+      Flasher::setFlash('Password tidak tepat', 'danger', 'ni ni-fat-remove', 'top', 'center');
     }
 
     $this->redirect('profil.edit');

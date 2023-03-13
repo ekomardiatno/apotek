@@ -27,6 +27,9 @@
             <div class="mx-1 d-flex">
               <a href="<?= $data ? Web::url('resep') : Web::url('resep.all'); ?>" class="btn btn-sm btn-primary d-flex align-items-center"><span class="fas fa-list"></span><span class="d-none d-md-inline-block ml-1"><?= $data ? 'Resep Baru' : 'Lihat Semua' ?></span></a>
             </div>
+            <div class="mx-1 d-flex">
+              <a href="<?= Web::url('resep'); ?>" class="btn btn-sm btn-primary d-flex align-items-center"><span class="fas fa-sync"></span></a>
+            </div>
           <?php endif ?>
         </div>
       </div>
@@ -39,8 +42,8 @@
         <th>#</th>
         <th>Tanggal/Waktu</th>
         <th>Nama Pasien</th>
-        <th>Umur</th>
         <th>Jenis Kelamin</th>
+        <th>Umur</th>
         <th>Resep</th>
         <?php if (Auth::user('role') === 'konsul') : ?>
           <th>Nama Dokter</th>
