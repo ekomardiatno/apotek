@@ -14,6 +14,7 @@
           'jenis_kelamin' => 'Jenis Kelamin',
           'norm' => 'Nomor Rekam Medis',
           'tanggal_lahir' => 'Tanggal Lahir',
+          'umur' => 'Umur',
           'tanggal_dibuat' => 'Terdaftar Sejak'
         ];
         foreach ($pasien_keys as $k) :

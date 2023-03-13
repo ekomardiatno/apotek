@@ -5,11 +5,11 @@ class PasienController extends Controller
   public function __construct()
   {
     parent::__construct();
-    $this->role(['konsul', 'farma']);
   }
   
   public function index()
   {
+    $this->role(['konsul', 'farma']);
     $this->_web->title('Pasien');
     $this->_web->breadcrumb([
       [
@@ -230,7 +230,7 @@ class PasienController extends Controller
     $pasien_m = $this->model('Pasien');
     $konsul_m = $this->model('Konsul');
     $pasien = $pasien_m->read(
-      ['nik', 'nama', 'alamat', 'jenis_kelamin', 'tanggal_lahir', 'norm', 'tanggal_dibuat'],
+      ['nik', 'nama', 'alamat', 'jenis_kelamin', 'timestampdiff(year, tanggal_lahir, curdate()) as umur', 'tanggal_lahir', 'norm', 'tanggal_dibuat'],
       [
         'params' => [
           [
@@ -244,6 +244,8 @@ class PasienController extends Controller
     if (!$pasien) return printf('NIK tidak valid');
 
     $pasien['tanggal_dibuat'] = Mod::timepiece($pasien['tanggal_dibuat']);
+    $pasien['tanggal_lahir'] = Mod::timepiece($pasien['tanggal_lahir']);
+    $pasien['umur'] .= ' Tahun';
 
     switch ($pasien['jenis_kelamin']) {
       case 'l':
