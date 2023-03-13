@@ -79,8 +79,8 @@ class DokterController extends Controller
         "email" => $row['email'],
         "kategori_dokter" => $row['kategori_dokter'],
         "sip_dokter" => $row['sip_dokter'],
-        "pengaturan" => "<a href='" . Web::url('obat.edit.' . md5($row['id_dokter'])) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span> Edit</a>"
-          . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-action='" . Web::url('obat.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-keyid='id_dokter' data-id='" . md5($row['id_dokter']) . "'><span class='fas fa-trash'></span> Hapus</button>"
+        "pengaturan" => "<a href='" . Web::url('dokter.edit.' . md5($row['id_dokter'])) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span> Edit</a>"
+          . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-action='" . Web::url('dokter.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-keyid='id_dokter' data-id='" . md5($row['id_dokter']) . "'><span class='fas fa-trash'></span> Hapus</button>"
           . "<form action='" . Web::url('dokter.reset') . "' method='post' class='d-inline-block'>" . Web::key_field() . "<input type='hidden' name='username' value='" . $row['username'] . "' /><button type='submit' class='btn btn-outline-primary btn-sm'><span class='fas fa-key'></span> Reset</button></form>"
       );
       $i++;
