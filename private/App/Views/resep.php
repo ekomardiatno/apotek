@@ -28,7 +28,7 @@
               <a href="<?= $data ? Web::url('resep') : Web::url('resep.all'); ?>" class="btn btn-sm btn-primary d-flex align-items-center"><span class="fas fa-list"></span><span class="d-none d-md-inline-block ml-1"><?= $data ? 'Resep Baru' : 'Lihat Semua' ?></span></a>
             </div>
             <div class="mx-1 d-flex">
-              <a href="<?= Web::url('resep'); ?>" class="btn btn-sm btn-primary d-flex align-items-center"><span class="fas fa-sync"></span></a>
+              <button type="button" id="reload-data-resep" class="btn btn-sm btn-primary d-flex align-items-center"><span class="fas fa-sync"></span></b>
             </div>
           <?php endif ?>
         </div>
@@ -117,6 +117,10 @@
           next: '<span class="fas fa-angle-right"></span>'
         }
       }
+    })
+
+    $('#reload-data-resep').on('click', function() {
+      dataTable.ajax.reload()
     })
 
     $('#length-resep').on('change', function() {

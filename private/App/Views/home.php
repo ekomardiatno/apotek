@@ -25,7 +25,7 @@
           </div>
           <?php if (Auth::user('role') === 'dokter') : ?>
             <div class="mx-1 d-flex">
-              <a href="<?= Web::url('konsul'); ?>" class="btn btn-sm btn-primary d-flex align-items-center"><span class="fas fa-sync"></span></a>
+              <button type="button" id="reload-data-konsul" class="btn btn-sm btn-primary d-flex align-items-center"><span class="fas fa-sync"></span></button>
             </div>
           <?php endif ?>
           <?php if (Auth::user('role') === 'konsul') : ?>
@@ -160,6 +160,10 @@
           next: '<span class="fas fa-angle-right"></span>'
         }
       }
+    })
+
+    $('#reload-data-konsul').on('click', function() {
+      dataTable.ajax.reload()
     })
 
     $('#length-konsultasi').on('change', function() {
