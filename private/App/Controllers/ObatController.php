@@ -220,16 +220,23 @@ class ObatController extends Controller
   public function stok()
   {
     $post = $this->request()->post;
-    $post['stok_obat'] = intval($post['stok_obat']);
     $post['kuantitas'] = intval($post['kuantitas']);
     $db = new Database;
-    $obat = $db->query('SELECT id_obat FROM obat WHERE md5(id_obat)="' . $post['id_obat'] . '"', 'ARRAY_ONE')['data'];
+    $obat = $db->query('SELECT id_obat, stok_obat FROM obat WHERE md5(id_obat)="' . $post['id_obat'] . '"', 'ARRAY_ONE')['data'];
     if (!$obat) {
       Flasher::setFlash('Data obat tidak ditemukan', 'danger', 'ni ni-fat-remove');
       return $this->redirect('obat');
     }
+
     $id_obat = $obat['id_obat'];
-    $stok_baru = $post['type'] === 'add' ? $post['stok_obat'] + $post['kuantitas'] : $post['stok_obat'] - $post['kuantitas'];
+    $stok_obat = intval($obat['stok_obat']);
+
+    if ($post['type'] !== 'add' && $post['kuantitas'] > $stok_obat) {
+      Flasher::setFlash('Maksimal stok keluar: '. $stok_obat, 'danger', 'ni ni-fat-remove');
+      return $this->redirect('obat');
+    }
+
+    $stok_baru = $post['type'] === 'add' ? $stok_obat + $post['kuantitas'] : $stok_obat - $post['kuantitas'];
     $stokKategori = $post['type'] === 'add' ? $this->model('StokMasukKategori') : $this->model('StokKeluarKategori');
     if ($post['id_kategori'] === "" || !isset($post['id_kategori'])) {
       $nameKeyName = $post['type'] === 'add' ? 'nama_stok_masuk_kategori' : 'nama_stok_keluar_kategori';

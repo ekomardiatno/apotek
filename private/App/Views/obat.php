@@ -155,9 +155,10 @@
       }
       const data = e.dataset
       const form = $('#stokObat').find('form')
+      if (form.find('input[name=id_obat]')) form.find('input[name=id_obat]').remove()
+      if (form.find('input[name=type]')) form.find('input[name=type]').remove()
       form.prepend(`<input type='hidden' name='id_obat' value='${data.id}'/>`)
       form.prepend(`<input type='hidden' name='type' value='${data.type}'/>`)
-      form.prepend(`<input type='hidden' name='stok_obat' value='${data.qty}'/>`)
       const idKeyName = data.type === 'add' ? 'id_stok_masuk_kategori' : 'id_stok_keluar_kategori'
       const nameKeyName = data.type === 'add' ? 'nama_stok_masuk_kategori' : 'nama_stok_keluar_kategori'
       let inputKategori = $('#stokObat').find('input#nama_kategori')
