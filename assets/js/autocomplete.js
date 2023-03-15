@@ -8,6 +8,44 @@
       var wrapper = $this.parent()
       $this.on('focus', function () {
         options.onStart()
+        wrapper.find('.option-wrapper').remove()
+        var val = $this.val()
+        var formData = new FormData()
+        formData.append('queries', val)
+        if (options.body) {
+          Object.keys(options.body).map(function (key, i) {
+            formData.append(key, Object.values(options.body)[i])
+          })
+        }
+        xhr.open('POST', apiUrl, true)
+        xhr.onload = function () {
+          var response = JSON.parse(this.responseText)
+          if (response.length > 0) {
+            wrapper.append(
+              '<div class="option-wrapper dropdown-menu show" style="top:' + wrapper.height() + 'px">' +
+              '</div>'
+            )
+            response.map(function (a, i) {
+              wrapper.children('.option-wrapper').append(
+                '<button type="button" data-value="' + a.value + '" class="option dropdown-item' + (i === 0 ? ' hover' : '') + '">' + a.text + '</button>'
+              )
+            })
+          }
+        }
+        xhr.onerror = function () {
+          alert('Error!')
+        }
+        xhr.onloadstart = function () {
+          $this.after(
+            '<div class="load-data">' +
+            '<img src="./assets/images/loading.gif"/>' +
+            '</div>'
+          )
+        }
+        xhr.onloadend = function () {
+          $this.siblings('.load-data').remove()
+        }
+        xhr.send(formData)
       })
       $this.on('keydown', function (e) {
         if (e.which === 13 && wrapper.find('.option-wrapper').length) {
@@ -37,10 +75,8 @@
                 })
               }
               xhr.open('POST', apiUrl, true)
-              console.log(xhr, 'xhr')
               xhr.onload = function () {
                 var response = JSON.parse(this.responseText)
-                console.log(response)
                 if (response.length > 0) {
                   wrapper.append(
                     '<div class="option-wrapper dropdown-menu show" style="top:' + wrapper.height() + 'px">' +
@@ -119,7 +155,7 @@
       })
 
       $(document).click(function (e) {
-        if (!$(e.target).is(wrapper.find('.option-wrapper')) && !$(e.target).is(wrapper.find('.option-wrapper').find('button.option'))) {
+        if (!$(e.target).is(wrapper.find('.option-wrapper')) && !$(e.target).is(wrapper.find('.option-wrapper').find('button.option')) && !$(e.target).is(wrapper.find('input'))) {
           wrapper.find('.option-wrapper').remove()
           if (timeout !== null) {
             clearTimeout(timeout)
