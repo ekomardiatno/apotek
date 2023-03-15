@@ -179,6 +179,7 @@ class ResepController extends Controller
     $this->role(['dokter']);
     $post = $this->request()->post;
     if (!isset($post['data'])) return $this->redirect('konsul');
+    $obatController = new ObatController;
     $data = [];
     $unableToSaved = [];
     $obat = $this->model('Obat');
@@ -261,6 +262,7 @@ class ResepController extends Controller
         $success = false;
         break;
       }
+      $obatController->updatestok($stok['id_obat'], $data[$i]['kuantitas'] * -1, true);
     }
 
     if (!$success) {
@@ -273,6 +275,8 @@ class ResepController extends Controller
             ]
           ]
         ]);
+
+        $obatController->updatestok($stok['id_obat'], $data[$i]['kuantitas'], true);
       }
       $resep->delete([
         'params' => [
@@ -341,12 +345,12 @@ class ResepController extends Controller
   {
     $this->role(['dokter']);
     $post = $this->request()->post;
+    $obatController = new ObatController;
     $curResep = $this->model('Resep')->read(['data_resep'], [
       'params' => [
         ['column' => 'md5(id_resep)', 'value' => $post['id_resep']]
       ]
     ], 'ARRAY_ONE');
-    $curResep = $curResep ? $curResep['data']['data_resep'] : null;
     $nextResep = [];
     foreach ($post['data']['id_obat'] as $index => $id_obat) {
       $kuantitas = intval($post['data']['kuantitas'][$index]);
@@ -366,6 +370,8 @@ class ResepController extends Controller
       ]);
       return $this->redirect('resep.edit.' . $post['id_resep']);
     }
+
+    $curResep = $curResep ? $curResep['data']['data_resep'] : null;
     $curResep = unserialize($curResep);
 
     foreach ($nextResep as $obj) {
@@ -394,16 +400,19 @@ class ResepController extends Controller
       $indexedCurResep = $this->searchForId($obj['id_obat'], $curResep, 'id_obat');
       if ($indexedCurResep < 0) {
         $this->_db->query('UPDATE obat SET stok_obat=stok_obat-' . $obj['kuantitas'] . ' WHERE md5(id_obat)="' . $obj['id_obat'] . '"');
+        $obatController->updatestok($obj['id_obat'], $obj['kuantitas'] * -1, true);
       } else {
         $stok_baru = $obj['kuantitas'] - $curResep[$indexedCurResep]['kuantitas'];
         $this->_db->query('UPDATE obat SET stok_obat=stok_obat-' . $stok_baru . ' WHERE md5(id_obat)="' . $obj['id_obat'] . '"');
         array_splice($curResep, $indexedCurResep, 1);
+        $obatController->updatestok($obj['id_obat'], $stok_baru * -1, true);
       }
     }
 
     if (count($curResep) > 0) {
       foreach ($curResep as $obj) {
         $this->_db->query('UPDATE obat SET stok_obat=stok_obat+' . $obj['kuantitas'] . ' WHERE md5(id_obat)="' . $obj['id_obat'] . '"');
+        $obatController->updatestok($obj['id_obat'], $obj['kuantitas'], true);
       }
     }
 
@@ -415,6 +424,7 @@ class ResepController extends Controller
   {
     $this->role(['dokter']);
     $post = $this->request()->post;
+    $obatController = new ObatController;
     $curResep = $this->model('Resep')->read(['id_konsul', 'data_resep'], [
       'params' => [
         ['column' => 'md5(id_resep)', 'value' => $post['id_resep']]
@@ -437,6 +447,7 @@ class ResepController extends Controller
       if (!$updateStok['success']) {
         $error[] = $obj;
       }
+      $obatController->updatestok($obj['id_obat'], $obj['kuantitas'], true);
     }
 
     $deleteResep = $this->_db->query('DELETE FROM resep WHERE md5(id_resep)="' . $post['id_resep'] . '"');
@@ -444,6 +455,7 @@ class ResepController extends Controller
       foreach (unserialize($curResep['data']['data_resep']) as $obj) {
         if ($this->searchForId($obj['id_obat'], $error, 'id_obat') < 0) {
           $this->_db->query('UPDATE obat SET stok_obat=stok_obat+' . $obj['kuantitas'] . ' WHERE md5(id_obat)="' . $obj['id_obat'] . '"');
+          $obatController->updatestok($obj['id_obat'], $obj['kuantitas'], true);
         }
       }
       Flasher::setFlash('Tidak dapat menghapus data.', 'danger', 'ni ni-fat-remove');

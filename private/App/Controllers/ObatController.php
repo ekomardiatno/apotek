@@ -5,10 +5,10 @@ class ObatController extends Controller
   public function __construct()
   {
     parent::__construct();
-    $this->role(['farma']);
   }
   public function index()
   {
+    $this->role(['farma']);
     $this->_web->title('Obat');
     $this->_web->breadcrumb([
       [
@@ -105,6 +105,7 @@ class ObatController extends Controller
 
   public function tambah()
   {
+    $this->role(['farma']);
     $this->_web->title('Obat');
     $this->_web->breadcrumb([
       [
@@ -119,6 +120,7 @@ class ObatController extends Controller
 
   public function edit($id)
   {
+    $this->role(['farma']);
     $this->_web->title('Obat');
     $this->_web->breadcrumb([
       [
@@ -155,12 +157,14 @@ class ObatController extends Controller
     $this->role(['farma']);
     $post = $this->request()->post;
     $obat = $this->model('Obat');
-
-    if (!$obat->insert($post)['success']) {
+    $posObat = $obat->insert($post);
+    if (!$posObat['success']) {
       Flasher::setData($post);
       Flasher::setFlash('Ada kesalahan yang tidak diketahui, silakan coba lagi.', 'danger', 'ni ni-fat-remove');
       return $this->redirect('obat.tambah');
     }
+
+    $this->updatestok($posObat['last_inserted_id']);
 
     Flasher::setFlash('Tambah data obat berhasil', 'success', 'ni ni-check-bold');
     $this->redirect('obat');
@@ -219,6 +223,7 @@ class ObatController extends Controller
 
   public function stok()
   {
+    $this->role(['farma']);
     $post = $this->request()->post;
     $post['kuantitas'] = intval($post['kuantitas']);
     $db = new Database;
@@ -232,7 +237,7 @@ class ObatController extends Controller
     $stok_obat = intval($obat['stok_obat']);
 
     if ($post['type'] !== 'add' && $post['kuantitas'] > $stok_obat) {
-      Flasher::setFlash('Maksimal stok keluar: '. $stok_obat, 'danger', 'ni ni-fat-remove');
+      Flasher::setFlash('Maksimal stok keluar: ' . $stok_obat, 'danger', 'ni ni-fat-remove');
       return $this->redirect('obat');
     }
 
@@ -294,7 +299,30 @@ class ObatController extends Controller
       return $this->redirect('obat');
     }
 
+    $this->updatestok($id_obat, $post['type'] === 'add' ? $post['kuantitas'] : $post['kuantitas'] * -1);
+
     Flasher::setFlash('Stok telah diperbarui', 'success', 'ni ni-check-bold');
     return $this->redirect('obat');
+  }
+
+  public function updatestok($id = null, $stok = 0, $encryptedId = false)
+  {
+    $this->role(['farma', 'dokter']);
+    if (!$id) return false;
+    $month = date('m');
+    $year = date('Y');
+    $db = new Database;
+    if ($encryptedId) {
+      $getPlainId = $db->query('SELECT id_obat FROM obat WHERE md5(id_obat)="' . $id . '"', 'ARRAY_ONE');
+      $id = $getPlainId['data']['id_obat'];
+    }
+    $riwayat = $db->query('SELECT * FROM riwayat_stok WHERE MONTH(tanggal_diperbarui)=' . $month . ' AND YEAR(tanggal_diperbarui)=' . $year . ' AND id_obat=' . $id, 'ARRAY_ONE');
+    if (!$riwayat['data']) {
+      $stmt = $db->query('INSERT INTO riwayat_stok(id_obat,stok_akhir) VALUES(' . $id . ',' . $stok . ')');
+    } else {
+      $stmt = $db->query('UPDATE riwayat_stok SET stok_akhir=stok_akhir+' . $stok . ' WHERE id_riwayat_stok=' . $riwayat['data']['id_riwayat_stok']);
+    }
+
+    return $stmt;
   }
 }
