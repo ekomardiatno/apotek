@@ -1745,6 +1745,8 @@ textarea.form-control {
   top: 0;
   left: 0;
   right: 0;
+  max-height: 200px;
+  overflow-y: auto;
 }
 .form-group .option-wrapper .option {
   background-color: transparent;

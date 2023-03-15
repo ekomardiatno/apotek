@@ -184,6 +184,8 @@
             const value = e.target.value
             const div = document.createElement('div')
             div.className = 'dropdown-menu position-absolute left-0 w-100 show'
+            div.style.maxHeight = '200px'
+            div.style.overflowY = 'auto'
             let datas = res.filter(a => (a[nameKeyName].toLowerCase().indexOf(value.toLowerCase()) > -1))
             for (let data of datas) {
               const a = document.createElement('a')
