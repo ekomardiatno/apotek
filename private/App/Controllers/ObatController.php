@@ -222,6 +222,13 @@ class ObatController extends Controller
     $post = $this->request()->post;
     $post['stok_obat'] = intval($post['stok_obat']);
     $post['kuantitas'] = intval($post['kuantitas']);
+    $db = new Database;
+    $obat = $db->query('SELECT id_obat FROM obat WHERE md5(id_obat)="' . $post['id_obat'] . '"', 'ARRAY_ONE')['data'];
+    if (!$obat) {
+      Flasher::setFlash('Data obat tidak ditemukan', 'danger', 'ni ni-fat-remove');
+      return $this->redirect('obat');
+    }
+    $id_obat = $obat['id_obat'];
     $stok_baru = $post['type'] === 'add' ? $post['stok_obat'] + $post['kuantitas'] : $post['stok_obat'] - $post['kuantitas'];
     $stokKategori = $post['type'] === 'add' ? $this->model('StokMasukKategori') : $this->model('StokKeluarKategori');
     if ($post['id_kategori'] === "" || !isset($post['id_kategori'])) {
@@ -241,7 +248,8 @@ class ObatController extends Controller
     $qtyKeyName = $post['type'] === 'add' ? 'kuantitas_stok_masuk' : 'kuantitas_stok_keluar';
     $stokHistoriInsert = $stokHistori->insert([
       $idKeyName => $post['id_kategori'],
-      $qtyKeyName => $post['kuantitas']
+      $qtyKeyName => $post['kuantitas'],
+      'id_obat' => $id_obat
     ]);
 
     if (!$stokHistoriInsert['success']) {
