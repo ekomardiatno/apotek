@@ -173,16 +173,19 @@ class Database
             die;
         }
 
-        if (!$this->mysqli()->query($sql)) {
-            $error = $this->mysqli()->error;
-            $this->mysqli()->close();
+        $mysqli = $this->mysqli();
+
+        if (!$mysqli->query($sql)) {
+            $error = $mysqli->error;
+            $mysqli->close();
             return [
                 'success' => false,
                 'error' => $error,
                 'sql' => $sql
             ];
         }
-        $last_id = $this->mysqli()->insert_id;
+        $last_id = $mysqli->insert_id;
+        $mysqli->close();
         return [
             'success' => true,
             'last_inserted_id' => $last_id,
@@ -232,16 +235,18 @@ class Database
             die;
         }
 
-        if (!$this->mysqli()->query($sql)) {
-            $error = $this->mysqli()->error;
-            $this->mysqli()->close();
+        $mysqli = $this->mysqli();
+
+        if (!$mysqli->query($sql)) {
+            $error = $mysqli->error;
+            $mysqli->close();
             return [
                 'success' => false,
                 'error' => $error,
                 'sql' => $sql
             ];
         }
-        $this->mysqli()->close();
+        $mysqli->close();
         return [
             'success' => true,
             'sql' => $sql
@@ -261,16 +266,18 @@ class Database
             die;
         }
 
-        if (!$this->mysqli()->query($sql)) {
-            $error = $this->mysqli()->error;
-            $this->mysqli()->close();
+        $mysqli = $this->mysqli();
+
+        if (!$mysqli->query($sql)) {
+            $error = $mysqli->error;
+            $mysqli->close();
             return [
                 'success' => false,
                 'error' => $error,
                 'sql' => $sql
             ];
         }
-        $this->mysqli()->close();
+        $mysqli->close();
         return [
             'success' => true,
             'sql' => $sql
@@ -347,10 +354,11 @@ class Database
     {
 
         $data = [];
-        $query = $this->mysqli()->query($sql);
+        $mysqli = $this->mysqli();
+        $query = $mysqli->query($sql);
         if (!$query) {
-            $error = $this->mysqli()->error;
-            $this->mysqli()->close();
+            $error = $mysqli->error;
+            $mysqli->close();
             return [
                 'success' => false,
                 'error' => $error,
@@ -381,8 +389,8 @@ class Database
                 $data = $query;
                 break;
         }
-        $last_id = $this->mysqli()->insert_id;
-        $this->mysqli()->close();
+        $last_id = $mysqli->insert_id;
+        $mysqli->close();
 
         return [
             'success' => true,
