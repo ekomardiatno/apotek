@@ -80,7 +80,7 @@ class DokterController extends Controller
         "kategori_dokter" => $row['kategori_dokter'],
         "sip_dokter" => $row['sip_dokter'],
         "pengaturan" => "<a href='" . Web::url('dokter.edit.' . md5($row['id_dokter'])) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span> Edit</a>"
-          . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-action='" . Web::url('dokter.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-keyid='id_dokter' data-id='" . md5($row['id_dokter']) . "'><span class='fas fa-trash'></span> Hapus</button>"
+          . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-action='" . Web::url('dokter.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-keyid='username' data-id='" . md5($row['username']) . "'><span class='fas fa-trash'></span> Hapus</button>"
           . "<form action='" . Web::url('dokter.reset') . "' method='post' class='d-inline-block'>" . Web::key_field() . "<input type='hidden' name='username' value='" . $row['username'] . "' /><button type='submit' class='btn btn-outline-primary btn-sm'><span class='fas fa-key'></span> Reset</button></form>"
       );
       $i++;
@@ -173,5 +173,57 @@ class DokterController extends Controller
 
     Flasher::setFlash('Berhasil menambahkan data dokter', 'success', 'ni ni-check-bold');
     return $this->redirect('dokter');
+  }
+
+  public function edit($id = null)
+  {
+    if (!$id) return $this->redirect('dokter');
+    $this->role(['farma']);
+    $this->_web->title('Dokter');
+    $this->_web->breadcrumb([
+      [
+        'dokter', 'Data Dokter'
+      ],
+      [
+        'dokter.edit', 'Edit Dokter'
+      ]
+    ]);
+    $db = new Database;
+    $dokter = $db->query('SELECT md5(dokter.id_dokter) AS id_dokter, md5(user.id_user) as id_user, user.name, dokter.kategori_dokter, dokter.sip_dokter, user.username, user.email FROM dokter LEFT JOIN user ON user.username=dokter.username WHERE md5(dokter.id_dokter)="' . $id . '"', 'ARRAY_ONE');
+
+    if (!$dokter['success'] || !$dokter['data']) {
+      Flasher::setFlash('Data tidak ditemukan', 'danger', 'ni ni-fat-remove');
+      return $this->redirect('dokter');
+    }
+
+    $this->_web->view('dokter_form', $dokter['data']);
+  }
+
+  public function ubah()
+  {
+    $post = $this->request()->post;
+    $db = new Database;
+    $updateDokter = $db->query('UPDATE dokter SET kategori_dokter="' . $post['kategori_dokter'] . '", sip_dokter="' . $post['sip_dokter'] . '", username="' . $post['username'] . '" WHERE md5(id_dokter)="' . $post['id_dokter'] . '"');
+    $updateUser = $db->query('UPDATE user SET name="' . $post['name'] . '", username="' . $post['username'] . '", email="' . $post['email'] . '" WHERE md5(id_user)="' . $post['id_user'] . '"');
+
+    if (!$updateDokter['success'] || !$updateUser['success']) {
+      Flasher::setFlash('Beberapa data tidak dapat diubah.', 'danger', 'ni ni-fat-remove');
+      Flasher::setData($post);
+    } else {
+      Flasher::setFlash('Berhasil mengubah data dokter', 'success', 'ni ni-check-bold');
+    }
+
+    $this->redirect('dokter.edit.' . $post['id_dokter']);
+  }
+
+  public function hapus()
+  {
+    $post = $this->request()->post;
+    $db = new Database;
+    $db->query('DELETE FROM dokter WHERE md5(username)="' . $post['username'] . '"');
+    $db->query('DELETE FROM user WHERE md5(username)="' . $post['username'] . '"');
+
+    Flasher::setFlash('Berhasil menghapus data dokter', 'success', 'ni ni-check-bold');
+    $this->redirect('dokter');
   }
 }

@@ -5,6 +5,7 @@
   ?>
   <div class="card shadow mb-4">
     <?= isset($data['id_dokter']) ? '<input type="hidden" name="id_dokter" value="' . $data['id_dokter'] . '" />' : '' ?>
+    <?= isset($data['id_user']) ? '<input type="hidden" name="id_user" value="' . $data['id_user'] . '" />' : '' ?>
     <div class="card-body">
       <div class="form-group">
         <label class="small form-control-label" for="name">Nama Dokter<span class="text-danger">*</span></label>
@@ -29,7 +30,7 @@
     </div>
     <div class="card-footer text-right">
       <?php if (isset($data['id_dokter'])) : ?>
-        <a class="btn btn-secondary" href="<?= Web::url('obat') ?>">Batal</a>
+        <a class="btn btn-secondary" href="<?= Web::url('dokter') ?>">Batal</a>
       <?php else : ?>
         <button class="btn btn-secondary" type="reset">Reset</button>
       <?php endif ?>
