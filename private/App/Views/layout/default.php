@@ -308,7 +308,8 @@
         disableTouchKeyboard: true,
         autoclose: true,
         language: 'id',
-        format: format
+        format: format,
+        maxViewMode: 2
       })
       // if ($(this).val() === '') {
       //   datepicker.datepicker("setDate", new Date())
