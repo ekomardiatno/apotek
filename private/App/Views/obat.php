@@ -163,18 +163,21 @@
       let inputKategori = $('#stokObat').find('input#nama_kategori')
       let inputKuantitas = $('#stokObat').find('input#kuantitas')
       if (inputKuantitas.length > 0) {
-        console.log(inputKuantitas, data.qty)
         inputKuantitas[0].max = data.type !== 'add' ? data.qty : ''
       }
       if ($('#stokObat').find('h5.modal-title').length > 0) {
         $('#stokObat').find('h5.modal-title')[0].textContent = `${data.name} - ${data.type === 'add' ? 'Stok Masuk' : 'Stok Keluar'}`
       }
       if (inputKategori.length < 1) return
+      inputKategori = inputKategori[0]
+      let inputIdKategori = (inputKategori.previousElementSibling?.nodeName || '') === 'INPUT' ? inputKategori.previousElementSibling : null
+      inputKategori.value = ''
+      inputKuantitas[0].value = ''
+      inputIdKategori.value = ''
       fetch(data.type === 'add' ? `<?= Web::url('stokmasukkategori') ?>` : `<?= Web::url('stokkeluarkategori') ?>`)
         .then(res => res.json())
         .then(res => {
-          inputKategori = inputKategori[0]
-          let inputIdKategori = (inputKategori.previousElementSibling?.nodeName || '') === 'INPUT' ? inputKategori.previousElementSibling : null
+
           const showingDropdown = e => {
             if (e.target.nextElementSibling) inputKategori.nextElementSibling?.remove()
             const value = e.target.value
