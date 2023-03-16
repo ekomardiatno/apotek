@@ -35,7 +35,7 @@
           <?php endif ?>
           <?php if (Auth::user('role') !== 'dokter') : ?>
             <div class="mx-1 d-flex">
-              <button type="button" class="btn btn-gray btn-sm mr-0" data-toggle="modal" data-target="#report">
+              <button type="button" class="btn btn-primary btn-sm mr-0" data-toggle="modal" data-target="#report">
                 <span class="fas fa-file-pdf"></span><span class="d-none d-md-inline-block ml-1">Buat Laporan</span>
               </button>
               <!-- Modal -->
@@ -62,7 +62,7 @@
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                        <button type="submit" class="btn btn-warning">Buat</button>
+                        <button type="submit" class="btn btn-primary">Buat</button>
                       </div>
                     </div>
                   </form>
