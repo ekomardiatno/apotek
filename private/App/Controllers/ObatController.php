@@ -1,5 +1,7 @@
 <?php
 
+use Dompdf\Dompdf;
+
 class ObatController extends Controller
 {
   public function __construct()
@@ -83,7 +85,7 @@ class ObatController extends Controller
         "nama_obat" => $row['nama_obat'],
         "satuan_obat" => $row['satuan_obat'],
         "stok_obat" => "<button type='button' class='btn btn-secondary btn-sm stock-btn mr-0' data-type='remove' data-id='" . $row['id_obat'] . "' data-name='" . $row['nama_obat'] . "' data-qty='" . $row['stok_obat'] . "'><span class='fas fa-minus'></span></button>"
-          . "<span class='mx-2 font-weight-bold h4 mt-1' style='vertical-align:middle'>" . $row['stok_obat'] . "</span>"
+          . "<span class='mx-2 font-weight-bold h4 mt-1' style='vertical-align:middle'>" . Mod::numeral($row['stok_obat']) . "</span>"
           . "<button type='button' class='btn btn-secondary btn-sm stock-btn' data-type='add' data-id='" . $row['id_obat'] . "' data-name='" . $row['nama_obat'] . "' data-qty='" . $row['stok_obat'] . "'><span class='fas fa-plus'></span></button>",
         "deskripsi_obat" => $row['deskripsi_obat'] !== '' ? $row['deskripsi_obat'] : '-',
         "pengaturan" => "<a href='" . Web::url('obat.edit.' . $row['id_obat']) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span><span class='ml-1 d-none d-md-inline-block'>Edit</span></a>"
@@ -324,5 +326,176 @@ class ObatController extends Controller
     }
 
     return $stmt;
+  }
+
+  public function print()
+  {
+    $months = ['Jan' => 1, 'Feb' => 2, 'Mar' => 3, 'Apr' => 4, 'Mei' => 5, 'Jun' => 6, 'Jul' => 7, 'Ags' => 8, 'Sep' => 9, 'Okt' => 10, 'Nov' => 11, 'Des' => 12];
+    $post = $this->request()->post;
+    if (!$post || !isset($post['bulan'])) return $this->redirect('obat');
+    $label_bulan_laporan = $post['bulan'];
+    $bulan = explode(' ', $post['bulan']);
+    $tahun = $bulan[1];
+    $bulan = $months[$bulan[0]];
+    $tanggal = $tahun . '-' . sprintf("%02d", $bulan) . '-01';
+    $tanggal_akhir = date('Y-m-t', strtotime($tanggal));
+    $db = new Database;
+    $obat = $db->query('SELECT id_obat, nama_obat, satuan_obat FROM obat');
+    $obat = $obat['data'];
+
+    $stok_masuk = $db->query("SELECT stok_masuk.id_obat, stok_masuk_kategori.nama_stok_masuk_kategori, stok_masuk_kategori.id_stok_masuk_kategori, CASE WHEN SUM(stok_masuk.kuantitas_stok_masuk) IS NULL THEN 0 ELSE SUM(stok_masuk.kuantitas_stok_masuk) END AS kuantitas_stok_masuk FROM stok_masuk RIGHT JOIN stok_masuk_kategori ON stok_masuk.id_stok_masuk_kategori=stok_masuk_kategori.id_stok_masuk_kategori WHERE id_obat IS NOT NULL AND stok_masuk.tanggal_diubah BETWEEN '" . $tanggal . "' AND '" . $tanggal_akhir . "' GROUP BY stok_masuk_kategori.id_stok_masuk_kategori, stok_masuk.id_obat")['data'];
+    $stok_masuk_kategori = [];
+    foreach ($stok_masuk as $kategori) {
+      $indexedKategori = ArrayHelpers::indexOf(function ($obj, $i) use ($kategori) {
+        return $obj['id_stok_masuk_kategori'] === $kategori['id_stok_masuk_kategori'];
+      }, $stok_masuk_kategori);
+      if ($indexedKategori < 0) {
+        $stok_masuk_kategori[] = [
+          'id_stok_masuk_kategori' => $kategori['id_stok_masuk_kategori'],
+          'nama_stok_masuk_kategori' => $kategori['nama_stok_masuk_kategori']
+        ];
+      }
+    }
+
+    $stok_keluar = $db->query("SELECT stok_keluar.id_obat, stok_keluar_kategori.nama_stok_keluar_kategori, stok_keluar_kategori.id_stok_keluar_kategori, CASE WHEN SUM(stok_keluar.kuantitas_stok_keluar) IS NULL THEN 0 ELSE SUM(stok_keluar.kuantitas_stok_keluar) END AS kuantitas_stok_keluar FROM stok_keluar RIGHT JOIN stok_keluar_kategori ON stok_keluar.id_stok_keluar_kategori=stok_keluar_kategori.id_stok_keluar_kategori WHERE id_obat IS NOT NULL AND stok_keluar.tanggal_diubah BETWEEN '" . $tanggal . "' AND '" . $tanggal_akhir . "' GROUP BY stok_keluar_kategori.id_stok_keluar_kategori, stok_keluar.id_obat")['data'];
+    $stok_keluar_kategori = [];
+    foreach ($stok_keluar as $kategori) {
+      $indexedKategori = ArrayHelpers::indexOf(function ($obj, $i) use ($kategori) {
+        return $obj['id_stok_keluar_kategori'] === $kategori['id_stok_keluar_kategori'];
+      }, $stok_keluar_kategori);
+      if ($indexedKategori < 0) {
+        $stok_keluar_kategori[] = [
+          'id_stok_keluar_kategori' => $kategori['id_stok_keluar_kategori'],
+          'nama_stok_keluar_kategori' => $kategori['nama_stok_keluar_kategori']
+        ];
+      }
+    }
+
+    $resep = $db->query('SELECT data_resep FROM resep WHERE tanggal_diubah BETWEEN "' . $tanggal . '" AND "' . $tanggal_akhir . '"')['data'];
+    foreach ($obat as $i => $params) {
+      $riwayat_stok = $db->query('SELECT stok_akhir FROM riwayat_stok WHERE id_obat="' . $params['id_obat'] . '" AND tanggal_diperbarui < "' . $tanggal . '" ORDER BY tanggal_diperbarui DESC', 'ARRAY_ONE');
+      if ($riwayat_stok['data']) {
+        $obat[$i]['stok_awal'] = intval($riwayat_stok['data']['stok_akhir']);
+      } else {
+        $obat[$i]['stok_awal'] = 0;
+      }
+    }
+
+    $reseps = [];
+    foreach ($resep as $objResep) {
+      $data_resep = unserialize($objResep['data_resep']);
+      foreach ($data_resep as $objDataResep) {
+        $indexedObat = ArrayHelpers::indexOf(function ($obj, $i) use ($objDataResep) {
+          return $obj['id_obat'] === $objDataResep['id_obat'];
+        }, $reseps);
+        if ($indexedObat > -1) {
+          $reseps[$i] = [
+            'id_obat' => $reseps[$i]['id_obat'],
+            'kuantitas' => $reseps[$i]['kuantitas'] + $objDataResep['kuantitas']
+          ];
+        } else {
+          $reseps[] = [
+            'id_obat' => $objDataResep['id_obat'],
+            'kuantitas' => $objDataResep['kuantitas']
+          ];
+        }
+      }
+    }
+
+    $html = '<html>';
+    $html .= '<head>';
+    $html .= '<title>' . 'Laporan Stok Obat Bulan ' . $label_bulan_laporan . '</title>';
+    $html .= '<link href="' . Web::assets('report.css', 'css') . '" rel="stylesheet" />';
+    $html .= '</head>';
+    $html .= '<body>';
+    $html .= '<h1 class="text-center">Laporan Stok Obat</h1>';
+    $html .= '<p>Bulan: ' . $label_bulan_laporan . '</p>';
+    $html .= '<table>';
+    $html .= '<thead>';
+    $html .= '<tr>';
+    $html .= '<th style="width:1%" rowspan="2">No.</th>';
+    $html .= '<th rowspan="2">Nama Obat</th>';
+    $html .= '<th rowspan="2">Satuan</th>';
+    $html .= '<th rowspan="2">Stok Awal</th>';
+    $html .= '<th rowspan="' . (count($stok_masuk_kategori) > 0 ? 1 : 2) . '" colspan="' . count($stok_masuk_kategori) . '">Stok Masuk</th>';
+    $html .= '<th rowspan="1" colspan="' . (count($stok_keluar_kategori) + 1) . '">Stok Keluar</th>';
+    $html .= '<th rowspan="2">Stok Akhir</th>';
+    $html .= '</tr>';
+    $html .= '<tr>';
+    foreach ($stok_masuk_kategori as $kategori) {
+      $html .= '<th>' . $kategori['nama_stok_masuk_kategori'] . '</th>';
+    }
+    $html .= '<th>Resep</th>';
+    foreach ($stok_keluar_kategori as $kategori) {
+      $html .= '<th>' . $kategori['nama_stok_keluar_kategori'] . '</th>';
+    }
+    $html .= '</tr>';
+    $html .= '</thead>';
+    $html .= '<tbody>';
+    $no = 1;
+    foreach ($obat as $objObat) {
+      $stok_akhir = 0;
+      $html .= '<tr>';
+      $html .= '<td class="text-center">' . $no . '</td>';
+      $html .= '<td>' . $objObat['nama_obat'] . '</td>';
+      $html .= '<td>' . $objObat['satuan_obat'] . '</td>';
+      $html .= '<td class="text-center">' . Mod::numeral($objObat['stok_awal']) . '</td>';
+
+      if (count($stok_masuk_kategori) < 1) {
+        $html .= '<td class="text-center">0</td>';
+      } else {
+        foreach ($stok_masuk_kategori as $kategori) {
+          $indexedStokMasuk = ArrayHelpers::indexOf(function ($obj, $i) use ($objObat, $kategori) {
+            return $objObat['id_obat'] == $obj['id_obat'] && $obj['id_stok_masuk_kategori'] == $kategori['id_stok_masuk_kategori'];
+          }, $stok_masuk);
+          if ($indexedStokMasuk < 0) {
+            $html .= '<td class="text-center">0</td>';
+          } else {
+            $stok_akhir += $stok_masuk[$indexedStokMasuk]['kuantitas_stok_masuk'];
+            $html .= '<td class="text-center">' . Mod::numeral($stok_masuk[$indexedStokMasuk]['kuantitas_stok_masuk']) . '</td>';
+          }
+        }
+      }
+
+      $indexedResep = ArrayHelpers::indexOf(function ($obj, $i) use ($objObat) {
+        return md5($objObat['id_obat']) == $obj['id_obat'];
+      }, $reseps);
+      if ($indexedResep < 0) {
+        $html .= '<td class="text-center">0</td>';
+      } else {
+        $stok_akhir -= $reseps[$indexedResep]['kuantitas'];
+        $html .= '<td class="text-center">' . Mod::numeral($reseps[$indexedResep]['kuantitas']) . '</td>';
+      }
+
+      if (count($stok_keluar_kategori) > 0) {
+        foreach ($stok_keluar_kategori as $kategori) {
+          $indexedStokKeluar = ArrayHelpers::indexOf(function ($obj, $i) use ($objObat, $kategori) {
+            return $objObat['id_obat'] == $obj['id_obat'] && $obj['id_stok_keluar_kategori'] == $kategori['id_stok_keluar_kategori'];
+          }, $stok_keluar);
+          if ($indexedStokKeluar < 0) {
+            $html .= '<td class="text-center">0</td>';
+          } else {
+            $stok_akhir -= $stok_keluar[$indexedStokKeluar]['kuantitas_stok_keluar'];
+            $html .= '<td class="text-center">' . Mod::numeral($stok_keluar[$indexedStokKeluar]['kuantitas_stok_keluar']) . '</td>';
+          }
+        }
+      }
+      $html .= '<td class="text-center">' . Mod::numeral($stok_akhir) . '</td>';
+      $html .= '</tr>';
+      $no++;
+    }
+    $html .= '</tbody>';
+    $html .= '</table>';
+    $html .= '</body>';
+    $html .= '</html>';
+
+    // echo $html;
+    // die;
+
+    $dompdf = new Dompdf();
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'landscape');
+    $dompdf->render();
+    $dompdf->stream('laporan-stok-obat-' . $bulan . '-' . $tahun . '-' . time() . '.pdf', array("Attachment" => false));
   }
 }

@@ -27,6 +27,37 @@
             <div class="mx-1 d-flex">
               <a href="<?= Web::url('obat.tambah'); ?>" class="btn btn-sm btn-primary d-flex align-items-center"><span class="fas fa-plus-circle"></span><span class="d-none d-md-inline-block ml-1">Tambah Obat</span></a>
             </div>
+            <div class="mx-1 d-flex">
+              <button type="button" class="btn btn-primary btn-sm mr-0" data-toggle="modal" data-target="#report">
+                <span class="fas fa-file-pdf"></span><span class="d-none d-md-inline-block ml-1">Buat Laporan</span>
+              </button>
+              <!-- Modal -->
+              <div class="modal fade" id="report" tabindex="-1" role="dialog" aria-labelledby="reportLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm" role="document">
+                  <form action="<?= Web::url('obat.print') ?>" id="print" target="_blank" method="post">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="reportLabel">Buat Laporan</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <?= Web::key_field() ?>
+                        <div class="form-group">
+                          <label class="small form-control-label" for="bulan">Bulan</label>
+                          <input autocomplete="off" type="text" name="bulan" required data-format="M yyyy" data-start_view="months" data-min_view="months" placeholder="Pilih Bulan" id="bulan" class="form-control form-control-alternative datepicker">
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary skip-confirmation">Buat</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
           <?php endif ?>
         </div>
       </div>
