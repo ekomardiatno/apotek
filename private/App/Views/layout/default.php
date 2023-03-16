@@ -299,17 +299,17 @@
   </script>
 
   <script>
-    $('.datepicker').each(function() {
-      let format = 'yyyy-mm-dd'
-      if ($(this).attr('date-format')) {
-        format = $(this).attr('date-format')
-      }
+    $('.datepicker').each(function(e) {
+      const dataset = this.dataset
+      console.log(dataset)
       let datepicker = $(this).datepicker({
         disableTouchKeyboard: true,
         autoclose: true,
         language: 'id',
-        format: format,
-        maxViewMode: 2
+        format: dataset.format || 'yyyy-mm-dd',
+        startView: dataset.start_view || 'days',
+        minViewMode: dataset.min_view || 'days',
+        maxViewMode: dataset.max_view || 'years'
       })
       // if ($(this).val() === '') {
       //   datepicker.datepicker("setDate", new Date())
@@ -332,6 +332,10 @@
   <script>
     $('body').on('click', 'button[type=submit]', function(e) {
       let form = $(e.target).parents('form')
+      let button = e.target
+      if (e.target.parentNode.nodeName === 'BUTTON') {
+        button = e.target.parentNode
+      }
       if (form.length < 1) return
       form = form[0]
       const inputs = [...form].filter(a => (a.name && a.name !== '_key'))
@@ -343,6 +347,7 @@
         }
       }
       if (!inputValid) return
+      if (button.classList.contains('skip-confirmation')) return
       e.preventDefault()
       bootbox.confirm({
         message: 'Apakah Anda yakin ingin menyimpan data?',
