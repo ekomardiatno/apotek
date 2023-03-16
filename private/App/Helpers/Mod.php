@@ -16,7 +16,7 @@ class Mod
         $y = substr($a, 0, 4);
         $m = substr($a, 5, 2);
         $d = substr($a, 8, 2);
-        
+
         $t = substr($a, 11, 5);
 
         if ($m == '01') {
@@ -45,26 +45,26 @@ class Mod
             $m = 'Des';
         }
 
-        if($t) {
+        if ($t) {
             $now = date('Y-m-d H:i:s');
             $past = $a;
             $date_now = date_create(substr($now, 0, 4) . '-' . substr($now, 5, 2) . '-' . substr($now, 8, 2));
             $date_past = date_create(substr($past, 0, 4) . '-' . substr($past, 5, 2) . '-' . substr($past, 8, 2));
             $diff = date_diff($date_past, $date_now);
             $diff = intval($diff->format('%R%a'));
-            switch($diff) {
+            switch ($diff) {
                 case 0:
                     $now = date_create($now);
                     $past = date_create($past);
                     $diff = date_diff($past, $now);
                     $diff_i = intval($diff->format('%R%i'));
                     $diff_h = intval($diff->format('%R%H'));
-                    $diff_i = $diff_i + $diff_h * 60 ;
-                    if($diff_i <= 0) {
+                    $diff_i = $diff_i + $diff_h * 60;
+                    if ($diff_i <= 0) {
                         return 'Baru saja';
-                    } else if($diff_i < 60){
+                    } else if ($diff_i < 60) {
                         return $diff_i . ' menit yang lalu';
-                    } else if($diff_h <= 10){
+                    } else if ($diff_h <= 10) {
                         return $diff_h . ' jam yang lalu';
                     } else {
                         return 'Hari ini' . ($t ? ', ' . $t : '');
@@ -77,7 +77,6 @@ class Mod
         } else {
             return $d . ' ' . $m . ' ' . $y;
         }
-        
     }
 
     public static function hash($password)
@@ -120,7 +119,7 @@ class Mod
 
         $scale = $width / $set_width;
 
-        if($width > $set_width) {
+        if ($width > $set_width) {
             $get_width = $width / $scale;
             $get_height = $height / $scale;
         } else {
@@ -192,5 +191,10 @@ class Mod
         $file = $size . '-' . $file;
 
         return $app_url . $dir_image . $file;
+    }
+
+    public static function numeral($val)
+    {
+        return number_format($val, 0, ",", ".");
     }
 }
