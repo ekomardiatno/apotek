@@ -12,7 +12,6 @@ class PrintController extends Controller
         $db = Database::getInstance();
         $sql = "SELECT a.tanggal, a.nik, b.nama, b.alamat, b.jenis_kelamin, b.norm, a.tanggal_kembali, b.tanggal_lahir FROM konsul a LEFT JOIN pasien b ON b.nik=a.nik WHERE a.tanggal >= '" . $post['start'] . "' AND a.tanggal <= '" . $post['end'] . "' ORDER BY a.tanggal OR b.nama ASC";
         $data = $db->query($sql)['data'];
-        $this->_web->layout('print');
         $html = '<html>';
         $html .= '<head>';
         $html .= '<title>' . 'Laporan Tanggal ' . Mod::timepiece($post['start']) . ($post['end'] !== $post['start'] ? ' s.d. ' . Mod::timepiece($post['end']) : '') . '</title>';
@@ -67,6 +66,10 @@ class PrintController extends Controller
         $html .= '</table>';
         $html .= '</body>';
         $html .= '</html>';
+
+        // echo $html;
+        // die;
+
         $dompdf = new Dompdf();
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'landscape');
