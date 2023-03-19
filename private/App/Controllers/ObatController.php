@@ -82,7 +82,7 @@ class ObatController extends Controller
       $row['id_obat'] = md5($row['id_obat']);
       $data[] = array(
         "no" => $i,
-        "nama_obat" => $row['nama_obat'],
+        "nama_obat" => "<a href='" . Web::url('riwayatstok.' . $row['id_obat'] . '.masuk') . "'>" . $row['nama_obat'] . "</a>",
         "satuan_obat" => $row['satuan_obat'],
         "stok_obat" => "<button type='button' class='btn btn-secondary btn-sm stock-btn mr-0' data-type='remove' data-id='" . $row['id_obat'] . "' data-name='" . $row['nama_obat'] . "' data-qty='" . $row['stok_obat'] . "'><span class='fas fa-minus'></span></button>"
           . "<span class='mx-2 font-weight-bold h4 mt-1' style='vertical-align:middle'>" . Mod::numeral($row['stok_obat']) . "</span>"
