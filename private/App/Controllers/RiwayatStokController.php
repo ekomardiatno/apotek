@@ -2,6 +2,7 @@
 
 class RiwayatStokController extends Controller
 {
+  private $maxRemovable = 30;
   public function index($id = null, $type = '')
   {
     if (!$id || $type === '') return $this->redirect('');
@@ -93,12 +94,16 @@ class RiwayatStokController extends Controller
     $i = $row + 1;
     foreach ($empRecords as $row) {
       $row[$idKeyName] = md5($row[$idKeyName]);
+      $tanggal_dibuat = new DateTime($row['tanggal_dibuat']);
+      $tanggal_now = new DateTime();
+      $tanggal_diff = $tanggal_now->diff($tanggal_dibuat);
+      $ableSettings = ($tanggal_diff->i > $this->maxRemovable) ? false : true;
       $data[] = array(
         "no" => $i,
         $categoryNameKeyName => $row[$categoryNameKeyName],
         $qtyKeyName => Mod::numeral($row[$qtyKeyName]),
         "tanggal_dibuat" => Mod::timepiece($row['tanggal_dibuat']),
-        "pengaturan" => "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-keyid='" . $idKeyName . "' data-action='" . Web::url('riwayatstok.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . $row[$idKeyName] . "'><span class='fas fa-trash'></span><span class='ml-1 d-none d-md-inline-block'>Hapus</span></button>"
+        "pengaturan" => $ableSettings ? "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-keyid='" . $idKeyName . "' data-action='" . Web::url('riwayatstok.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . $row[$idKeyName] . "'><span class='fas fa-trash'></span><span class='ml-1 d-none d-md-inline-block'>Hapus</span></button>" : '-'
       );
       $i++;
     }
@@ -121,7 +126,14 @@ class RiwayatStokController extends Controller
     $id = $type === 'masuk' ? $post['id_stok_masuk'] : $post['id_stok_keluar'];
     if (!isset($post['id_stok_masuk']) && !isset($post['id_stok_masuk'])) return $this->redirect('');
     $db = new Database;
-    $riwayat = $db->query('SELECT md5(id_obat) AS id_obat,' . ($type === 'masuk' ? 'kuantitas_stok_masuk' : 'kuantitas_stok_keluar') . ' AS kuantitas FROM ' . ($type === 'masuk' ? 'stok_masuk' : 'stok_keluar') . ' WHERE ' . ($type === 'masuk' ? 'md5(id_stok_masuk)' : 'md5(id_stok_keluar)') . '="' . $id . '"', 'ARRAY_ONE')['data'];
+    $riwayat = $db->query('SELECT md5(id_obat) AS id_obat,' . ($type === 'masuk' ? 'kuantitas_stok_masuk' : 'kuantitas_stok_keluar') . ' AS kuantitas, tanggal_dibuat FROM ' . ($type === 'masuk' ? 'stok_masuk' : 'stok_keluar') . ' WHERE ' . ($type === 'masuk' ? 'md5(id_stok_masuk)' : 'md5(id_stok_keluar)') . '="' . $id . '"', 'ARRAY_ONE')['data'];
+    $tanggal_dibuat = new DateTime($riwayat['tanggal_dibuat']);
+    $tanggal_now = new DateTime();
+    $tanggal_diff = $tanggal_now->diff($tanggal_dibuat);
+    if ($tanggal_diff->i > $this->maxRemovable) {
+      Flasher::setFlash('Data yang dibuat ' . $this->maxRemovable . ' menit lalu tidak dapat dihapus', 'danger', 'ni ni-fat-remove');
+      return $this->redirect('riwayatstok.' . $riwayat['id_obat'] . '.' . $type);
+    }
     $query = $db->query('DELETE FROM ' . ($type === 'masuk' ? 'stok_masuk' : 'stok_keluar') . ' WHERE ' . ($type === 'masuk' ? 'md5(id_stok_masuk)' : 'md5(id_stok_keluar)') . '="' . $id . '"');
     $obatController = new ObatController;
     $obatController->updatestok($riwayat['id_obat'], $riwayat['kuantitas'] * -1, true);
