@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="<?= Web::assets('datatables.min.css', 'css') ?>">
   <link rel="stylesheet" href="<?= Web::assets('argon.css', 'css') ?>">
   <link rel="stylesheet" href="<?= Web::assets('font-awesome.min.css', 'css') ?>">
+  <link rel="stylesheet" href="<?= Web::assets('gijgo.css', 'css') ?>">
 
   <script src="<?= Web::assets('jquery.min.js', 'js') ?>"></script>
   <script src="<?= Web::assets('bootstrap.bundle.min.js', 'js') ?>"></script>
@@ -34,6 +35,7 @@
   <script src="<?= Web::assets('autocomplete.js', 'js') ?>"></script>
   <script src="<?= Web::assets('bootbox.min.js', 'js') ?>"></script>
   <script src="<?= Web::assets('bootbox.locales.min.js', 'js') ?>"></script>
+  <script src="<?= Web::assets('gijgo.js', 'js') ?>"></script>
   <script>
     function dateFormat(date) {
       let y = parseInt(date.substr(0, 4))
@@ -116,6 +118,10 @@
     .cursor-pointer,
     .btn {
       cursor: pointer;
+    }
+
+    .vertical-align-middle {
+      vertical-align: middle !important;
     }
   </style>
 

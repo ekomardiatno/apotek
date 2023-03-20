@@ -39,6 +39,7 @@
         <th scope="col">#</th>
         <th scope="col">Nama Dokter</th>
         <th scope="col">Username</th>
+        <th scope="col">No. HP</th>
         <th scope="col">E-Mail</th>
         <th scope="col">Kategori Dokter</th>
         <th scope="col">SIP Dokter</th>
@@ -70,6 +71,9 @@
         },
         {
           data: 'username'
+        },
+        {
+          data: 'no_hp'
         },
         {
           data: 'email'

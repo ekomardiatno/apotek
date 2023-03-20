@@ -56,7 +56,7 @@ class DokterController extends Controller
     $totalRecordwithFilter = $records['allcount'];
 
     // Fetch records
-    $stmt = $pdo->prepare("SELECT dokter.id_dokter, dokter.sip_dokter, dokter.kategori_dokter, user.name, user.username, user.email FROM dokter LEFT JOIN user ON user.username=dokter.username WHERE 1" . $searchQuery . " ORDER BY " . $columnName . " " . $columnSortOrder . " LIMIT :limit,:offset");
+    $stmt = $pdo->prepare("SELECT dokter.id_dokter, dokter.sip_dokter, dokter.kategori_dokter, user.name, user.username, user.email, dokter.no_hp FROM dokter LEFT JOIN user ON user.username=dokter.username WHERE 1" . $searchQuery . " ORDER BY " . $columnName . " " . $columnSortOrder . " LIMIT :limit,:offset");
 
     // Bind values
     foreach ($searchArray as $key => $search) {
@@ -77,6 +77,7 @@ class DokterController extends Controller
         "name" => $row['name'],
         "username" => $row['username'],
         "email" => $row['email'],
+        "no_hp" => $row['no_hp'] === '' ? '-' : $row['no_hp'],
         "kategori_dokter" => $row['kategori_dokter'],
         "sip_dokter" => $row['sip_dokter'],
         "pengaturan" => "<a href='" . Web::url('dokter.edit.' . md5($row['id_dokter'])) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span> Edit</a>"
@@ -144,7 +145,9 @@ class DokterController extends Controller
     $post_dokter = [
       'sip_dokter' => $post['sip_dokter'],
       'username' => $post['username'],
-      'kategori_dokter' => $post['kategori_dokter']
+      'kategori_dokter' => $post['kategori_dokter'],
+      'jadwal_praktek' => serialize($post['jadwal_praktek']),
+      'no_hp' => $post['no_hp']
     ];
     $user = $this->model('User');
     $dokter = $this->model('Dokter');
@@ -189,11 +192,16 @@ class DokterController extends Controller
       ]
     ]);
     $db = new Database;
-    $dokter = $db->query('SELECT md5(dokter.id_dokter) AS id_dokter, md5(user.id_user) as id_user, user.name, dokter.kategori_dokter, dokter.sip_dokter, user.username, user.email FROM dokter LEFT JOIN user ON user.username=dokter.username WHERE md5(dokter.id_dokter)="' . $id . '"', 'ARRAY_ONE');
+    $dokter = $db->query('SELECT md5(dokter.id_dokter) AS id_dokter, md5(user.id_user) as id_user, user.name, dokter.kategori_dokter, dokter.sip_dokter, user.username, user.email, dokter.jadwal_praktek, dokter.no_hp FROM dokter LEFT JOIN user ON user.username=dokter.username WHERE md5(dokter.id_dokter)="' . $id . '"', 'ARRAY_ONE');
 
     if (!$dokter['success'] || !$dokter['data']) {
       Flasher::setFlash('Data tidak ditemukan', 'danger', 'ni ni-fat-remove');
       return $this->redirect('dokter');
+    }
+    if ($dokter['data']['jadwal_praktek'] !== '') {
+      $dokter['data']['jadwal_praktek'] = unserialize($dokter['data']['jadwal_praktek']);
+    } else {
+      unset($dokter['data']['jadwal_praktek']);
     }
 
     $this->_web->view('dokter_form', $dokter['data']);
@@ -202,8 +210,15 @@ class DokterController extends Controller
   public function ubah()
   {
     $post = $this->request()->post;
+
+    if ($this->scheduleValidating($post['jadwal_praktek'])) {
+      Flasher::setFlash($this->scheduleValidating($post['jadwal_praktek']), 'danger', 'ni ni-fat-remove');
+      Flasher::setData($post);
+      return $this->redirect('dokter.edit.' . $post['id_dokter']);
+    }
+
     $db = new Database;
-    $updateDokter = $db->query('UPDATE dokter SET kategori_dokter="' . $post['kategori_dokter'] . '", sip_dokter="' . $post['sip_dokter'] . '", username="' . $post['username'] . '" WHERE md5(id_dokter)="' . $post['id_dokter'] . '"');
+    $updateDokter = $db->query('UPDATE dokter SET kategori_dokter="' . $post['kategori_dokter'] . '", sip_dokter="' . $post['sip_dokter'] . '", username="' . $post['username'] . '", jadwal_praktek=\'' . serialize($post['jadwal_praktek']) . '\', no_hp="' . $post['no_hp'] . '" WHERE md5(id_dokter)="' . $post['id_dokter'] . '"');
     $updateUser = $db->query('UPDATE user SET name="' . $post['name'] . '", username="' . $post['username'] . '", email="' . $post['email'] . '" WHERE md5(id_user)="' . $post['id_user'] . '"');
 
     if (!$updateDokter['success'] || !$updateUser['success']) {
@@ -214,6 +229,66 @@ class DokterController extends Controller
     }
 
     $this->redirect('dokter.edit.' . $post['id_dokter']);
+  }
+
+  private function scheduleValidating($sch)
+  {
+    $invalidMsg = null;
+    foreach ($sch as $i => $obj) {
+      if ($obj['jam_mulai'] === '' && $obj['jam_selesai'] === '') continue;
+      if (($obj['jam_mulai'] === '' && $obj['jam_selesai'] !== '') || ($obj['jam_mulai'] !== '' && $obj['jam_selesai'] === '')) {
+        $invalidMsg = 'Masukan jam mulai dan jam selesai atau tidak keduanya';
+        break;
+      }
+      $d = date('d');
+      $m = date('m');
+      $y = date('Y');
+      $h_mulai = substr($obj['jam_mulai'], 0, 2);
+      $m_mulai = substr($obj['jam_mulai'], 3, 2);
+      $h_selesai = substr($obj['jam_selesai'], 0, 2);
+      $m_selesai = substr($obj['jam_selesai'], 3, 2);
+      $date_mulai = date('Y-m-d ' . $h_mulai . ':' . $m_mulai . ':00');
+      $date_selesai = date('Y-m-d ' . $h_selesai . ':' . $m_selesai . ':00');
+      if (strtotime($date_mulai) > strtotime($date_selesai)) {
+        $invalidMsg = 'Jam selesai harus lebih besar dari jam mulai';
+        break;
+      }
+    }
+
+    return $invalidMsg;
+  }
+
+  public function formattedSchedule($sch)
+  {
+    $days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+    $hari = [];
+    $jam = [];
+    $index = 0;
+    foreach ($sch as $i => $obj) {
+      if ($obj['jam_mulai'] === '' && $obj['jam_selesai'] === '') continue;
+      $day = $days[$i];
+      $startAndEnd = $obj['jam_mulai'] . ' - ' . $obj['jam_selesai'];
+      if (count($jam) < 1 || (count($jam) > 0 && $startAndEnd !== $jam[$index])) {
+        $hari[] = $day;
+        $jam[] = $startAndEnd;
+        if ($i > 0) {
+          $index++;
+        }
+        continue;
+      }
+      if ($startAndEnd === $jam[$index]) {
+        $explodedHari = explode(' - ', $hari[$index]);
+        $hari[$index] = $explodedHari[0] . ' - ' . $days[$i];
+        continue;
+      }
+    }
+    $str = '';
+    foreach ($hari as $i => $val) {
+      if ($i > 0) $str .= '<br>';
+      $str .= $val . ', ' . $jam[$i];
+    }
+
+    return $str;
   }
 
   public function hapus()
