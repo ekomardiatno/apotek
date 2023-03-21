@@ -13,6 +13,7 @@
           'alamat' => 'Alamat Pasien',
           'jenis_kelamin' => 'Jenis Kelamin',
           'norm' => 'Nomor Rekam Medis',
+          'no_hp' => 'Nomor Telp/HP',
           'tanggal_lahir' => 'Tanggal Lahir',
           'umur' => 'Umur',
           'tanggal_dibuat' => 'Terdaftar Sejak'

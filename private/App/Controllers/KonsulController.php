@@ -53,7 +53,7 @@ class KonsulController extends Controller
     if ($id !== '') {
       $pasien_m = $this->model('Pasien');
       $data_pasien = $pasien_m->read(
-        ['nik', 'nama', 'jenis_kelamin', 'tanggal_lahir', 'alamat', 'norm'],
+        ['nik', 'nama', 'jenis_kelamin', 'tanggal_lahir', 'alamat', 'norm', 'no_hp'],
         [
           'params' => [
             [
@@ -112,7 +112,8 @@ class KonsulController extends Controller
             'jenis_kelamin' => $post['jenis_kelamin'],
             'alamat' => $post['alamat'],
             'tanggal_lahir' => $post['tanggal_lahir'],
-            'norm' => $post['norm']
+            'norm' => $post['norm'],
+            'no_hp' => $post['no_hp']
           ]
         )['success']
       ) {
@@ -189,7 +190,7 @@ class KonsulController extends Controller
   {
     $this->role(['konsul']);
     $db = Database::getInstance();
-    $sql = "SELECT id_konsul, a.id_dokter, a.tanggal, a.nik, b.nama, b.alamat, b.tanggal_lahir, b.jenis_kelamin, b.norm, a.tanggal_kembali FROM konsul a LEFT JOIN pasien b ON b.nik=a.nik WHERE md5(id_konsul)='" . $id . "'";
+    $sql = "SELECT id_konsul, a.id_dokter, a.tanggal, a.nik, b.nama, b.alamat, b.tanggal_lahir, b.jenis_kelamin, b.norm, b.no_hp, a.tanggal_kembali FROM konsul a LEFT JOIN pasien b ON b.nik=a.nik WHERE md5(id_konsul)='" . $id . "'";
     $data = $db->query($sql, 'ARRAY_ONE')['data'];
 
     if (!$data) return printf('ID Konsultasi tidak valid');
@@ -251,7 +252,8 @@ class KonsulController extends Controller
               'jenis_kelamin' => $post['jenis_kelamin'],
               'tanggal_lahir' => $post['tanggal_lahir'],
               'alamat' => $post['alamat'],
-              'norm' => $post['norm']
+              'norm' => $post['norm'],
+              'no_hp' => $post['no_hp']
             ]
           )['success']
         ) {
@@ -270,6 +272,7 @@ class KonsulController extends Controller
               'tanggal_lahir' => $post['tanggal_lahir'],
               'alamat' => $post['alamat'],
               'norm' => $post['norm'],
+              'no_hp' => $post['no_hp'],
             ],
             [
               'params' => [

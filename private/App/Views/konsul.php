@@ -52,6 +52,10 @@
         <input type="text" maxlength="50" autocomplete="off" value="<?= $flash['norm'] ?? $data['pasien']['norm'] ?? '' ?>" required placeholder="Nomor rekam medis" required name="norm" id="norm" class="form-control form-control-alternative">
       </div>
       <div class="form-group">
+        <label class="small form-control-label" for="no_hp">No. HP<span class="text-danger">*</span></label>
+        <input type="text" maxlength="15" autocomplete="off" value="<?= $flash['no_hp'] ?? $data['pasien']['no_hp'] ?? '' ?>" required placeholder="Nomor telp/HP" required name="no_hp" id="no_hp" class="form-control form-control-alternative">
+      </div>
+      <div class="form-group">
         <label class="small form-control-label" for="jenis_kelamin">Jenis Kelamin<span class="text-danger">*</span></label>
         <?php
         $gender_list = ['l', 'p'];

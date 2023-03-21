@@ -35,6 +35,7 @@
         <th scope="col">Nama</th>
         <th scope="col">NIK</th>
         <th scope="col">No. RM</th>
+        <th scope="col">No. Telp/HP</th>
         <th scope="col">L/P</th>
         <th scope="col">Tanggal Lahir</th>
         <?php if (Auth::user('role') === 'konsul') : ?>
@@ -68,6 +69,9 @@
         },
         {
           data: 'norm'
+        },
+        {
+          data: 'no_hp'
         },
         {
           data: 'jenis_kelamin'

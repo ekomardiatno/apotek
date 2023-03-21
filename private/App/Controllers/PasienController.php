@@ -65,7 +65,7 @@ class PasienController extends Controller
     $totalRecordwithFilter = $records['allcount'];
 
     // Fetch records
-    $stmt = $pdo->prepare("SELECT nama, nik, norm, tanggal_lahir, jenis_kelamin, tanggal_dibuat FROM pasien WHERE 1" . $searchQuery . " ORDER BY " . $columnName . " " . $columnSortOrder . " LIMIT :limit,:offset");
+    $stmt = $pdo->prepare("SELECT nama, nik, norm, no_hp, tanggal_lahir, jenis_kelamin, tanggal_dibuat FROM pasien WHERE 1" . $searchQuery . " ORDER BY " . $columnName . " " . $columnSortOrder . " LIMIT :limit,:offset");
 
     // Bind values
     foreach ($searchArray as $key => $search) {
@@ -86,6 +86,7 @@ class PasienController extends Controller
         "nama" => "<a href='" . Web::url('pasien.detail.' . md5($row['nik'])) . "'>" . ($row['nama'] !== NULL ? $row['nama'] : '-') . "</a>",
         "nik" => $row['nik'],
         "norm" => $row['norm'],
+        "no_hp" => $row['no_hp'] === '' ? '-' : $row['no_hp'],
         "jenis_kelamin" => $row['jenis_kelamin'] !== NULL ? strtoupper($row['jenis_kelamin']) : '-',
         "tanggal_lahir" => $row['tanggal_lahir'] ? Mod::timepiece($row['tanggal_lahir']) : '-',
         "tanggal_dibuat" => Mod::timepiece($row['tanggal_dibuat']),
@@ -138,7 +139,7 @@ class PasienController extends Controller
     $this->role(['konsul']);
     $pasien = $this->model('Pasien');
     $data = $pasien->read(
-      ['nik', 'nama', 'alamat', 'tanggal_lahir', 'jenis_kelamin', 'norm'],
+      ['nik', 'nama', 'alamat', 'tanggal_lahir', 'jenis_kelamin', 'norm', 'no_hp'],
       [
         'params' => [
           [
@@ -200,7 +201,8 @@ class PasienController extends Controller
           'alamat' => $post['alamat'],
           'jenis_kelamin' => $post['jenis_kelamin'],
           'tanggal_lahir' => $post['tanggal_lahir'],
-          'norm' => $post['norm']
+          'norm' => $post['norm'],
+          'no_hp' => $post['no_hp']
         ],
         [
           'params' => [
@@ -230,7 +232,7 @@ class PasienController extends Controller
     $pasien_m = $this->model('Pasien');
     $konsul_m = $this->model('Konsul');
     $pasien = $pasien_m->read(
-      ['nik', 'nama', 'alamat', 'jenis_kelamin', 'timestampdiff(year, tanggal_lahir, curdate()) as umur', 'tanggal_lahir', 'norm', 'tanggal_dibuat'],
+      ['nik', 'nama', 'alamat', 'jenis_kelamin', 'timestampdiff(year, tanggal_lahir, curdate()) as umur', 'tanggal_lahir', 'norm', 'no_hp', 'tanggal_dibuat'],
       [
         'params' => [
           [
