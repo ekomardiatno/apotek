@@ -1,5 +1,7 @@
 <?php
 
+use Dompdf\Dompdf;
+
 class ResepController extends Controller
 {
 
@@ -471,7 +473,95 @@ class ResepController extends Controller
   public function print()
   {
     $post = $this->request()->post;
-    echo json_encode($post);
-    die;
+    $db = new Database;
+    $sql = "SELECT resep.data_resep,pasien.nama AS nama_pasien,pasien.alamat,pasien.jenis_kelamin,pasien.tanggal_lahir,pasien.no_hp,dokter.kategori_dokter,dokter.sip_dokter,dokter.jadwal_praktek,user.name AS nama_dokter, resep.tanggal_dibuat FROM resep LEFT JOIN konsul ON konsul.id_konsul=resep.id_konsul LEFT JOIN pasien ON pasien.nik=konsul.nik LEFT JOIN dokter ON dokter.id_dokter=konsul.id_dokter LEFT JOIN user ON user.username=dokter.username WHERE md5(resep.id_resep)='" . $post['id_resep'] . "'";
+    $query = $db->query($sql, 'ARRAY_ONE');
+    $data = $query['data'];
+    $query = $db->query("SELECT * FROM pengaturan");
+    $pengaturan = $query['data'];
+    $indexedAlamat = ArrayHelpers::indexOf(function ($obj, $i) {
+      return $obj['key_pengaturan'] === 'BRAND_ADDRESS';
+    }, $pengaturan);
+    $alamatApotek = $indexedAlamat > -1 ? $pengaturan[$indexedAlamat]['value_pengaturan'] : '-';
+    $indexedKota = ArrayHelpers::indexOf(function ($obj, $i) {
+      return $obj['key_pengaturan'] === 'BRAND_CITY';
+    }, $pengaturan);
+    $kotaApotek = $indexedKota > -1 ? $pengaturan[$indexedKota]['value_pengaturan'] : '-';
+    $dokterController = new DokterController();
+    $data['jadwal_praktek'] = $dokterController->formattedSchedule(unserialize($data['jadwal_praktek']));
+    $data['data_resep'] = unserialize($data['data_resep']);
+    $tanggal_lahir = new DateTime($data['tanggal_lahir']);
+    $tanggal_now = new DateTime();
+    $tanggal_diff = $tanggal_now->diff($tanggal_lahir);
+    $data['umur'] = $tanggal_diff->y . ' Tahun';
+    $html = '<html>';
+    $html .= '<head>';
+    $html .= '<title>Resep Obat</title>';
+    $html .= '<link href="' . Web::assets('report.css', 'css') . '" rel="stylesheet" />';
+    $html .= '</head>';
+    $html .= '<style>@page { margin: 5pt; }</style>';
+    $html .= '<body>';
+    $html .= '<h1 class="text-center text-underline" style="margin-bottom:5pt">' . $data['nama_dokter'] . '</h1>';
+    $html .= '<p class="text-center text-uppercase" style="margin-bottom:5pt">' . $data['kategori_dokter'] . '</p>';
+    $html .= '<p class="text-center" style="font-size:9pt">SIP: ' . $data['sip_dokter'] . '</p>';
+    $html .= '<table class="no-border"><tr><td width="50%" style="padding-right:10pt">' . $alamatApotek . '</td><td width="50%" style="padding-left:10pt"><p class="mb-0">Jadwal Praktek:</p>' . $data['jadwal_praktek'] . '</td></tr></table>';
+    $html .= '<hr style="margin:5pt 0">';
+    $html .= '<p class="text-right" style="margin-top:10pt">' . $kotaApotek . ', ' . Mod::timepiece(substr($data['tanggal_dibuat'], 0, 10)) . '</p>';
+    $html .= '<h2 style="margin-bottom:10pt">R/</h2>';
+    $html .= '<table class="no-border small-padding">';
+    foreach ($data['data_resep'] as $resep) {
+      $html .= '<tr>';
+      $html .= '<td>' . $resep['nama_obat'] . '</td>';
+      $html .= '<td>' . $resep['dosis'] . '</td>';
+      $html .= '</tr>';
+      $html .= '<tr>';
+      $html .= '<td>' . $resep['nama_obat'] . '</td>';
+      $html .= '<td>' . $resep['dosis'] . '</td>';
+      $html .= '</tr>';
+    }
+    $html .= '</table>';
+    $html .= '<div style="position:fixed;top:65%">';
+    $html .= '<div style="width:50%;margin-left:auto">';
+    $html .= '<table style="font-size: 6pt">';
+    $html .= '<tr>';
+    $html .= '<td width="1%">No.</td>';
+    $html .= '<td>Alur Proses</td>';
+    $html .= '<td>Pelaksana</td>';
+    $html .= '</tr>';
+    $alur = ['Penerimaan Reseo', 'Pembuatan Etiket', 'Peracikan Obat', 'Verifikasi', 'Penyerahan Obat'];
+    for ($i = 1; $i <= 5; $i++) {
+      $html .= '<tr>';
+      $html .= '<td>' . $i . '</td>';
+      $html .= '<td>' . $alur[$i - 1] . '</td>';
+      $html .= '<td></td>';
+      $html .= '</tr>';
+    }
+    $html .= '</table>';
+    $html .= '</div>';
+    $html .= '<div style="width:100%;margin-top:10pt">';
+    $html .= '<table class="no-border small-padding">';
+    $list = ['Pro', 'Umur', 'Alamat', 'Tlp/Hp'];
+    $prop = ['nama_pasien', 'umur', 'alamat', 'no_hp'];
+    for ($i = 0; $i < count($list); $i++) {
+      $html .= '<tr>';
+      $html .= '<td width="1%">' . $list[$i] . '</td>';
+      $html .= '<td width="1%">:</td>';
+      $html .= '<td>' . ($data[$prop[$i]] === '' ? '-' : $data[$prop[$i]]) . '</td>';
+      $html .= '</tr>';
+    }
+    $html .= '</table>';
+    $html .= '</div>';
+    $html .= '<p class="mb-0 text-center" style="font-weight:bold;margin-top:10pt;font-style:italic">Obat tidak boleh diganti tanpa persetujuan dokter</p>';
+    $html .= '</div>';
+    $html .= '</body>';
+    $html .= '</html>';
+    // echo $html;
+    // die;
+    $db->query('UPDATE resep SET status_dicetak=1 WHERE md5(id_resep)="' . $post['id_resep'] . '"');
+    $dompdf = new Dompdf();
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper([0, 0, 100 * 2.835, 210 * 2.835], 'portrait');
+    $dompdf->render();
+    $dompdf->stream('resep-' . time() . '.pdf', array("Attachment" => false));
   }
 }
