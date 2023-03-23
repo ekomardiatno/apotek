@@ -183,6 +183,9 @@
           $('[name="nama"]').val(res.pasien.nama)
           $('[name="alamat"]').val(res.pasien.alamat)
           $('[name="jenis_kelamin"]').val(res.pasien.jenis_kelamin)
+          $('[name="tanggal_lahir"]').val(res.pasien.tanggal_lahir)
+          $('[name="tanggal_lahir"]').datepicker("update", res.pasien.tanggal_lahir)
+          $('[name="no_hp"]').val(res.pasien.no_hp)
           $('[name="norm"]').val(res.pasien.norm)
         }
         if (res.isAvailable) $('form').find('button[type="button"]').prop('disabled', false)
@@ -230,6 +233,12 @@
         $('[name="norm"]').val('')
       $('[name="jenis_kelamin"]').val() !== '' &&
         $('[name="jenis_kelamin"]').val('')
+      $('[name="tanggal_lahir"]').val() !== '' &&
+        $('[name="tanggal_lahir"]').val('')
+      $('[name="tanggal_lahir"]').val() !== '' &&
+        $('[name="tanggal_lahir"]').datepicker("update", '')
+      $('[name="no_hp"]').val() !== '' &&
+        $('[name="no_hp"]').val('')
     },
     onSelect: (value) => {
       clearTimeout(timeout)
