@@ -27,7 +27,7 @@ class HomeController extends Controller
         $sql_existed_data = "SELECT tanggal, tanggal_kembali FROM `konsul` WHERE nik = '" . $post['nik'] . "' AND ('" . $post['tanggal'] . "' BETWEEN tanggal AND tanggal_kembali OR '" . $post['tanggal_kembali'] . "' BETWEEN tanggal AND tanggal_kembali) ORDER BY tanggal ASC";
         $sql_konsul_last = "SELECT tanggal, tanggal_kembali FROM konsul WHERE nik='" . $post['nik'] . "' ORDER BY tanggal DESC LIMIT 1";
         $sql_konsul_first = "SELECT tanggal, tanggal_kembali FROM konsul WHERE nik='" . $post['nik'] . "' ORDER BY tanggal ASC LIMIT 1";
-        $sql_pasien = "SELECT nik, nama, alamat, jenis_kelamin, tanggal_lahir, norm FROM pasien WHERE nik='" . $post['nik'] . "'";
+        $sql_pasien = "SELECT nik, nama, alamat, jenis_kelamin, tanggal_lahir, norm, no_hp FROM pasien WHERE nik='" . $post['nik'] . "'";
         $sql_old_data = 'SELECT tanggal, tanggal_kembali FROM konsul WHERE md5(id_konsul)="' . ($post['id'] ?? '') . '"';
         $old_data = isset($post['id']) !== '' ? $this->db->query($sql_old_data, 'ARRAY_ONE')['data'] : null;
         $count_data = isset($post['id']) !== '' ? $this->db->query($sql_count_data, 'ARRAY_ONE')['data'] : null;
