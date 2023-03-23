@@ -116,7 +116,7 @@ class ResepController extends Controller
         'data_resep' => $data_resep,
         'pengaturan' => Auth::user('role') === 'dokter' ? "<a href='" . Web::url('resep.edit.' . md5($row['id_resep'])) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span><span class='d-none d-md-inline-block ml-1'>Edit</span></a>"
           . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-keyid='id_resep' data-action='" . Web::url('resep.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . md5($row['id_resep']) . "'><span class='fas fa-trash'></span><span class='d-none d-md-inline-block ml-1'>Hapus</span></button>"
-          : "<form action='" . Web::url('resep.print') . "' method='post' class='inline-block'>" . Web::key_field() . "<input type='hidden' name='id_resep' value='" . md5($row['id_resep']) . "' /><button type='submit' class='btn btn-outline-primary btn-sm skip-confirmation'><span class='fas fa-print'></span><span class='d-none d-md-inline-block ml-1'>Cetak</span></button></form>",
+          : "<form action='" . Web::url('resep.print.' . time()) . "' method='post' class='inline-block'>" . Web::key_field() . "<input type='hidden' name='id_resep' value='" . md5($row['id_resep']) . "' /><button type='submit' class='btn btn-outline-primary btn-sm skip-confirmation'><span class='fas fa-print'></span><span class='d-none d-md-inline-block ml-1'>Cetak</span></button></form>",
         'nama_dokter' => $row['name']
       ];
       $i++;

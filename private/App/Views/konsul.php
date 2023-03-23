@@ -170,6 +170,8 @@
           $('[name="alamat"]').val(res.pasien.alamat)
           $('[name="jenis_kelamin"]').val(res.pasien.jenis_kelamin)
           $('[name="tanggal_lahir"]').val(res.pasien.tanggal_lahir)
+          $('[name="tanggal_lahir"]').datepicker("update", res.pasien.tanggal_lahir)
+          $('[name="no_hp"]').val(res.pasien.no_hp)
           $('[name="norm"]').val(res.pasien.norm)
         }
         if (res.isAvailable) $('form').find('[type="submit"]').prop('disabled', false)
@@ -214,6 +216,12 @@
         $('[name="norm"]').val('')
       $('[name="jenis_kelamin"]').val() !== '' &&
         $('[name="jenis_kelamin"]').val('')
+      $('[name="tanggal_lahir"]').val() !== '' &&
+        $('[name="tanggal_lahir"]').val('')
+      $('[name="tanggal_lahir"]').val() !== '' &&
+        $('[name="tanggal_lahir"]').datepicker("update", '')
+      $('[name="no_hp"]').val() !== '' &&
+        $('[name="no_hp"]').val('')
     },
     onSelect: (value) => {
       clearTimeout(timeout)
@@ -228,6 +236,9 @@
     $('input[name="nama"]').val('')
     $('textarea[name="alamat"]').val('')
     $('input[name="norm"]').val('')
+    $('input[name="tanggal_lahir"]').val('')
+    $('input[name="tanggal_lahir"]').datepicker("update", '')
+    $('input[name="no_hp"]').val('')
     $('select[name="jenis_kelamin"] option:selected').prop('selected', false)
     if ($('form .card-body').find('.alert').length > 0) $('form .card-body').find('.alert')[0].remove()
     $('form button[type="submit"]').prop('disabled', true)

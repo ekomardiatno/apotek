@@ -41,7 +41,7 @@
               <!-- Modal -->
               <div class="modal fade" id="report" tabindex="-1" role="dialog" aria-labelledby="reportLabel" aria-hidden="true">
                 <div class="modal-dialog modal-sm" role="document">
-                  <form action="<?= Web::url('print') ?>" id="print" target="_blank" method="post">
+                  <form action="<?= Web::url('print.' . time()) ?>" id="print" target="_blank" method="post">
                     <div class="modal-content">
                       <div class="modal-header">
                         <h5 class="modal-title" id="reportLabel">Buat Laporan</h5>

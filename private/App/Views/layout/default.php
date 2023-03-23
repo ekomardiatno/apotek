@@ -307,7 +307,6 @@
   <script>
     $('.datepicker').each(function(e) {
       const dataset = this.dataset
-      console.log(dataset)
       let datepicker = $(this).datepicker({
         disableTouchKeyboard: true,
         autoclose: true,
