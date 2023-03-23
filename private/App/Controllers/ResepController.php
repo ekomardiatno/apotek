@@ -511,10 +511,7 @@ class ResepController extends Controller
     $html .= '<table class="no-border small-padding">';
     foreach ($data['data_resep'] as $resep) {
       $html .= '<tr>';
-      $html .= '<td>' . $resep['nama_obat'] . '</td>';
-      $html .= '<td>' . $resep['dosis'] . '</td>';
-      $html .= '</tr>';
-      $html .= '<tr>';
+      $html .= '<td>' . $resep['kuantitas'] . 'pcs</td>';
       $html .= '<td>' . $resep['nama_obat'] . '</td>';
       $html .= '<td>' . $resep['dosis'] . '</td>';
       $html .= '</tr>';
