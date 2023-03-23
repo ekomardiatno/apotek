@@ -418,14 +418,13 @@ class ObatController extends Controller
     $html .= '<th rowspan="2">Satuan</th>';
     $html .= '<th rowspan="2">Stok Awal</th>';
     $html .= '<th rowspan="' . (count($stok_masuk_kategori) > 0 ? 1 : 2) . '" colspan="' . count($stok_masuk_kategori) . '">Stok Masuk</th>';
-    $html .= '<th rowspan="1" colspan="' . (count($stok_keluar_kategori) + 1) . '">Stok Keluar</th>';
+    $html .= '<th rowspan="' . (count($stok_keluar_kategori) > 0 ? 1 : 2) . '" colspan="' . count($stok_keluar_kategori)  . '">Stok Keluar</th>';
     $html .= '<th rowspan="2">Stok Akhir</th>';
     $html .= '</tr>';
     $html .= '<tr>';
     foreach ($stok_masuk_kategori as $kategori) {
       $html .= '<th>' . $kategori['nama_stok_masuk_kategori'] . '</th>';
     }
-    $html .= '<th>Resep</th>';
     foreach ($stok_keluar_kategori as $kategori) {
       $html .= '<th>' . $kategori['nama_stok_keluar_kategori'] . '</th>';
     }
@@ -457,16 +456,6 @@ class ObatController extends Controller
         }
       }
 
-      $indexedResep = ArrayHelpers::indexOf(function ($obj, $i) use ($objObat) {
-        return md5($objObat['id_obat']) == $obj['id_obat'];
-      }, $reseps);
-      if ($indexedResep < 0) {
-        $html .= '<td class="text-center">0</td>';
-      } else {
-        $stok_akhir -= $reseps[$indexedResep]['kuantitas'];
-        $html .= '<td class="text-center">' . Mod::numeral($reseps[$indexedResep]['kuantitas']) . '</td>';
-      }
-
       if (count($stok_keluar_kategori) > 0) {
         foreach ($stok_keluar_kategori as $kategori) {
           $indexedStokKeluar = ArrayHelpers::indexOf(function ($obj, $i) use ($objObat, $kategori) {
@@ -479,7 +468,10 @@ class ObatController extends Controller
             $html .= '<td class="text-center">' . Mod::numeral($stok_keluar[$indexedStokKeluar]['kuantitas_stok_keluar']) . '</td>';
           }
         }
+      } else {
+        $html .= '<td class="text-center">0</td>';
       }
+
       $html .= '<td class="text-center">' . Mod::numeral($stok_akhir) . '</td>';
       $html .= '</tr>';
       $no++;
