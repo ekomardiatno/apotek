@@ -97,7 +97,8 @@ class RiwayatStokController extends Controller
       $tanggal_dibuat = new DateTime($row['tanggal_dibuat']);
       $tanggal_now = new DateTime();
       $tanggal_diff = $tanggal_now->diff($tanggal_dibuat);
-      $ableSettings = ($tanggal_diff->i > $this->maxRemovable) ? false : true;
+      $menit = $tanggal_diff->h * 60 + $tanggal_diff->i + $tanggal_diff->s / 60;
+      $ableSettings = ($menit > $this->maxRemovable) ? false : true;
       $data[] = array(
         "no" => $i,
         $categoryNameKeyName => $row[$categoryNameKeyName],
@@ -130,7 +131,8 @@ class RiwayatStokController extends Controller
     $tanggal_dibuat = new DateTime($riwayat['tanggal_dibuat']);
     $tanggal_now = new DateTime();
     $tanggal_diff = $tanggal_now->diff($tanggal_dibuat);
-    if ($tanggal_diff->i > $this->maxRemovable) {
+    $menit = $tanggal_diff->h * 60 + $tanggal_diff->i + $tanggal_diff->s / 60;
+    if ($menit > $this->maxRemovable) {
       Flasher::setFlash('Data yang dibuat ' . $this->maxRemovable . ' menit lalu tidak dapat dihapus', 'danger', 'ni ni-fat-remove');
       return $this->redirect('riwayatstok.' . $riwayat['id_obat'] . '.' . $type);
     }
