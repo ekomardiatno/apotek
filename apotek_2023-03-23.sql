@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Mar 23, 2023 at 07:08 AM
+-- Generation Time: Mar 23, 2023 at 07:48 AM
 -- Server version: 8.0.29
 -- PHP Version: 7.4.30
 
@@ -228,9 +228,7 @@ CREATE TABLE `user` (
 
 INSERT INTO `user` (`id_user`, `username`, `name`, `email`, `password`, `role`, `last_login`, `tanggal_dibuat`, `tanggal_diubah`) VALUES
 (1, 'konsul', 'Konsul', 'user@email.com', '$2y$10$0b8sYXhtJLKK1sYQSzrf/uivOP2C.q422iJllsDvXAGufh9TZ1TS6', 'konsul', '2023-03-23 11:46:40', '2023-03-11 02:33:10', '2023-03-23 04:46:40'),
-(3, 'farma', 'Farma', 'user2@email.com', '$2y$10$uDagAdHnUXhCJeVAna0O9ur1Cy/yHAMU47m3TOqsI6ZzS2PjwtGrO', 'farma', '2023-03-23 13:13:58', '2023-03-11 02:33:10', '2023-03-23 06:13:58'),
-(4, 'ellie_williams', 'Ellie Williams', 'ellie@email.com', '$2y$10$Q0y27uHeVp0dfwyCdAqOD.Nn4sckHDtwzYNhFb3LsEJ2SZjfQkou.', 'dokter', '2023-03-21 23:49:26', '2023-03-11 05:26:17', '2023-03-21 16:49:26'),
-(6, 'bambang', 'Bambang', 'bambang@email.com', '$2y$10$JuwXIwYhKPPI4vMu3dTj/uPhCE/AvsIGIo7IKjTYUcR..pAmSzY9S', 'dokter', '2023-03-23 13:12:12', '2023-03-23 04:07:43', '2023-03-23 06:12:12');
+(3, 'farma', 'Farma', 'user2@email.com', '$2y$10$uDagAdHnUXhCJeVAna0O9ur1Cy/yHAMU47m3TOqsI6ZzS2PjwtGrO', 'farma', '2023-03-23 13:13:58', '2023-03-11 02:33:10', '2023-03-23 06:13:58');
 
 --
 -- Indexes for dumped tables
