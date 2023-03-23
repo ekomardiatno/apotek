@@ -202,40 +202,20 @@ class ResepController extends Controller
         ]
       ], 'ARRAY_ONE')['data']['stok_obat'];
       $stok = intval($stok);
-      if ($stok < $kuantitas) {
-        $unableToSaved[] = [
-          'id_obat' => $id_obat,
-          'nama_obat' => $nama_obat,
-          'kuantitas' => $kuantitas,
-          'dosis' => $dosis,
-        ];
-      } else {
-        $data[] = [
-          'id_obat' => $id_obat,
-          'nama_obat' => $nama_obat,
-          'kuantitas' => $kuantitas,
-          'dosis' => $dosis,
-        ];
-        $stok_baru[] = [
-          'id_obat' => $id_obat,
-          'stok_obat' => $stok - $kuantitas
-        ];
-        $stok_lama[] = [
-          'id_obat' => $id_obat,
-          'stok_obat' => $stok
-        ];
-      }
-    }
-
-    if (count($unableToSaved) > 0) {
-      Flasher::setFlash('Stok ' . $unableToSaved[0]['nama_obat'] . ' tidak cukup.', 'danger', 'ni ni-fat-remove');
-      foreach ($data as $key => $val) {
-        if (in_array($val, $unableToSaved)) array_splice($data, $key, 1);
-      }
-      Flasher::setData([
-        'resep' => $data
-      ]);
-      return $this->redirect('resep.tambah.' . $post['id_konsul']);
+      $data[] = [
+        'id_obat' => $id_obat,
+        'nama_obat' => $nama_obat,
+        'kuantitas' => $kuantitas,
+        'dosis' => $dosis,
+      ];
+      $stok_baru[] = [
+        'id_obat' => $id_obat,
+        'stok_obat' => $stok - $kuantitas
+      ];
+      $stok_lama[] = [
+        'id_obat' => $id_obat,
+        'stok_obat' => $stok
+      ];
     }
 
     $resep = $this->model('Resep');
@@ -377,18 +357,6 @@ class ResepController extends Controller
 
     $curResep = $curResep ? $curResep['data']['data_resep'] : null;
     $curResep = unserialize($curResep);
-
-    foreach ($nextResep as $obj) {
-      $indexedCurResep = $this->searchForId($obj['id_obat'], $curResep, 'id_obat');
-      $checkAny = $this->_db->query('SELECT stok_obat FROM obat WHERE stok_obat>=' . ($indexedCurResep < 0 ? $obj['kuantitas'] : $obj['kuantitas'] - $curResep[$indexedCurResep]['kuantitas']) . ' AND md5(id_obat)="' . $obj['id_obat'] . '"', 'ARRAY_ONE')['data'];
-      if (!$checkAny) {
-        Flasher::setFlash('Stok ' . $obj['nama_obat'] . ' tidak cukup.', 'danger', 'ni ni-fat-remove');
-        Flasher::setData([
-          'resep' => $nextResep
-        ]);
-        return $this->redirect('resep.edit.' . $post['id_resep']);
-      }
-    }
 
     $updateResep = $this->_db->query("UPDATE resep SET data_resep='" . serialize($nextResep) . "' WHERE md5(id_resep)='" . $post['id_resep'] . "'");
 

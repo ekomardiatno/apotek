@@ -10,7 +10,7 @@ class ObatController extends Controller
   }
   public function index()
   {
-    $this->role(['farma']);
+    $this->role(['farma', 'dokter']);
     $this->_web->title('Obat');
     $this->_web->breadcrumb([
       [
@@ -84,12 +84,12 @@ class ObatController extends Controller
         "no" => $i,
         "nama_obat" => "<a href='" . Web::url('riwayatstok.' . $row['id_obat'] . '.masuk') . "'>" . $row['nama_obat'] . "</a>",
         "satuan_obat" => $row['satuan_obat'],
-        "stok_obat" => "<button type='button' class='btn btn-secondary btn-sm stock-btn mr-0' data-type='remove' data-id='" . $row['id_obat'] . "' data-name='" . $row['nama_obat'] . "' data-qty='" . $row['stok_obat'] . "'><span class='fas fa-minus'></span></button>"
+        "stok_obat" => (Auth::user('role') === 'farma' ? "<button type='button' class='btn btn-secondary btn-sm stock-btn mr-0' data-type='remove' data-id='" . $row['id_obat'] . "' data-name='" . $row['nama_obat'] . "' data-qty='" . $row['stok_obat'] . "'><span class='fas fa-minus'></span></button>" : "")
           . "<span class='mx-2 font-weight-bold h4 mt-1' style='vertical-align:middle'>" . Mod::numeral($row['stok_obat']) . "</span>"
-          . "<button type='button' class='btn btn-secondary btn-sm stock-btn' data-type='add' data-id='" . $row['id_obat'] . "' data-name='" . $row['nama_obat'] . "' data-qty='" . $row['stok_obat'] . "'><span class='fas fa-plus'></span></button>",
+          . (Auth::user('role') === 'farma' ? "<button type='button' class='btn btn-secondary btn-sm stock-btn' data-type='add' data-id='" . $row['id_obat'] . "' data-name='" . $row['nama_obat'] . "' data-qty='" . $row['stok_obat'] . "'><span class='fas fa-plus'></span></button>" : ""),
         "deskripsi_obat" => $row['deskripsi_obat'] !== '' ? $row['deskripsi_obat'] : '-',
-        "pengaturan" => "<a href='" . Web::url('obat.edit.' . $row['id_obat']) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span><span class='ml-1 d-none d-md-inline-block'>Edit</span></a>"
-          . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-keyid='id_obat' data-action='" . Web::url('obat.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . $row['id_obat'] . "'><span class='fas fa-trash'></span><span class='ml-1 d-none d-md-inline-block'>Hapus</span></button>"
+        "pengaturan" => Auth::user('role') === 'farma' ? "<a href='" . Web::url('obat.edit.' . $row['id_obat']) . "' class='btn btn-outline-warning btn-sm'><span class='fas fa-edit'></span><span class='ml-1 d-none d-md-inline-block'>Edit</span></a>"
+          . "<button type='button' class='btn btn-outline-danger btn-sm hapus-data' data-keyid='id_obat' data-action='" . Web::url('obat.hapus') . "' data-key='" . getenv('APP_KEY') . "' data-id='" . $row['id_obat'] . "'><span class='fas fa-trash'></span><span class='ml-1 d-none d-md-inline-block'>Hapus</span></button>" : "-"
       );
       $i++;
     }
@@ -384,8 +384,8 @@ class ObatController extends Controller
     $reseps = [];
     foreach ($resep as $objResep) {
       $data_resep = unserialize($objResep['data_resep']);
-      foreach ($data_resep as $objDataResep) {
-        $indexedObat = ArrayHelpers::indexOf(function ($obj, $i) use ($objDataResep) {
+      foreach ($data_resep as $i => $objDataResep) {
+        $indexedObat = ArrayHelpers::indexOf(function ($obj) use ($objDataResep) {
           return $obj['id_obat'] === $objDataResep['id_obat'];
         }, $reseps);
         if ($indexedObat > -1) {

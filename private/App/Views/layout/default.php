@@ -144,7 +144,7 @@
                   <a href="<?= Web::url('pasien') ?>"><span class="fas fa-user-injured"></span><span class="d-none d-md-inline-block ml-2">Pasien</span></a>
                 </li>
               <?php endif; ?>
-              <?php if (Auth::user('role') === 'farma') : ?>
+              <?php if (Auth::user('role') === 'farma' || Auth::user('role') === 'dokter') : ?>
                 <li>
                   <a href="<?= Web::url('obat') ?>"><span class="fas fa-capsules"></span><span class="d-none d-md-inline-block ml-2">Obat</span></a>
                 </li>
