@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Mar 23, 2023 at 07:55 AM
+-- Generation Time: Mar 23, 2023 at 08:03 AM
 -- Server version: 8.0.29
 -- PHP Version: 7.4.30
 
@@ -29,14 +29,14 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `dokter` (
   `id_dokter` int NOT NULL,
-  `username` varchar(25) NOT NULL,
-  `sip_dokter` varchar(100) NOT NULL,
-  `kategori_dokter` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `no_hp` varchar(15) NOT NULL,
-  `jadwal_praktek` text NOT NULL,
+  `username` varchar(25) COLLATE utf8mb4_general_ci NOT NULL,
+  `sip_dokter` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `kategori_dokter` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `no_hp` varchar(15) COLLATE utf8mb4_general_ci NOT NULL,
+  `jadwal_praktek` text COLLATE utf8mb4_general_ci NOT NULL,
   `tanggal_dibuat` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `tanggal_diubah` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -49,11 +49,11 @@ CREATE TABLE `konsul` (
   `id_dokter` int NOT NULL,
   `tanggal` date NOT NULL,
   `tanggal_kembali` date NOT NULL,
-  `nik` varchar(16) NOT NULL,
+  `nik` varchar(16) COLLATE utf8mb4_general_ci NOT NULL,
   `status_selesai` tinyint(1) NOT NULL DEFAULT '0',
   `tanggal_dibuat` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `tanggal_diubah` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -63,13 +63,13 @@ CREATE TABLE `konsul` (
 
 CREATE TABLE `obat` (
   `id_obat` int NOT NULL,
-  `nama_obat` varchar(150) NOT NULL,
-  `satuan_obat` varchar(50) NOT NULL,
+  `nama_obat` varchar(150) COLLATE utf8mb4_general_ci NOT NULL,
+  `satuan_obat` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
   `stok_obat` int NOT NULL DEFAULT '0',
-  `deskripsi_obat` varchar(300) NOT NULL,
+  `deskripsi_obat` varchar(300) COLLATE utf8mb4_general_ci NOT NULL,
   `tanggal_dibuat` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `tanggal_diubah` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -78,16 +78,16 @@ CREATE TABLE `obat` (
 --
 
 CREATE TABLE `pasien` (
-  `nik` varchar(16) NOT NULL,
-  `nama` varchar(50) NOT NULL,
-  `jenis_kelamin` enum('l','p') NOT NULL,
+  `nik` varchar(16) COLLATE utf8mb4_general_ci NOT NULL,
+  `nama` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `jenis_kelamin` enum('l','p') COLLATE utf8mb4_general_ci NOT NULL,
   `tanggal_lahir` date DEFAULT NULL,
-  `alamat` text NOT NULL,
-  `norm` varchar(50) NOT NULL,
-  `no_hp` varchar(15) NOT NULL,
+  `alamat` text COLLATE utf8mb4_general_ci NOT NULL,
+  `norm` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `no_hp` varchar(15) COLLATE utf8mb4_general_ci NOT NULL,
   `tanggal_dibuat` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `tanggal_diubah` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -96,11 +96,11 @@ CREATE TABLE `pasien` (
 --
 
 CREATE TABLE `pengaturan` (
-  `key_pengaturan` varchar(25) NOT NULL,
-  `label_pengaturan` varchar(50) NOT NULL,
-  `value_pengaturan` varchar(150) NOT NULL,
+  `key_pengaturan` varchar(25) COLLATE utf8mb4_general_ci NOT NULL,
+  `label_pengaturan` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `value_pengaturan` varchar(150) COLLATE utf8mb4_general_ci NOT NULL,
   `priority_pengaturan` tinyint(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `pengaturan`
@@ -121,11 +121,11 @@ INSERT INTO `pengaturan` (`key_pengaturan`, `label_pengaturan`, `value_pengatura
 CREATE TABLE `resep` (
   `id_resep` int NOT NULL,
   `id_konsul` int NOT NULL,
-  `data_resep` text NOT NULL,
+  `data_resep` text COLLATE utf8mb4_general_ci NOT NULL,
   `status_dicetak` tinyint(1) NOT NULL DEFAULT '0',
   `tanggal_dibuat` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `tanggal_diubah` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -139,7 +139,7 @@ CREATE TABLE `riwayat_stok` (
   `stok_akhir` int NOT NULL,
   `tanggal_dibuat` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `tanggal_diperbarui` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -154,7 +154,7 @@ CREATE TABLE `stok_keluar` (
   `kuantitas_stok_keluar` int NOT NULL,
   `tanggal_dibuat` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `tanggal_diubah` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -164,10 +164,10 @@ CREATE TABLE `stok_keluar` (
 
 CREATE TABLE `stok_keluar_kategori` (
   `id_stok_keluar_kategori` int NOT NULL,
-  `nama_stok_keluar_kategori` varchar(150) NOT NULL,
+  `nama_stok_keluar_kategori` varchar(150) COLLATE utf8mb4_general_ci NOT NULL,
   `tanggal_dibuat` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `tanggal_diubah` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `stok_keluar_kategori`
@@ -189,7 +189,7 @@ CREATE TABLE `stok_masuk` (
   `kuantitas_stok_masuk` int NOT NULL,
   `tanggal_dibuat` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `tanggal_diubah` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -199,10 +199,10 @@ CREATE TABLE `stok_masuk` (
 
 CREATE TABLE `stok_masuk_kategori` (
   `id_stok_masuk_kategori` int NOT NULL,
-  `nama_stok_masuk_kategori` varchar(150) NOT NULL,
+  `nama_stok_masuk_kategori` varchar(150) COLLATE utf8mb4_general_ci NOT NULL,
   `tanggal_dibuat` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `tanggal_diubah` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -212,15 +212,15 @@ CREATE TABLE `stok_masuk_kategori` (
 
 CREATE TABLE `user` (
   `id_user` int NOT NULL,
-  `username` varchar(25) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `email` varchar(50) NOT NULL,
-  `password` text NOT NULL,
-  `role` varchar(50) NOT NULL,
+  `username` varchar(25) COLLATE utf8mb4_general_ci NOT NULL,
+  `name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` mediumtext COLLATE utf8mb4_general_ci NOT NULL,
+  `role` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
   `last_login` datetime DEFAULT NULL,
   `tanggal_dibuat` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `tanggal_diubah` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `user`
