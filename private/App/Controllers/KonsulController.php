@@ -163,8 +163,8 @@ class KonsulController extends Controller
   {
     $this->role(['konsul']);
     $post = $this->request()->post;
-    echo json_encode($post);
-    die;
+    // echo json_encode($post);
+    // die;
     $konsul = $this->model('Konsul');
     $delete = $konsul->delete(
       [
