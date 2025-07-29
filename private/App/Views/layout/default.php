@@ -235,7 +235,7 @@
           </div>
           <div class="col-sm">
             <div class="copyright text-center text-sm-right">
-              Powered by <a href="https://ekomardiatno.github.io" class="text-default"><span class="font-weight-bold">KOMA-MVC</span></a>
+              Powered by <a href="https://ekomardiatno.my.id" class="text-default"><span class="font-weight-bold">KOMA-MVC</span></a>
             </div>
           </div>
         </div>

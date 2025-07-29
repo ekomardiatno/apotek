@@ -115,10 +115,10 @@ class App extends Aes
     }
 
     switch($this->license_status) {
-      case 'invalid':
-        return require_once $this->error_invalid;
-      case 'expired':
-        return require_once $this->error_expired;
+      // case 'invalid':
+      //   return require_once $this->error_invalid;
+      // case 'expired':
+      //   return require_once $this->error_expired;
       default:
         require_once $this->controller_dir . $this->controller . '.php';
     }
@@ -145,9 +145,12 @@ class App extends Aes
   private function parseURL()
   {
 
-      if (isset($_GET['url'])) {
+      $santize_url = $_GET['url'] ?? '';
+      $santize_url = preg_replace('#^/apotek/#', '', $santize_url);
 
-          $url = explode('/', filter_var(trim($_GET['url']), FILTER_SANITIZE_URL));
+      if (isset($santize_url)) {
+
+          $url = explode('/', filter_var(trim($santize_url), FILTER_SANITIZE_URL));
           $sub_dir = '';
 
           if (is_dir($this->controller_dir . $url[0])) {

@@ -39,7 +39,7 @@
     <!-- Navbar -->
     <nav class="navbar navbar-top navbar-horizontal navbar-expand-md navbar-dark mt-4">
       <div class="container px-4">
-        <a class="navbar-brand" href="https://ekomardiatno.github.io">
+        <a class="navbar-brand" href="https://ekomardiatno.my.id">
           <img src="<?= Web::assets('brand/white.png', 'images'); ?>" />
         </a>
       </div>
@@ -76,7 +76,7 @@
       <div class="row align-items-center justify-content-xl-between">
         <div class="col-xl-12">
           <div class="copyright text-center text-xl-left text-muted">
-            &copy; <?= date('Y') ?> <a href="https://ekomardiatno.github.io" class="font-weight-bold ml-1 text-white" target="_blank">KOMA MVC</a>
+            &copy; <?= date('Y') ?> <a href="https://ekomardiatno.my.id" class="font-weight-bold ml-1 text-white" target="_blank">KOMA MVC</a>
           </div>
         </div>
       </div>
