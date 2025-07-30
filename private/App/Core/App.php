@@ -15,10 +15,10 @@ class App extends Aes
   private $controller = 'HomeController';
   private $method = 'index';
   private $params = [];
-  private $controller_dir = __DIR__. '/../Controllers/';
-  private $error_404 = __DIR__.'/../Views/error/404.php';
-  private $error_invalid = __DIR__.'/../Views/error/invalid.php';
-  private $error_expired = __DIR__.'/../Views/error/expired.php';
+  private $controller_dir = __DIR__ . '/../Controllers/';
+  private $error_404 = __DIR__ . '/../Views/error/404.php';
+  private $error_invalid = __DIR__ . '/../Views/error/invalid.php';
+  private $error_expired = __DIR__ . '/../Views/error/expired.php';
   private $chiper_method = 'aes-256-cbc';
   public function __construct()
   {
@@ -66,35 +66,34 @@ class App extends Aes
   public function route()
   {
     $request_key = '';
-    if(isset($_POST['_key'])) {
+    if (isset($_POST['_key'])) {
       $request_key = $_POST['_key'];
       unset($_POST['_key']);
     }
 
-    if($_POST) {
+    if ($_POST) {
       $_POST = $this->encrypt(json_encode($_POST), $request_key);
     }
-    
-    if($_FILES) {
+
+    if ($_FILES) {
       $_FILES = $this->encrypt(json_encode($_FILES), $request_key);
     }
 
     $get = $this->parseURL();
 
-    
+
     if (isset($get['sub_dir']) && $get['sub_dir'] != '') {
-      
+
       $this->controller_dir = $this->controller_dir . $get['sub_dir'] . '/';
     }
-    
-    if(isset($get['url'])) {
-      
-      $url = $get['url'];
 
+    if (isset($get['url'])) {
+
+      $url = $get['url'];
     }
 
     if (isset($url[0])) {
-      
+
       $url[0] = ucfirst($url[0]);
       if (strpos($url[0], '-')) {
         $str_explode = explode('-', $url[0]);
@@ -104,12 +103,20 @@ class App extends Aes
         }
         $url[0] = substr($url[0], 0, -1);
       }
-      if (file_exists($this->controller_dir . $url[0] . 'Controller.php')) {
-        
-        $this->controller = $url[0] . 'Controller';
+      $files = scandir($this->controller_dir);
+      $target_controller = strtolower($url[0]) . 'controller.php';
+      $found_controller = '';
+      foreach ($files as $file) {
+        if (strtolower($file) === $target_controller) {
+          $found_controller = explode('.php', $file)[0];
+          break;
+        }
+      }
+      if ($found_controller !== '' && file_exists($this->controller_dir . $found_controller . '.php')) {
+        $this->controller = $found_controller;
         unset($url[0]);
       } else {
-        
+
         return require_once $this->error_404;
       }
     }
@@ -150,20 +157,19 @@ class App extends Aes
           $url = explode('/', filter_var(trim($_GET['url']), FILTER_SANITIZE_URL));
           $sub_dir = '';
 
-          if (is_dir($this->controller_dir . $url[0])) {
+      if (is_dir($this->controller_dir . $url[0])) {
 
-              $sub_dir = $url[0];
-              unset($url[0]);
-          }
-
-          if (!empty($url)) {
-
-              $url = array_values($url);
-          }
-
-          return ['sub_dir' => $sub_dir, 'url' => $url];
-          
+        $sub_dir = $url[0];
+        unset($url[0]);
       }
+
+      if (!empty($url)) {
+
+        $url = array_values($url);
+      }
+
+      return ['sub_dir' => $sub_dir, 'url' => $url];
+    }
   }
 
   private function hash()
