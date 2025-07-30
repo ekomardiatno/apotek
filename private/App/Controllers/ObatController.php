@@ -17,7 +17,7 @@ class ObatController extends Controller
         'obat', 'Data Obat'
       ]
     ]);
-    $this->_web->view('Obat');
+    $this->_web->view('obat');
   }
 
   public function fetch()
@@ -200,8 +200,6 @@ class ObatController extends Controller
   {
     $this->role(['farma']);
     $post = $this->request()->post;
-    echo json_encode($post);
-    die;
     $obat = $this->model('Obat');
     $delete = $obat->delete(
       [
