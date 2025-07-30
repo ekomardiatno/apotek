@@ -33,8 +33,8 @@ class Controller
 
     public function role($role = [])
     {
-        $url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https://" : "http://") . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-        $url = str_replace(getenv('APP_URL'), '', $url);
+        // $url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https://" : "http://") . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        $url = str_replace(getenv('APP_URL'), '', '');
         $url = str_replace('/', '.', $url);
 
         if ($_SESSION) {
