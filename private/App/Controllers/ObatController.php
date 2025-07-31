@@ -51,19 +51,19 @@ class ObatController extends Controller
     }
 
     // Total number of records without filtering
-    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM obat");
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM obat WHERE is_deleted IS FALSE");
     $stmt->execute();
     $records = $stmt->fetch();
     $totalRecords = $records['allcount'];
 
     // Total number of records with filtering
-    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM obat WHERE 1" . $searchQuery);
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM obat WHERE is_deleted IS FALSE" . $searchQuery);
     $stmt->execute($searchArray);
     $records = $stmt->fetch();
     $totalRecordwithFilter = $records['allcount'];
 
     // Fetch records
-    $stmt = $pdo->prepare("SELECT id_obat, nama_obat, satuan_obat, stok_obat, deskripsi_obat, tanggal_dibuat, tanggal_diubah FROM obat WHERE 1" . $searchQuery . " ORDER BY " . $columnName . " " . $columnSortOrder . " LIMIT :limit,:offset");
+    $stmt = $pdo->prepare("SELECT id_obat, nama_obat, satuan_obat, stok_obat, deskripsi_obat, tanggal_dibuat, tanggal_diubah FROM obat WHERE is_deleted IS FALSE" . $searchQuery . " ORDER BY " . $columnName . " " . $columnSortOrder . " LIMIT :limit,:offset");
 
     // Bind values
     foreach ($searchArray as $key => $search) {
@@ -227,7 +227,7 @@ class ObatController extends Controller
     $post = $this->request()->post;
     $post['kuantitas'] = intval($post['kuantitas']);
     $db = new Database;
-    $obat = $db->query('SELECT id_obat, stok_obat FROM obat WHERE md5(id_obat)="' . $post['id_obat'] . '"', 'ARRAY_ONE')['data'];
+    $obat = $db->query('SELECT id_obat, stok_obat FROM obat WHERE is_deleted IS FALSE AND md5(id_obat)="' . $post['id_obat'] . '"', 'ARRAY_ONE')['data'];
     if (!$obat) {
       Flasher::setFlash('Data obat tidak ditemukan', 'danger', 'ni ni-fat-remove');
       return $this->redirect('obat');
@@ -313,10 +313,10 @@ class ObatController extends Controller
     $year = date('Y');
     $db = new Database;
     if ($encryptedId) {
-      $getPlainId = $db->query('SELECT id_obat FROM obat WHERE md5(id_obat)="' . $id . '"', 'ARRAY_ONE');
+      $getPlainId = $db->query('SELECT id_obat FROM obat WHERE is_deleted IS FALSE AND md5(id_obat)="' . $id . '"', 'ARRAY_ONE');
       $id = $getPlainId['data']['id_obat'];
     }
-    $riwayat = $db->query('SELECT * FROM riwayat_stok WHERE MONTH(tanggal_diperbarui)=' . $month . ' AND YEAR(tanggal_diperbarui)=' . $year . ' AND id_obat=' . $id, 'ARRAY_ONE');
+    $riwayat = $db->query('SELECT * FROM riwayat_stok WHERE is_deleted IS FALSE AND MONTH(tanggal_diperbarui)=' . $month . ' AND YEAR(tanggal_diperbarui)=' . $year . ' AND id_obat=' . $id, 'ARRAY_ONE');
     if (!$riwayat['data']) {
       $stmt = $db->query('INSERT INTO riwayat_stok(id_obat,stok_akhir) VALUES(' . $id . ',' . $stok . ')');
     } else {
@@ -341,7 +341,7 @@ class ObatController extends Controller
     $obat = $db->query('SELECT id_obat, nama_obat, satuan_obat FROM obat');
     $obat = $obat['data'];
 
-    $stok_masuk = $db->query("SELECT stok_masuk.id_obat, stok_masuk_kategori.nama_stok_masuk_kategori, stok_masuk_kategori.id_stok_masuk_kategori, CASE WHEN SUM(stok_masuk.kuantitas_stok_masuk) IS NULL THEN 0 ELSE SUM(stok_masuk.kuantitas_stok_masuk) END AS kuantitas_stok_masuk FROM stok_masuk RIGHT JOIN stok_masuk_kategori ON stok_masuk.id_stok_masuk_kategori=stok_masuk_kategori.id_stok_masuk_kategori WHERE id_obat IS NOT NULL AND stok_masuk.tanggal_diubah BETWEEN '" . $tanggal . "' AND '" . $tanggal_akhir . "' GROUP BY stok_masuk_kategori.id_stok_masuk_kategori, stok_masuk.id_obat")['data'];
+    $stok_masuk = $db->query("SELECT stok_masuk.id_obat, stok_masuk_kategori.nama_stok_masuk_kategori, stok_masuk_kategori.id_stok_masuk_kategori, CASE WHEN SUM(stok_masuk.kuantitas_stok_masuk) IS NULL THEN 0 ELSE SUM(stok_masuk.kuantitas_stok_masuk) END AS kuantitas_stok_masuk FROM stok_masuk RIGHT JOIN stok_masuk_kategori ON stok_masuk.id_stok_masuk_kategori=stok_masuk_kategori.id_stok_masuk_kategori WHERE stok_masuk.is_deleted IS FALSE AND id_obat IS NOT NULL AND stok_masuk.tanggal_diubah BETWEEN '" . $tanggal . "' AND '" . $tanggal_akhir . "' GROUP BY stok_masuk_kategori.id_stok_masuk_kategori, stok_masuk.id_obat")['data'];
     $stok_masuk_kategori = [];
     foreach ($stok_masuk as $kategori) {
       $indexedKategori = ArrayHelpers::indexOf(function ($obj, $i) use ($kategori) {
@@ -355,7 +355,7 @@ class ObatController extends Controller
       }
     }
 
-    $stok_keluar = $db->query("SELECT stok_keluar.id_obat, stok_keluar_kategori.nama_stok_keluar_kategori, stok_keluar_kategori.id_stok_keluar_kategori, CASE WHEN SUM(stok_keluar.kuantitas_stok_keluar) IS NULL THEN 0 ELSE SUM(stok_keluar.kuantitas_stok_keluar) END AS kuantitas_stok_keluar FROM stok_keluar RIGHT JOIN stok_keluar_kategori ON stok_keluar.id_stok_keluar_kategori=stok_keluar_kategori.id_stok_keluar_kategori WHERE id_obat IS NOT NULL AND stok_keluar.tanggal_diubah BETWEEN '" . $tanggal . "' AND '" . $tanggal_akhir . "' GROUP BY stok_keluar_kategori.id_stok_keluar_kategori, stok_keluar.id_obat")['data'];
+    $stok_keluar = $db->query("SELECT stok_keluar.id_obat, stok_keluar_kategori.nama_stok_keluar_kategori, stok_keluar_kategori.id_stok_keluar_kategori, CASE WHEN SUM(stok_keluar.kuantitas_stok_keluar) IS NULL THEN 0 ELSE SUM(stok_keluar.kuantitas_stok_keluar) END AS kuantitas_stok_keluar FROM stok_keluar RIGHT JOIN stok_keluar_kategori ON stok_keluar.id_stok_keluar_kategori=stok_keluar_kategori.id_stok_keluar_kategori WHERE stok_keluar.is_deleted IS FALSE AND id_obat IS NOT NULL AND stok_keluar.tanggal_diubah BETWEEN '" . $tanggal . "' AND '" . $tanggal_akhir . "' GROUP BY stok_keluar_kategori.id_stok_keluar_kategori, stok_keluar.id_obat")['data'];
     $stok_keluar_kategori = [];
     foreach ($stok_keluar as $kategori) {
       $indexedKategori = ArrayHelpers::indexOf(function ($obj, $i) use ($kategori) {
@@ -369,9 +369,9 @@ class ObatController extends Controller
       }
     }
 
-    $resep = $db->query('SELECT data_resep FROM resep WHERE tanggal_diubah BETWEEN "' . $tanggal . '" AND "' . $tanggal_akhir . '"')['data'];
+    $resep = $db->query('SELECT data_resep FROM resep WHERE is_deleted IS FALSE AND tanggal_diubah BETWEEN "' . $tanggal . '" AND "' . $tanggal_akhir . '"')['data'];
     foreach ($obat as $i => $params) {
-      $riwayat_stok = $db->query('SELECT stok_akhir FROM riwayat_stok WHERE id_obat="' . $params['id_obat'] . '" AND tanggal_diperbarui < "' . $tanggal . '" ORDER BY tanggal_diperbarui DESC', 'ARRAY_ONE');
+      $riwayat_stok = $db->query('SELECT stok_akhir FROM riwayat_stok WHERE is_deleted IS FALSE AND id_obat="' . $params['id_obat'] . '" AND tanggal_diperbarui < "' . $tanggal . '" ORDER BY tanggal_diperbarui DESC', 'ARRAY_ONE');
       if ($riwayat_stok['data']) {
         $obat[$i]['stok_awal'] = intval($riwayat_stok['data']['stok_akhir']);
       } else {

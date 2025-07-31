@@ -93,6 +93,26 @@ class Database
 
         $sql = substr($sql, 0, -1) . ' FROM ' . $table;
 
+        if (!$where) {
+            $where = [
+                'params' => [
+                    [
+                        'column' => 'is_deleted',
+                        'value' => false,
+                        'operator' => '=',
+                        'conjuction' => 'AND'
+                    ]
+                ]
+            ];
+        } else if ($where['params']) {
+            $where['params'] = array_merge([[
+                'column' => 'is_deleted',
+                'value' => false,
+                'operator' => '=',
+                'conjuction' => 'AND'
+            ]], $where['params']);
+        }
+
         $sql = $this->where($where, $sql);
 
         $data = $this->fetch($sql, $fetch);
@@ -137,6 +157,24 @@ class Database
 
         foreach ($index as $key => $value) {
             $sql .= ' ' . $join . ' ' . $key . ' ON ' . $value['index_table'] . '.' . $value['index_id'] . '=' . $key . '.' . $value['index_id'];
+        }
+
+        if (!$where) {
+            $where['params'] = [
+                [
+                    'column' => $table . '.is_deleted',
+                    'value' => false,
+                    'operator' => '=',
+                    'conjuction' => 'AND'
+                ]
+            ];
+        } else if ($where['params']) {
+            $where['params'] = array_merge([[
+                'column' => $table . '.is_deleted',
+                'value' => false,
+                'operator' => '=',
+                'conjuction' => 'AND'
+            ]], $where['params']);
         }
 
         $sql = $this->where($where, $sql);
@@ -257,7 +295,7 @@ class Database
     {
 
         $table = '`' . $this->table . '`';
-        $sql = "DELETE FROM " . $table;
+        $sql = "UPDATE " . $table . " SET is_deleted=true";
 
         $sql = $this->where($where, $sql);
 

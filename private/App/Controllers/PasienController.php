@@ -53,19 +53,19 @@ class PasienController extends Controller
     }
 
     // Total number of records without filtering
-    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM pasien");
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM pasien WHERE is_deleted IS FALSE");
     $stmt->execute();
     $records = $stmt->fetch();
     $totalRecords = $records['allcount'];
 
     // Total number of records with filtering
-    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM pasien WHERE 1" . $searchQuery);
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM pasien WHERE is_deleted IS FALSE" . $searchQuery);
     $stmt->execute($searchArray);
     $records = $stmt->fetch();
     $totalRecordwithFilter = $records['allcount'];
 
     // Fetch records
-    $stmt = $pdo->prepare("SELECT nama, nik, norm, no_hp, tanggal_lahir, jenis_kelamin, tanggal_dibuat FROM pasien WHERE 1" . $searchQuery . " ORDER BY " . $columnName . " " . $columnSortOrder . " LIMIT :limit,:offset");
+    $stmt = $pdo->prepare("SELECT nama, nik, norm, no_hp, tanggal_lahir, jenis_kelamin, tanggal_dibuat FROM pasien WHERE is_deleted IS FALSE" . $searchQuery . " ORDER BY " . $columnName . " " . $columnSortOrder . " LIMIT :limit,:offset");
 
     // Bind values
     foreach ($searchArray as $key => $search) {

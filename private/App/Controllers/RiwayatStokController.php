@@ -8,7 +8,7 @@ class RiwayatStokController extends Controller
     if (!$id || $type === '') return $this->redirect('');
     if ($type !== 'masuk' && $type !== 'keluar') return $this->redirect('');
     $db = new Database;
-    $query = $db->query('SELECT nama_obat, satuan_obat FROM obat WHERE md5(id_obat)="' . $id . '"', 'ARRAY_ONE');
+    $query = $db->query('SELECT nama_obat, satuan_obat FROM obat WHERE obat.is_deleted IS FALSE AND md5(id_obat)="' . $id . '"', 'ARRAY_ONE');
     if (!$query['data']) return $this->redirect('');
     $this->_web->title('Riwayat Stok');
     $this->_web->breadcrumb([
@@ -61,13 +61,13 @@ class RiwayatStokController extends Controller
     $tableName = $type === 'masuk' ? 'stok_masuk' : 'stok_keluar';
 
     // Total number of records without filtering
-    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM " . $tableName . " WHERE md5(id_obat)='" . $id . "'");
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM " . $tableName . " WHERE is_deleted IS FALSE AND md5(id_obat)='" . $id . "'");
     $stmt->execute();
     $records = $stmt->fetch();
     $totalRecords = $records['allcount'];
 
     // Total number of records with filtering
-    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM " . $tableName . " WHERE 1 AND md5(id_obat)='" . $id . "'" . $searchQuery);
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM " . $tableName . " WHERE is_deleted IS FALSE AND md5(id_obat)='" . $id . "'" . $searchQuery);
     $stmt->execute($searchArray);
     $records = $stmt->fetch();
     $totalRecordwithFilter = $records['allcount'];
@@ -77,7 +77,7 @@ class RiwayatStokController extends Controller
     $qtyKeyName = $type === 'masuk' ? 'kuantitas_stok_masuk' : 'kuantitas_stok_keluar';
     $categoryTableName = $type === 'masuk' ? 'stok_masuk_kategori' : 'stok_keluar_kategori';
     // Fetch records
-    $stmt = $pdo->prepare("SELECT a." . $idKeyName . ",b." . $categoryNameKeyName . ",a." . $qtyKeyName . ",a.tanggal_dibuat,a.tanggal_diubah" . " FROM " . $tableName . " a LEFT JOIN " . $categoryTableName . " b ON a." . $categoryIdKeyName . "=b." . $categoryIdKeyName . " WHERE 1" . " AND md5(id_obat)='" . $id . "'" . $searchQuery . " ORDER BY " . $columnName . " " . $columnSortOrder . " LIMIT :limit,:offset");
+    $stmt = $pdo->prepare("SELECT a." . $idKeyName . ",b." . $categoryNameKeyName . ",a." . $qtyKeyName . ",a.tanggal_dibuat,a.tanggal_diubah" . " FROM " . $tableName . " a LEFT JOIN " . $categoryTableName . " b ON a." . $categoryIdKeyName . "=b." . $categoryIdKeyName . " WHERE a.is_deleted IS FALSE" . " AND md5(id_obat)='" . $id . "'" . $searchQuery . " ORDER BY " . $columnName . " " . $columnSortOrder . " LIMIT :limit,:offset");
 
     // Bind values
     foreach ($searchArray as $key => $search) {
@@ -127,7 +127,7 @@ class RiwayatStokController extends Controller
     $id = $type === 'masuk' ? $post['id_stok_masuk'] : $post['id_stok_keluar'];
     if (!isset($post['id_stok_masuk']) && !isset($post['id_stok_masuk'])) return $this->redirect('');
     $db = new Database;
-    $riwayat = $db->query('SELECT md5(id_obat) AS id_obat,' . ($type === 'masuk' ? 'kuantitas_stok_masuk' : 'kuantitas_stok_keluar') . ' AS kuantitas, tanggal_dibuat FROM ' . ($type === 'masuk' ? 'stok_masuk' : 'stok_keluar') . ' WHERE ' . ($type === 'masuk' ? 'md5(id_stok_masuk)' : 'md5(id_stok_keluar)') . '="' . $id . '"', 'ARRAY_ONE')['data'];
+    $riwayat = $db->query('SELECT md5(id_obat) AS id_obat,' . ($type === 'masuk' ? 'kuantitas_stok_masuk' : 'kuantitas_stok_keluar') . ' AS kuantitas, tanggal_dibuat FROM ' . ($type === 'masuk' ? 'stok_masuk' : 'stok_keluar') . ' WHERE is_deleted IS FALSE AND ' . ($type === 'masuk' ? 'md5(id_stok_masuk)' : 'md5(id_stok_keluar)') . '="' . $id . '"', 'ARRAY_ONE')['data'];
     $tanggal_dibuat = new DateTime($riwayat['tanggal_dibuat']);
     $tanggal_now = new DateTime();
     $tanggal_diff = $tanggal_now->diff($tanggal_dibuat);
@@ -136,7 +136,7 @@ class RiwayatStokController extends Controller
       Flasher::setFlash('Data yang dibuat ' . $this->maxRemovable . ' menit lalu tidak dapat dihapus', 'danger', 'ni ni-fat-remove');
       return $this->redirect('riwayatstok.' . $riwayat['id_obat'] . '.' . $type);
     }
-    $query = $db->query('DELETE FROM ' . ($type === 'masuk' ? 'stok_masuk' : 'stok_keluar') . ' WHERE ' . ($type === 'masuk' ? 'md5(id_stok_masuk)' : 'md5(id_stok_keluar)') . '="' . $id . '"');
+    $query = $db->query('UPDATE ' . ($type === 'masuk' ? 'stok_masuk' : 'stok_keluar') . ' SET is_deleted=true WHERE ' . ($type === 'masuk' ? 'md5(id_stok_masuk)' : 'md5(id_stok_keluar)') . '="' . $id . '"');
     $obatController = new ObatController;
     $obatController->updatestok($riwayat['id_obat'], $riwayat['kuantitas'] * -1, true);
     $db->query('UPDATE obat SET stok_obat=stok_obat-' . $riwayat['kuantitas'] . ' WHERE md5(id_obat)="' . $riwayat['id_obat'] . '"');

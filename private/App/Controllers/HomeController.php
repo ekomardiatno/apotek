@@ -65,19 +65,19 @@ class HomeController extends Controller
         }
 
         // Total number of records without filtering
-        $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM konsul" . ($isDokter ? " WHERE id_dokter='$dokter[id_dokter]' AND konsul.status_selesai='0'" : ''));
+        $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM konsul WHERE is_deleted IS FALSE" . ($isDokter ? " AND id_dokter='$dokter[id_dokter]' AND konsul.status_selesai='0'" : ''));
         $stmt->execute();
         $records = $stmt->fetch();
         $totalRecords = $records['allcount'];
 
         // Total number of records with filtering
-        $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount, pasien.nik AS nik, pasien.norm AS norm, pasien.nama AS nama FROM konsul LEFT JOIN pasien ON konsul.nik=pasien.nik WHERE 1" . $searchQuery . ($isDokter ? " AND id_dokter='$dokter[id_dokter]' AND konsul.status_selesai='0'" : '') . ' GROUP BY pasien.nik');
+        $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount, pasien.nik AS nik, pasien.norm AS norm, pasien.nama AS nama FROM konsul LEFT JOIN pasien ON konsul.nik=pasien.nik WHERE konsul.is_deleted IS FALSE" . $searchQuery . ($isDokter ? " AND id_dokter='$dokter[id_dokter]' AND konsul.status_selesai='0'" : '') . ' GROUP BY pasien.nik');
         $stmt->execute($searchArray);
         $records = $stmt->fetch();
         $totalRecordwithFilter = $records['allcount'] ?? 0;
 
         // Fetch records
-        $stmt = $pdo->prepare("SELECT konsul.id_konsul AS id_konsul, pasien.nama AS nama, pasien.nik AS nik, pasien.norm AS norm, pasien.jenis_kelamin AS jenis_kelamin, konsul.tanggal AS tanggal, konsul.tanggal_kembali AS tanggal_kembali, konsul.tanggal_dibuat, pasien.tanggal_lahir, user.name AS nama_dokter FROM konsul LEFT JOIN pasien ON konsul.nik=pasien.nik LEFT JOIN dokter ON konsul.id_dokter=dokter.id_dokter LEFT JOIN user ON user.username=dokter.username WHERE 1" . $searchQuery . ($isDokter ? " AND konsul.id_dokter='$dokter[id_dokter]' AND konsul.status_selesai='0'" : '') . " ORDER BY " . $columnName . " " . $columnSortOrder . ", konsul.tanggal_dibuat " . $columnSortOrder . " LIMIT :limit,:offset");
+        $stmt = $pdo->prepare("SELECT konsul.id_konsul AS id_konsul, pasien.nama AS nama, pasien.nik AS nik, pasien.norm AS norm, pasien.jenis_kelamin AS jenis_kelamin, konsul.tanggal AS tanggal, konsul.tanggal_kembali AS tanggal_kembali, konsul.tanggal_dibuat, pasien.tanggal_lahir, user.name AS nama_dokter FROM konsul LEFT JOIN pasien ON konsul.nik=pasien.nik LEFT JOIN dokter ON konsul.id_dokter=dokter.id_dokter LEFT JOIN user ON user.username=dokter.username WHERE konsul.is_deleted IS FALSE" . $searchQuery . ($isDokter ? " AND konsul.id_dokter='$dokter[id_dokter]' AND konsul.status_selesai='0'" : '') . " ORDER BY " . $columnName . " " . $columnSortOrder . ", konsul.tanggal_dibuat " . $columnSortOrder . " LIMIT :limit,:offset");
 
         // Bind values
         foreach ($searchArray as $key => $search) {
