@@ -70,20 +70,20 @@ class ResepController extends Controller
     )['data']['id_dokter'];
 
     // Total number of records without filtering
-    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM resep LEFT JOIN konsul ON konsul.id_konsul=resep.id_konsul" . (Auth::user('role') === 'dokter' ? ' WHERE konsul.id_dokter="' . $dokter . '"' : ($type === 'all' ? '' : ' WHERE resep.status_dicetak="0"')));
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM resep LEFT JOIN konsul ON konsul.id_konsul=resep.id_konsul WHERE resep.is_deleted IS FALSE" . (Auth::user('role') === 'dokter' ? ' AND konsul.id_dokter="' . $dokter . '"' : ($type === 'all' ? '' : ' AND resep.status_dicetak="0"')));
 
     $stmt->execute();
     $records = $stmt->fetch();
     $totalRecords = $records['allcount'];
 
     // Total number of records with filtering
-    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM resep LEFT JOIN konsul ON konsul.id_konsul=resep.id_konsul WHERE 1" . $searchQuery . (Auth::user('role') === 'dokter' ? ' AND konsul.id_dokter="' . $dokter . '"' : ($type === 'all' ? '' : ' AND resep.status_dicetak="0"')));
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM resep LEFT JOIN konsul ON konsul.id_konsul=resep.id_konsul WHERE resep.is_deleted IS FALSE" . $searchQuery . (Auth::user('role') === 'dokter' ? ' AND konsul.id_dokter="' . $dokter . '"' : ($type === 'all' ? '' : ' AND resep.status_dicetak="0"')));
     $stmt->execute($searchArray);
     $records = $stmt->fetch();
     $totalRecordwithFilter = $records['allcount'];
 
     // Fetch records
-    $stmt = $pdo->prepare("SELECT resep.id_resep,resep.data_resep,resep.tanggal_diubah,pasien.nama,pasien.jenis_kelamin,pasien.tanggal_lahir,resep.status_dicetak, user.name FROM resep LEFT JOIN konsul ON resep.id_konsul=konsul.id_konsul LEFT JOIN pasien ON pasien.nik=konsul.nik LEFT JOIN dokter ON dokter.id_dokter=konsul.id_dokter LEFT JOIN user ON user.username=dokter.username WHERE 1" . $searchQuery . (Auth::user('role') === 'dokter' ? ' AND konsul.id_dokter="' . $dokter . '"' : ($type === 'all' ? '' : ' AND resep.status_dicetak="0"')) . " ORDER BY " . $columnName . " " . $columnSortOrder . " LIMIT :limit,:offset");
+    $stmt = $pdo->prepare("SELECT resep.id_resep,resep.data_resep,resep.tanggal_diubah,pasien.nama,pasien.jenis_kelamin,pasien.tanggal_lahir,resep.status_dicetak, user.name FROM resep LEFT JOIN konsul ON resep.id_konsul=konsul.id_konsul LEFT JOIN pasien ON pasien.nik=konsul.nik LEFT JOIN dokter ON dokter.id_dokter=konsul.id_dokter LEFT JOIN user ON user.username=dokter.username WHERE resep.is_deleted IS FALSE" . $searchQuery . (Auth::user('role') === 'dokter' ? ' AND konsul.id_dokter="' . $dokter . '"' : ($type === 'all' ? '' : ' AND resep.status_dicetak="0"')) . " ORDER BY " . $columnName . " " . $columnSortOrder . " LIMIT :limit,:offset");
 
     // Bind values
     foreach ($searchArray as $key => $search) {
@@ -169,7 +169,7 @@ class ResepController extends Controller
     ]);
     if ($id === '') return $this->redirect('konsul');
     $db = Database::getInstance();
-    $pasien = $db->query("SELECT pasien.nama, pasien.jenis_kelamin, timestampdiff(year, pasien.tanggal_lahir, curdate()) as umur, pasien.alamat FROM `konsul` LEFT JOIN pasien ON pasien.nik=konsul.nik WHERE md5(konsul.id_konsul)='" . $id . "' AND konsul.status_selesai='0'", 'ARRAY_ONE');
+    $pasien = $db->query("SELECT pasien.nama, pasien.jenis_kelamin, timestampdiff(year, pasien.tanggal_lahir, curdate()) as umur, pasien.alamat FROM `konsul` LEFT JOIN pasien ON pasien.nik=konsul.nik WHERE konsul.is_deleted IS FALSE AND md5(konsul.id_konsul)='" . $id . "' AND konsul.status_selesai='0'", 'ARRAY_ONE');
     $pasien = $pasien['success'] ? $pasien['data'] : null;
     if (!$pasien) return $this->redirect('konsul');
     $this->_web->view('resep_form', [
@@ -237,7 +237,7 @@ class ResepController extends Controller
       ]
     ]);
     if (!$id) return $this->redirect('resep');
-    $pasien = $this->_db->query('SELECT resep.data_resep, pasien.nama, pasien.jenis_kelamin, timestampdiff(year, pasien.tanggal_lahir, curdate()) as umur, pasien.alamat FROM resep LEFT JOIN konsul ON konsul.id_konsul=resep.id_konsul LEFT JOIN pasien ON pasien.nik=konsul.nik WHERE md5(resep.id_resep)="' . $id . '"', 'ARRAY_ONE')['data'];
+    $pasien = $this->_db->query('SELECT resep.data_resep, pasien.nama, pasien.jenis_kelamin, timestampdiff(year, pasien.tanggal_lahir, curdate()) as umur, pasien.alamat FROM resep LEFT JOIN konsul ON konsul.id_konsul=resep.id_konsul LEFT JOIN pasien ON pasien.nik=konsul.nik WHERE resep.is_deleted IS FALSE AND md5(resep.id_resep)="' . $id . '"', 'ARRAY_ONE')['data'];
     $data_resep = $pasien['data_resep'];
     unset($pasien['data_resep']);
     $this->_web->view('resep_form', [
@@ -294,7 +294,7 @@ class ResepController extends Controller
     $this->role(['dokter']);
     $post = $this->request()->post;
 
-    $deleteResep = $this->_db->query('DELETE FROM resep WHERE md5(id_resep)="' . $post['id_resep'] . '"');
+    $deleteResep = $this->_db->query('UPDATE resep SET is_deleted=true WHERE md5(id_resep)="' . $post['id_resep'] . '"');
     if (!$deleteResep['success']) {
       Flasher::setFlash('Tidak dapat menghapus data.', 'danger', 'ni ni-fat-remove');
       return $this->redirect('resep');
@@ -308,10 +308,10 @@ class ResepController extends Controller
   {
     $post = $this->request()->post;
     $db = new Database;
-    $sql = "SELECT resep.data_resep,pasien.nama AS nama_pasien,pasien.alamat,pasien.jenis_kelamin,pasien.tanggal_lahir,pasien.no_hp,dokter.kategori_dokter,dokter.sip_dokter,dokter.jadwal_praktek,user.name AS nama_dokter, resep.tanggal_dibuat FROM resep LEFT JOIN konsul ON konsul.id_konsul=resep.id_konsul LEFT JOIN pasien ON pasien.nik=konsul.nik LEFT JOIN dokter ON dokter.id_dokter=konsul.id_dokter LEFT JOIN user ON user.username=dokter.username WHERE md5(resep.id_resep)='" . $post['id_resep'] . "'";
+    $sql = "SELECT resep.data_resep,pasien.nama AS nama_pasien,pasien.alamat,pasien.jenis_kelamin,pasien.tanggal_lahir,pasien.no_hp,dokter.kategori_dokter,dokter.sip_dokter,dokter.jadwal_praktek,user.name AS nama_dokter, resep.tanggal_dibuat FROM resep LEFT JOIN konsul ON konsul.id_konsul=resep.id_konsul LEFT JOIN pasien ON pasien.nik=konsul.nik LEFT JOIN dokter ON dokter.id_dokter=konsul.id_dokter LEFT JOIN user ON user.username=dokter.username WHERE resep.is_deleted IS FALSE AND md5(resep.id_resep)='" . $post['id_resep'] . "'";
     $query = $db->query($sql, 'ARRAY_ONE');
     $data = $query['data'];
-    $query = $db->query("SELECT * FROM pengaturan");
+    $query = $db->query("SELECT * FROM pengaturan WHERE is_deleted IS FALSE");
     $pengaturan = $query['data'];
     $indexedAlamat = ArrayHelpers::indexOf(function ($obj, $i) {
       return $obj['key_pengaturan'] === 'BRAND_ADDRESS';

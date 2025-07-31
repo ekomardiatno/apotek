@@ -122,7 +122,7 @@ class KonsulController extends Controller
         return $this->redirect('konsul.daftar');
       }
     } else {
-      $sql_existed_date = "SELECT * FROM `konsul` WHERE nik = '" . $post['nik'] . "' AND ('" . $post['tanggal'] . "' BETWEEN tanggal AND tanggal_kembali OR '" . $post['tanggal_kembali'] . "' BETWEEN tanggal AND tanggal_kembali) ORDER BY tanggal ASC";
+      $sql_existed_date = "SELECT * FROM `konsul` WHERE  is_deleted IS FALSE AND nik = '" . $post['nik'] . "' AND ('" . $post['tanggal'] . "' BETWEEN tanggal AND tanggal_kembali OR '" . $post['tanggal_kembali'] . "' BETWEEN tanggal AND tanggal_kembali) ORDER BY tanggal ASC";
       $data_existed_date = $this->db->query($sql_existed_date)['data'];
       $available_date = false;
       if (count($data_existed_date) >= 2) {
@@ -190,7 +190,7 @@ class KonsulController extends Controller
   {
     $this->role(['konsul']);
     $db = Database::getInstance();
-    $sql = "SELECT id_konsul, a.id_dokter, a.tanggal, a.nik, b.nama, b.alamat, b.tanggal_lahir, b.jenis_kelamin, b.norm, b.no_hp, a.tanggal_kembali FROM konsul a LEFT JOIN pasien b ON b.nik=a.nik WHERE md5(id_konsul)='" . $id . "'";
+    $sql = "SELECT id_konsul, a.id_dokter, a.tanggal, a.nik, b.nama, b.alamat, b.tanggal_lahir, b.jenis_kelamin, b.norm, b.no_hp, a.tanggal_kembali FROM konsul a LEFT JOIN pasien b ON b.nik=a.nik WHERE a.is_deleted IS FALSE AND md5(id_konsul)='" . $id . "'";
     $data = $db->query($sql, 'ARRAY_ONE')['data'];
 
     if (!$data) return printf('ID Konsultasi tidak valid');

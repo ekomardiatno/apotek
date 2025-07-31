@@ -6,7 +6,7 @@ class PengaturanController extends Controller
   {
     $this->role(['farma']);
     $db = new Database;
-    $sql = "SELECT * FROM pengaturan ORDER BY priority_pengaturan ASC";
+    $sql = "SELECT * FROM pengaturan WHERE is_deleted IS FALSE ORDER BY priority_pengaturan ASC";
     $query = $db->query($sql);
     $this->_web->view('pengaturan', $query['data']);
   }

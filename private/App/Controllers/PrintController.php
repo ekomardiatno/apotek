@@ -10,7 +10,7 @@ class PrintController extends Controller
         $post['start'] = substr($post['start'], 6, 4) . '-' . substr($post['start'], 3, 2) . '-' . substr($post['start'], 0, 2);
         $post['end'] = substr($post['end'], 6, 4) . '-' . substr($post['end'], 3, 2) . '-' . substr($post['end'], 0, 2);
         $db = Database::getInstance();
-        $sql = "SELECT a.tanggal, a.nik, b.nama, b.alamat, b.jenis_kelamin, b.norm, a.tanggal_kembali, b.tanggal_lahir FROM konsul a LEFT JOIN pasien b ON b.nik=a.nik WHERE a.tanggal >= '" . $post['start'] . "' AND a.tanggal <= '" . $post['end'] . "' ORDER BY a.tanggal OR b.nama ASC";
+        $sql = "SELECT a.tanggal, a.nik, b.nama, b.alamat, b.jenis_kelamin, b.norm, a.tanggal_kembali, b.tanggal_lahir FROM konsul a LEFT JOIN pasien b ON b.nik=a.nik WHERE a.is_deleted IS FALSE AND a.tanggal >= '" . $post['start'] . "' AND a.tanggal <= '" . $post['end'] . "' ORDER BY a.tanggal OR b.nama ASC";
         $data = $db->query($sql)['data'];
         $html = '<html>';
         $html .= '<head>';

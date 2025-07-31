@@ -44,19 +44,19 @@ class DokterController extends Controller
     }
 
     // Total number of records without filtering
-    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM dokter");
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM dokter WHERE is_deleted IS FALSE");
     $stmt->execute();
     $records = $stmt->fetch();
     $totalRecords = $records['allcount'];
 
     // Total number of records with filtering
-    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM dokter WHERE 1" . $searchQuery);
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS allcount FROM dokter WHERE is_deleted IS FALSE" . $searchQuery);
     $stmt->execute($searchArray);
     $records = $stmt->fetch();
     $totalRecordwithFilter = $records['allcount'];
 
     // Fetch records
-    $stmt = $pdo->prepare("SELECT dokter.id_dokter, dokter.sip_dokter, dokter.kategori_dokter, user.name, user.username, user.email, dokter.no_hp FROM dokter LEFT JOIN user ON user.username=dokter.username WHERE 1" . $searchQuery . " ORDER BY " . $columnName . " " . $columnSortOrder . " LIMIT :limit,:offset");
+    $stmt = $pdo->prepare("SELECT dokter.id_dokter, dokter.sip_dokter, dokter.kategori_dokter, user.name, user.username, user.email, dokter.no_hp FROM dokter LEFT JOIN user ON user.username=dokter.username WHERE is_deleted IS FALSE" . $searchQuery . " ORDER BY " . $columnName . " " . $columnSortOrder . " LIMIT :limit,:offset");
 
     // Bind values
     foreach ($searchArray as $key => $search) {
@@ -192,7 +192,7 @@ class DokterController extends Controller
       ]
     ]);
     $db = new Database;
-    $dokter = $db->query('SELECT md5(dokter.id_dokter) AS id_dokter, md5(user.id_user) as id_user, user.name, dokter.kategori_dokter, dokter.sip_dokter, user.username, user.email, dokter.jadwal_praktek, dokter.no_hp FROM dokter LEFT JOIN user ON user.username=dokter.username WHERE md5(dokter.id_dokter)="' . $id . '"', 'ARRAY_ONE');
+    $dokter = $db->query('SELECT md5(dokter.id_dokter) AS id_dokter, md5(user.id_user) as id_user, user.name, dokter.kategori_dokter, dokter.sip_dokter, user.username, user.email, dokter.jadwal_praktek, dokter.no_hp FROM dokter LEFT JOIN user ON user.username=dokter.username WHERE is_deleted IS FALSE AND md5(dokter.id_dokter)="' . $id . '"', 'ARRAY_ONE');
 
     if (!$dokter['success'] || !$dokter['data']) {
       Flasher::setFlash('Data tidak ditemukan', 'danger', 'ni ni-fat-remove');
@@ -295,8 +295,8 @@ class DokterController extends Controller
   {
     $post = $this->request()->post;
     $db = new Database;
-    $db->query('DELETE FROM dokter WHERE md5(username)="' . $post['username'] . '"');
-    $db->query('DELETE FROM user WHERE md5(username)="' . $post['username'] . '"');
+    $db->query('UPDATE dokter SET is_deleted=true WHERE md5(username)="' . $post['username'] . '"');
+    $db->query('UPDATE user SET is_deleted=true WHERE md5(username)="' . $post['username'] . '"');
 
     Flasher::setFlash('Berhasil menghapus data dokter', 'success', 'ni ni-check-bold');
     $this->redirect('dokter');
