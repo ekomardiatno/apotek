@@ -56,7 +56,7 @@ class DokterController extends Controller
     $totalRecordwithFilter = $records['allcount'];
 
     // Fetch records
-    $stmt = $pdo->prepare("SELECT dokter.id_dokter, dokter.sip_dokter, dokter.kategori_dokter, user.name, user.username, user.email, dokter.no_hp FROM dokter LEFT JOIN user ON user.username=dokter.username WHERE is_deleted IS FALSE" . $searchQuery . " ORDER BY " . $columnName . " " . $columnSortOrder . " LIMIT :limit,:offset");
+    $stmt = $pdo->prepare("SELECT dokter.id_dokter, dokter.sip_dokter, dokter.kategori_dokter, user.name, user.username, user.email, dokter.no_hp FROM dokter LEFT JOIN user ON user.username=dokter.username WHERE dokter.is_deleted IS FALSE" . $searchQuery . " ORDER BY " . $columnName . " " . $columnSortOrder . " LIMIT :limit,:offset");
 
     // Bind values
     foreach ($searchArray as $key => $search) {
@@ -192,7 +192,7 @@ class DokterController extends Controller
       ]
     ]);
     $db = new Database;
-    $dokter = $db->query('SELECT md5(dokter.id_dokter) AS id_dokter, md5(user.id_user) as id_user, user.name, dokter.kategori_dokter, dokter.sip_dokter, user.username, user.email, dokter.jadwal_praktek, dokter.no_hp FROM dokter LEFT JOIN user ON user.username=dokter.username WHERE is_deleted IS FALSE AND md5(dokter.id_dokter)="' . $id . '"', 'ARRAY_ONE');
+    $dokter = $db->query('SELECT md5(dokter.id_dokter) AS id_dokter, md5(user.id_user) as id_user, user.name, dokter.kategori_dokter, dokter.sip_dokter, user.username, user.email, dokter.jadwal_praktek, dokter.no_hp FROM dokter LEFT JOIN user ON user.username=dokter.username WHERE dokter.is_deleted IS FALSE AND md5(dokter.id_dokter)="' . $id . '"', 'ARRAY_ONE');
 
     if (!$dokter['success'] || !$dokter['data']) {
       Flasher::setFlash('Data tidak ditemukan', 'danger', 'ni ni-fat-remove');
