@@ -19,7 +19,8 @@ class ResepController extends Controller
     $this->_web->title('Resep');
     $this->_web->breadcrumb([
       [
-        'resep', 'Data Resep'
+        'resep',
+        'Data Resep'
       ]
     ]);
     $this->_web->view('resep', $type);
@@ -161,10 +162,12 @@ class ResepController extends Controller
     $this->_web->title('Resep');
     $this->_web->breadcrumb([
       [
-        'resep', 'Data Resep'
+        'resep',
+        'Data Resep'
       ],
       [
-        'resep.tambah', 'Tambah Resep'
+        'resep.tambah',
+        'Tambah Resep'
       ]
     ]);
     if ($id === '') return $this->redirect('konsul');
@@ -230,10 +233,12 @@ class ResepController extends Controller
     $this->_web->title('Resep');
     $this->_web->breadcrumb([
       [
-        'resep', 'Data Resep'
+        'resep',
+        'Data Resep'
       ],
       [
-        'resep.edit', 'Edit Resep'
+        'resep.edit',
+        'Edit Resep'
       ]
     ]);
     if (!$id) return $this->redirect('resep');
@@ -341,13 +346,15 @@ class ResepController extends Controller
     $html .= '<table class="no-border"><tr><td width="50%" style="padding-right:10pt">' . $alamatApotek . '</td><td width="50%" style="padding-left:10pt"><p class="mb-0">Jadwal Praktek:</p>' . $data['jadwal_praktek'] . '</td></tr></table>';
     $html .= '<hr style="margin:5pt 0">';
     $html .= '<p class="text-right" style="margin-top:10pt">' . $kotaApotek . ', ' . Mod::timepiece(substr($data['tanggal_dibuat'], 0, 10)) . '</p>';
-    $html .= '<h2 style="margin-bottom:10pt">R/</h2>';
-    $html .= '<table class="no-border small-padding">';
+    $html .= '<h2 style="margin-bottom:0">R/</h2>';
+    $html .= '<table class="no-border small-padding" style="width:100%">';
     foreach ($data['data_resep'] as $resep) {
+      $nama_obat = explode('(', $data['data_resep'][0]['nama_obat'])[0];
+      $satuan = explode('(', $data['data_resep'][0]['nama_obat'])[1];
+      $satuan = str_replace(')', '', $satuan);
       $html .= '<tr>';
-      $html .= '<td>' . $resep['kuantitas'] . 'pcs</td>';
-      $html .= '<td>' . $resep['nama_obat'] . '</td>';
-      $html .= '<td>' . $resep['dosis'] . '</td>';
+      $html .= '<td colspan="2" style="vertical-align:top"><p style="margin:0 !important">' . $nama_obat . '</p><span style="padding-left:20px;margin-top:8px;font-weight:bold">' . $resep['dosis']  . '</span></td>';
+      $html .= '<td style="vertical-align:top;width:30%">' . $resep['kuantitas'] . ' (' . $satuan . ')</td>';
       $html .= '</tr>';
     }
     $html .= '</table>';
@@ -386,8 +393,7 @@ class ResepController extends Controller
     $html .= '</div>';
     $html .= '</body>';
     $html .= '</html>';
-    // echo $html;
-    // die;
+    // echo $html; die;
     $db->query('UPDATE resep SET status_dicetak=1 WHERE md5(id_resep)="' . $post['id_resep'] . '"');
     $dompdf = new Dompdf();
     $dompdf->loadHtml($html);
