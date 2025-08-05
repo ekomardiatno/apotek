@@ -14,7 +14,8 @@ class ObatController extends Controller
     $this->_web->title('Obat');
     $this->_web->breadcrumb([
       [
-        'obat', 'Data Obat'
+        'obat',
+        'Data Obat'
       ]
     ]);
     $this->_web->view('obat');
@@ -111,10 +112,12 @@ class ObatController extends Controller
     $this->_web->title('Obat');
     $this->_web->breadcrumb([
       [
-        'obat', 'Data Obat'
+        'obat',
+        'Data Obat'
       ],
       [
-        'obat.tambah', 'Tambah Data'
+        'obat.tambah',
+        'Tambah Data'
       ]
     ]);
     $this->_web->view('obat_form');
@@ -126,10 +129,12 @@ class ObatController extends Controller
     $this->_web->title('Obat');
     $this->_web->breadcrumb([
       [
-        'obat', 'Data Obat'
+        'obat',
+        'Data Obat'
       ],
       [
-        'obat.edit', 'Edit Data'
+        'obat.edit',
+        'Edit Data'
       ]
     ]);
 
@@ -191,6 +196,36 @@ class ObatController extends Controller
       Flasher::setFlash('Ada kesalahan yang tidak diketahui, silakan coba lagi.', 'danger', 'ni ni-fat-remove');
       Flasher::setData($post);
     } else {
+
+      $resep = $this->model('Resep');
+      $data_resep = $resep->read(null, [
+        'params' => [
+          [
+            'column' => 'data_resep',
+            'value' => '%' . $id . '%',
+            'operator' => 'LIKE'
+          ]
+        ]
+      ], 'ARRAY');
+
+      foreach ($data_resep['data'] as $resepData) {
+        $data = unserialize($resepData['data_resep']);
+        if(!is_array($data)) continue;
+        foreach ($data as $i => $resepItem) {
+          if ($resepItem['id_obat'] === $id) {
+            $data[$i]['nama_obat'] = $post['nama_obat'] . ' (' . $post['satuan_obat'] . ')';
+          }
+        }
+        $resep->update(['data_resep' => serialize($data)], [
+          'params' => [
+            [
+              'column' => 'id_resep',
+              'value' => $resepData['id_resep']
+            ]
+          ]
+        ]);
+      }
+
       Flasher::setFlash('Data berhasil diperbarui.', 'success', 'ni ni-check-bold');
     }
     $this->redirect('obat.edit.' . $id);
