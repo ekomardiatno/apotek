@@ -349,8 +349,8 @@ class ResepController extends Controller
     $html .= '<h2 style="margin-bottom:0">R/</h2>';
     $html .= '<table class="no-border small-padding" style="width:100%">';
     foreach ($data['data_resep'] as $resep) {
-      $nama_obat = explode('(', $data['data_resep'][0]['nama_obat'])[0];
-      $satuan = explode('(', $data['data_resep'][0]['nama_obat'])[1];
+      $nama_obat = explode('(', $resep['nama_obat'])[0];
+      $satuan = explode('(', $resep['nama_obat'])[1];
       $satuan = str_replace(')', '', $satuan);
       $html .= '<tr>';
       $html .= '<td colspan="2" style="vertical-align:top"><p style="margin:0 !important">' . $nama_obat . '</p><span style="padding-left:20px;margin-top:8px;font-weight:bold">' . $resep['dosis']  . '</span></td>';
